@@ -8,7 +8,7 @@ import Footer from '../components/layout/Footer';
 import Spinner from '../components/ui/Spinner';
 
 export default function LandingPage() {
-  const { data: campaigns, isLoading } = useQuery({
+  const { data: campaigns, isLoading, isError, refetch } = useQuery({
     queryKey: ['campaigns'],
     queryFn: campaignsApi.list,
   });
@@ -177,6 +177,12 @@ export default function LandingPage() {
 
           {isLoading ? (
             <div className="py-16 flex justify-center"><Spinner size="lg" /></div>
+          ) : isError ? (
+            <div className="py-16 text-center">
+              <Heart size={40} className="mx-auto mb-3 text-gray-300" />
+              <p className="text-gray-500 mb-4">Could not load campaigns. Please check your connection and try again.</p>
+              <Button variant="outline" onClick={() => refetch()}>Retry</Button>
+            </div>
           ) : featured.length === 0 ? (
             <div className="py-16 text-center text-gray-400">
               <Heart size={40} className="mx-auto mb-3 text-gray-300" />

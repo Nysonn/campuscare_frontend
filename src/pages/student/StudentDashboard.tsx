@@ -8,6 +8,7 @@ import { bookingsApi } from '../../api/bookings';
 import { campaignsApi } from '../../api/campaigns';
 import type { ChatMessage } from '../../types';
 import Badge from '../../components/ui/Badge';
+import Spinner from '../../components/ui/Spinner';
 
 export default function StudentDashboard() {
   const user = useAppSelector(s => s.auth.user);
@@ -15,20 +16,45 @@ export default function StudentDashboard() {
     ? (user.display_name || user.first_name || 'Student')
     : 'Student';
 
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '0',
-      role: 'bot',
-      content: `Hi ${displayName}! 👋 I'm your CampusCare support assistant. I'm here to listen and provide guidance on mental health and wellbeing. How are you feeling today?`,
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const { data: historyData, isLoading: historyLoading } = useQuery({
+    queryKey: ['chatHistory'],
+    queryFn: chatbotApi.history,
+  });
+
   const { data: bookings } = useQuery({ queryKey: ['myBookings'], queryFn: bookingsApi.myBookings });
   const { data: myCampaigns } = useQuery({ queryKey: ['myCampaigns'], queryFn: campaignsApi.mine });
+
+  // Seed messages from history once on load. After that, messages are managed
+  // locally so ongoing conversation is not disrupted by background refetches.
+  useEffect(() => {
+    if (historyLoaded || historyData === undefined) return;
+
+    if (historyData.length === 0) {
+      setMessages([{
+        id: 'welcome',
+        role: 'bot',
+        content: `Hi ${displayName}! I'm your CampusCare support assistant. I'm here to listen and provide guidance on mental health and wellbeing. How are you feeling today?`,
+        timestamp: new Date(),
+      }]);
+    } else {
+      setMessages(
+        historyData.map(item => ({
+          id: item.id,
+          role: item.role === 'assistant' ? 'bot' : 'user',
+          content: item.content,
+          timestamp: new Date(item.created_at),
+        }))
+      );
+    }
+
+    setHistoryLoaded(true);
+  }, [historyData, historyLoaded, displayName]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -119,6 +145,11 @@ export default function StudentDashboard() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+            {historyLoading && !historyLoaded && (
+              <div className="flex items-center justify-center h-full">
+                <Spinner size="md" />
+              </div>
+            )}
             {messages.map(msg => (
               <div key={msg.id} className={`flex gap-2.5 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`h-7 w-7 rounded-full flex items-center justify-center shrink-0 ${msg.role === 'bot' ? 'bg-primary-100' : 'bg-gray-200'}`}>

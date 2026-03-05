@@ -146,3 +146,10 @@ export interface ChatMessage {
   crisis_flagged?: boolean;
   timestamp: Date;
 }
+
+export interface ChatHistoryItem {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+}

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Playfair Display", serif;
-  --font-body: "Inter", sans-serif;
+  --font-display: "Lato", sans-serif;
+  --font-body: "Lato", sans-serif;
 
   --color-primary-50: #f0fdf4;
   --color-primary-100: #dcfce7;

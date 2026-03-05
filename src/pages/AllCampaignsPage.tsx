@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Heart } from 'lucide-react';
+import { Search, Heart, RefreshCw } from 'lucide-react';
+import Button from '../components/ui/Button';
 import { campaignsApi } from '../api/campaigns';
 import CampaignCard from '../components/campaign/CampaignCard';
 import Spinner from '../components/ui/Spinner';
@@ -12,7 +13,7 @@ export default function AllCampaignsPage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
 
-  const { data: campaigns, isLoading } = useQuery({
+  const { data: campaigns, isLoading, isError, refetch } = useQuery({
     queryKey: ['campaigns'],
     queryFn: campaignsApi.list,
   });
@@ -70,10 +71,19 @@ export default function AllCampaignsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         {isLoading ? (
           <div className="py-20 flex justify-center"><Spinner size="lg" /></div>
+        ) : isError ? (
+          <div className="py-20 text-center">
+            <Heart size={48} className="mx-auto mb-4 text-gray-300" />
+            <h3 className="text-lg text-gray-500 mb-2">Could not load campaigns</h3>
+            <p className="text-sm text-gray-400 mb-5">Please check your connection and try again.</p>
+            <Button variant="outline" onClick={() => refetch()}>
+              <RefreshCw size={15} /> Retry
+            </Button>
+          </div>
         ) : filtered.length === 0 ? (
           <div className="py-20 text-center">
             <Heart size={48} className="mx-auto mb-4 text-gray-300" />
-            <h3 className="font-display text-lg text-gray-500 mb-1">No campaigns found</h3>
+            <h3 className="text-lg text-gray-500 mb-1">No campaigns found</h3>
             <p className="text-sm text-gray-400">Try adjusting your search or filters.</p>
           </div>
         ) : (
