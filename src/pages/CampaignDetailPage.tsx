@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Calendar, Tag, Heart } from 'lucide-react';
+import { ArrowLeft, Calendar, Tag, Heart, AlertTriangle } from 'lucide-react';
 import { campaignsApi } from '../api/campaigns';
 import { contributionsApi } from '../api/contributions';
 import Avatar from '../components/ui/Avatar';
@@ -114,7 +114,7 @@ export default function CampaignDetailPage() {
         </Link>
 
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="h-2 bg-gradient-to-r from-primary-400 to-primary-600" />
+          <div className="h-2 bg-linear-to-r from-primary-400 to-primary-600" />
 
           <div className="p-8">
             {/* Author + meta */}
@@ -228,7 +228,10 @@ export default function CampaignDetailPage() {
             </label>
 
             {error && (
-              <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-xl">{error}</p>
+              <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+                <AlertTriangle size={14} className="text-red-500 shrink-0" />
+                {error}
+              </div>
             )}
 
             <Button onClick={handleDonate} loading={submitting} className="w-full">
@@ -248,7 +251,12 @@ export default function CampaignDetailPage() {
                 This is a demo payment. Choose to simulate a successful or failed transaction.
               </p>
             </div>
-            {error && <p className="text-sm text-red-500">{error}</p>}
+            {error && (
+              <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+                <AlertTriangle size={14} className="text-red-500 shrink-0" />
+                {error}
+              </div>
+            )}
             <div className="flex gap-3">
               <Button onClick={() => handleSimulate(true)} loading={submitting} className="flex-1">
                 ✓ Payment Success

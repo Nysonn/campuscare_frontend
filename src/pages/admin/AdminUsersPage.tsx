@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AlertTriangle } from 'lucide-react';
 import { adminApi } from '../../api/admin';
 import type { AdminUser } from '../../types';
 import Badge from '../../components/ui/Badge';
@@ -124,7 +125,12 @@ export default function AdminUsersPage() {
             <strong>{targetUser?.full_name}</strong>?
             {newStatus === 'suspended' && ' They will no longer be able to log in.'}
           </p>
-          {mutation.isError && <p className="text-sm text-red-500">{mutation.error?.message}</p>}
+          {mutation.isError && (
+            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+              <AlertTriangle size={14} className="text-red-500 shrink-0" />
+              {mutation.error?.message}
+            </div>
+          )}
           <div className="flex gap-3">
             <Button variant="ghost" className="flex-1" onClick={() => { setTargetUser(null); setNewStatus(null); }}>Cancel</Button>
             <Button

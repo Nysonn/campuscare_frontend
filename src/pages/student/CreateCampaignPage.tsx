@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Plus, X } from 'lucide-react';
+import { ArrowLeft, Plus, X, AlertTriangle } from 'lucide-react';
 import { campaignsApi } from '../../api/campaigns';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -142,7 +142,12 @@ export default function CreateCampaignPage() {
             </span>
           </label>
 
-          {error && <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600">{error}</div>}
+          {error && (
+            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+              <AlertTriangle size={14} className="text-red-500 shrink-0" />
+              {error}
+            </div>
+          )}
 
           <div className="flex gap-3 pt-2">
             <Button variant="ghost" type="button" onClick={() => navigate(-1)}>Cancel</Button>

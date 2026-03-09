@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react';
 import { counselorsApi } from '../../api/counselors';
 import { bookingsApi } from '../../api/bookings';
 import type { Counselor } from '../../types';
@@ -77,7 +77,7 @@ export default function BookCounselorPage() {
         <p className="text-gray-500">Select a counsellor and schedule a confidential session.</p>
       </div>
 
-      <div className="max-w-2xl space-y-6">
+      <div className="space-y-6">
         {/* Counselor selection */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <h3 className="font-display font-semibold text-gray-900 mb-4">Choose a Counsellor</h3>
@@ -171,7 +171,12 @@ export default function BookCounselorPage() {
             rows={3}
           />
 
-          {error && <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600">{error}</div>}
+          {error && (
+            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+              <AlertTriangle size={14} className="text-red-500 shrink-0" />
+              {error}
+            </div>
+          )}
 
           <div className="flex gap-3">
             <Button variant="ghost" type="button" onClick={() => navigate(-1)}>Cancel</Button>

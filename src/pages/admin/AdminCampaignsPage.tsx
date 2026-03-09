@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Check, X, Trash2, Heart } from 'lucide-react';
+import { Check, X, Trash2, Heart, AlertTriangle } from 'lucide-react';
 import { adminApi } from '../../api/admin';
 import type { AdminCampaign } from '../../types';
 import Button from '../../components/ui/Button';
@@ -111,7 +111,10 @@ export default function AdminCampaignsPage() {
             {action === 'delete' && `Permanently delete "${selected?.title}"? This cannot be undone.`}
           </p>
           {(statusMutation.isError || deleteMutation.isError) && (
-            <p className="text-sm text-red-500">{statusMutation.error?.message || deleteMutation.error?.message}</p>
+            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+              <AlertTriangle size={14} className="text-red-500 shrink-0" />
+              {statusMutation.error?.message || deleteMutation.error?.message}
+            </div>
           )}
           <div className="flex gap-3">
             <Button variant="ghost" className="flex-1" onClick={() => { setSelected(null); setAction(null); }}>Cancel</Button>

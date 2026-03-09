@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { useAppDispatch } from '../store/hooks';
 import { setUser } from '../store/authSlice';
 import { authApi } from '../api/auth';
@@ -35,7 +35,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex bg-gray-50">
       {/* Left panel */}
-      <div className="hidden lg:flex flex-col justify-between w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 p-12 text-white">
+      <div className="hidden lg:flex flex-col justify-between w-1/2 bg-linear-to-br from-primary-600 to-primary-800 p-12 text-white">
         <Link to="/" className="flex items-center gap-2.5">
           <img src="/logo.png" alt="CampusCare" className="h-9 w-9 object-contain" />
           <span className="font-display font-bold text-xl">CampusCare</span>
@@ -102,7 +102,8 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600">
+                <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+                  <AlertTriangle size={14} className="text-red-500 shrink-0" />
                   {error}
                 </div>
               )}

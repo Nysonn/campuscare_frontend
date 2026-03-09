@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, Heart } from 'lucide-react';
+import { Plus, Pencil, Trash2, Heart, AlertTriangle } from 'lucide-react';
 import { campaignsApi } from '../../api/campaigns';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
@@ -109,7 +109,12 @@ export default function MyCampaignsPage() {
               Yes, Delete
             </Button>
           </div>
-          {deleteMutation.isError && <p className="text-sm text-red-500">{deleteMutation.error?.message}</p>}
+          {deleteMutation.isError && (
+            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+              <AlertTriangle size={14} className="text-red-500 shrink-0" />
+              {deleteMutation.error?.message}
+            </div>
+          )}
         </div>
       </Modal>
     </div>

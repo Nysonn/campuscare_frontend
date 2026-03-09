@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setUser } from '../../store/authSlice';
 import { authApi } from '../../api/auth';
@@ -131,12 +132,14 @@ export default function StudentProfilePage() {
           </div>
 
           {success && (
-            <div className="bg-primary-50 border border-primary-100 rounded-xl px-4 py-3 text-sm text-primary-700">
+            <div className="bg-primary-50 border border-primary-100 rounded-xl px-4 py-3 text-sm text-primary-700 flex items-center gap-2">
+              <CheckCircle2 size={14} className="text-primary-600 shrink-0" />
               Profile updated successfully!
             </div>
           )}
           {mutation.isError && (
-            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600">
+            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+              <AlertTriangle size={14} className="text-red-500 shrink-0" />
               {mutation.error?.message}
             </div>
           )}

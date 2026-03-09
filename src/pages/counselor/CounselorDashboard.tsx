@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Calendar, Check, X, Video, MapPin } from 'lucide-react';
+import { Calendar, Check, X, Video, MapPin, AlertTriangle } from 'lucide-react';
 import { bookingsApi } from '../../api/bookings';
 import type { CounselorBooking } from '../../types';
 import Badge from '../../components/ui/Badge';
@@ -162,7 +162,12 @@ export default function CounselorDashboard() {
               }
             </p>
           </div>
-          {mutation.isError && <p className="text-sm text-red-500">{mutation.error?.message}</p>}
+          {mutation.isError && (
+            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+              <AlertTriangle size={14} className="text-red-500 shrink-0" />
+              {mutation.error?.message}
+            </div>
+          )}
           <div className="flex gap-3">
             <Button variant="ghost" className="flex-1" onClick={() => { setSelectedBooking(null); setActionType(null); }}>
               Cancel
