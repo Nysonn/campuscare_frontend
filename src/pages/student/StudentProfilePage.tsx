@@ -63,7 +63,7 @@ export default function StudentProfilePage() {
         <p className="text-gray-500">Manage your public profile and privacy settings.</p>
       </div>
 
-      <div className="max-w-2xl space-y-6">
+      <div className="space-y-6">
         {/* Avatar preview */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <div className="flex items-center gap-4">

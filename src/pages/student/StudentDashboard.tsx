@@ -10,6 +10,10 @@ import type { ChatMessage } from '../../types';
 import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
 
+function cleanBotText(text: string) {
+  return text.replace(/\s*\*\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
+}
+
 export default function StudentDashboard() {
   const user = useAppSelector(s => s.auth.user);
   const displayName = user?.role === 'student'
@@ -103,7 +107,7 @@ export default function StudentDashboard() {
     <div>
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">
-          Good day, {displayName} 👋
+          Good day, {displayName}
         </h1>
         <p className="text-gray-500">Here's what's happening with your CampusCare account.</p>
       </div>
@@ -172,7 +176,7 @@ export default function StudentDashboard() {
                       ? 'bg-red-50 text-gray-800 border border-red-100 rounded-tl-sm'
                       : 'bg-gray-100 text-gray-800 rounded-tl-sm'
                   }`}>
-                    {msg.content}
+                    {msg.role === 'bot' ? cleanBotText(msg.content) : msg.content}
                   </div>
                   <span className="text-[10px] text-gray-400">
                     {msg.timestamp.toLocaleTimeString('en-UG', { hour: '2-digit', minute: '2-digit' })}

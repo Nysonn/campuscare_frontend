@@ -50,7 +50,7 @@ export default function CounselorProfilePage() {
         <p className="text-gray-500">Manage your professional profile visible to students.</p>
       </div>
 
-      <div className="max-w-2xl space-y-6">
+      <div className="space-y-6">
         {/* Preview card */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-4">
           <Avatar name={form.full_name || user.full_name} size="xl" />

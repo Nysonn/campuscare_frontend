@@ -32,15 +32,15 @@ export default function AdminDashboard() {
       {isLoading ? (
         <div className="py-20 flex justify-center"><Spinner size="lg" /></div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-5">
           {stats.map(s => (
-            <div key={s.label} className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-4 ${s.wide ? 'lg:col-span-1' : ''}`}>
+            <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-4 flex-1">
               <div className={`h-14 w-14 rounded-2xl ${s.bg} flex items-center justify-center shrink-0`}>
                 {s.icon}
               </div>
-              <div>
-                <p className="font-display text-2xl font-bold text-gray-900">{s.value}</p>
-                <p className="text-sm text-gray-500">{s.label}</p>
+              <div className="shrink-0">
+                <p className="font-display text-2xl font-bold text-gray-900 whitespace-nowrap">{s.value}</p>
+                <p className="text-sm text-gray-500 whitespace-nowrap">{s.label}</p>
               </div>
             </div>
           ))}

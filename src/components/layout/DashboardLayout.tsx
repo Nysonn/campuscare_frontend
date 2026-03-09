@@ -42,14 +42,6 @@ export default function DashboardLayout({ children, navItems, title }: Dashboard
     <div className="min-h-screen flex bg-gray-50">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-100 flex flex-col fixed h-full z-30 shadow-sm">
-        {/* Logo */}
-        <div className="h-16 flex items-center gap-2.5 px-5 border-b border-gray-100">
-          <img src="/logo.png" alt="CampusCare" className="h-8 w-8 object-contain" />
-          <span className="font-display font-bold text-lg text-gray-900">
-            Campus<span className="text-primary-600">Care</span>
-          </span>
-        </div>
-
         {/* User info */}
         <div className="px-5 py-4 border-b border-gray-100">
           <div className="flex items-center gap-3">
@@ -63,7 +55,6 @@ export default function DashboardLayout({ children, navItems, title }: Dashboard
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">{title}</p>
           {navItems.map(item => (
             <NavLink
               key={item.to}

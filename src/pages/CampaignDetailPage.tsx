@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Calendar, Tag, Heart } from 'lucide-react';
 import { campaignsApi } from '../api/campaigns';
@@ -19,6 +19,7 @@ const PAYMENT_METHODS = [
 
 export default function CampaignDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const [donateOpen, setDonateOpen] = useState(false);
   const [step, setStep] = useState<'form' | 'simulate' | 'done'>('form');
   const [contributionId, setContributionId] = useState('');
@@ -28,6 +29,13 @@ export default function CampaignDetailPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Auto-open modal when navigating with #donate hash
+  useEffect(() => {
+    if (location.hash === '#donate') {
+      setDonateOpen(true);
+    }
+  }, [location.hash]);
 
   const { data: campaigns, isLoading } = useQuery({
     queryKey: ['campaigns'],
@@ -165,45 +173,66 @@ export default function CampaignDetailPage() {
       </div>
 
       {/* Donation Modal */}
-      <Modal open={donateOpen} onClose={resetDonate} title="Make a Donation" maxWidth="max-w-md">
+      <Modal
+        open={donateOpen}
+        onClose={resetDonate}
+        title="Make a Donation"
+        subtitle={campaign.title}
+        maxWidth="max-w-lg"
+      >
         {step === 'form' && (
-          <div className="space-y-4">
-            <Input label="Full Name *" value={form.donor_name} onChange={e => setForm(f => ({ ...f, donor_name: e.target.value }))} placeholder="Jane Smith" />
-            <Input label="Email Address *" type="email" value={form.donor_email} onChange={e => setForm(f => ({ ...f, donor_email: e.target.value }))} placeholder="jane@example.com" />
-            <Input label="Phone Number *" value={form.donor_phone} onChange={e => setForm(f => ({ ...f, donor_phone: e.target.value }))} placeholder="+256 700 000 000" />
-            <Input label="Amount (UGX) *" type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="50000" min="1000" />
+          <div className="space-y-3">
+            {/* Row 1: Name + Email */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Input label="Full Name *" value={form.donor_name} onChange={e => setForm(f => ({ ...f, donor_name: e.target.value }))} placeholder="Jane Smith" />
+              <Input label="Email Address *" type="email" value={form.donor_email} onChange={e => setForm(f => ({ ...f, donor_email: e.target.value }))} placeholder="jane@example.com" />
+            </div>
 
+            {/* Row 2: Phone + Amount */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Input label="Phone Number *" value={form.donor_phone} onChange={e => setForm(f => ({ ...f, donor_phone: e.target.value }))} placeholder="+256 700 000 000" />
+              <Input label="Amount (UGX) *" type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="50000" min="1000" />
+            </div>
+
+            {/* Payment method */}
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium text-gray-700">Payment Method *</label>
               <select
                 value={form.payment_method}
                 onChange={e => setForm(f => ({ ...f, payment_method: e.target.value }))}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
               >
                 {PAYMENT_METHODS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
               </select>
             </div>
 
+            {/* Message */}
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">Message (optional)</label>
+              <label className="text-sm font-medium text-gray-700">Message <span className="text-gray-400 font-normal">(optional)</span></label>
               <textarea
                 value={form.message}
                 onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-                placeholder="Leave a heartful message..."
-                rows={3}
+                placeholder="Leave a heartfelt message..."
+                rows={2}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
 
-            <label className="flex items-center gap-2 cursor-pointer select-none">
+            {/* Anonymous toggle */}
+            <label className="flex items-center gap-2.5 cursor-pointer select-none p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
               <input type="checkbox" checked={form.is_anonymous} onChange={e => setForm(f => ({ ...f, is_anonymous: e.target.checked }))} className="accent-primary-600 h-4 w-4" />
-              <span className="text-sm text-gray-700">Donate anonymously</span>
+              <div>
+                <p className="text-sm font-medium text-gray-700">Donate anonymously</p>
+                <p className="text-xs text-gray-400">Your name won't appear on the campaign</p>
+              </div>
             </label>
 
-            {error && <p className="text-sm text-red-500">{error}</p>}
+            {error && (
+              <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-xl">{error}</p>
+            )}
 
             <Button onClick={handleDonate} loading={submitting} className="w-full">
-              Proceed to Payment
+              <Heart size={16} /> Proceed to Payment
             </Button>
           </div>
         )}
