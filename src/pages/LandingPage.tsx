@@ -91,10 +91,10 @@ export default function LandingPage() {
             ].map((stat, i) => (
               <div
                 key={stat.label}
-                className={`px-8 ${i === 0 ? 'pl-0' : ''} ${i === 2 ? 'pr-0' : ''} text-center`}
+                className={`px-4 sm:px-8 ${i === 0 ? 'pl-0' : ''} ${i === 2 ? 'pr-0' : ''} text-center`}
               >
-                <p className="font-display font-bold text-3xl text-primary-700">{stat.value}</p>
-                <p className="text-xs text-gray-400 mt-1">{stat.label}</p>
+                <p className="font-display font-bold text-xl sm:text-3xl text-primary-700">{stat.value}</p>
+                <p className="text-[10px] sm:text-xs text-gray-400 mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -152,7 +152,7 @@ export default function LandingPage() {
                 desc: 'Book online or in-person sessions with certified counsellors who truly understand student life and its pressures.',
                 bullets: ['Verified professionals', 'Flexible scheduling', 'Virtual & in-person'],
               },
-            ].map((f, i) => (
+            ].map((f) => (
               <div
                 key={f.title}
                 className="group relative bg-white border border-gray-100 rounded-3xl p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"

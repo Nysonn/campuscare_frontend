@@ -17,7 +17,7 @@ interface DashboardLayoutProps {
   title: string;
 }
 
-export default function DashboardLayout({ children, navItems, title }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, navItems }: DashboardLayoutProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector(s => s.auth.user);
