@@ -31,7 +31,7 @@ export default function AdminContributionsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Contributions</h1>
           <p className="text-gray-500">All donation contributions across the platform.</p>
@@ -63,7 +63,7 @@ export default function AdminContributionsPage() {
       ) : (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-150">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
                   {['Donor', 'Email', 'Amount', 'Status', 'Date'].map(h => (

@@ -33,7 +33,7 @@ export default function MyCampaignsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">My Campaigns</h1>
           <p className="text-gray-500">Manage your fundraising campaigns.</p>

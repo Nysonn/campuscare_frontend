@@ -27,7 +27,7 @@ export default function AdminBookingsPage() {
       ) : (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-150">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
                   {['Student', 'Counsellor', 'Date', 'Time', 'Status'].map(h => (
