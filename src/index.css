@@ -40,6 +40,13 @@
   --color-blue-50: #eff6ff;
   --color-blue-500: #3b82f6;
   --color-blue-600: #2563eb;
+
+  --animate-slide-up: slide-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  from { transform: translate(-50%, 16px); opacity: 0; }
+  to   { transform: translate(-50%, 0);   opacity: 1; }
 }
 
 * {

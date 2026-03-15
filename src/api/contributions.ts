@@ -10,8 +10,6 @@ export const contributionsApi = {
     is_anonymous: boolean;
     payment_method: string;
     amount: number;
-  }) => api.post<{ contribution_id: string; message: string }>('/contributions', data),
+  }) => api.post<{ contribution_id: string; status: string }>('/contributions', data),
 
-  simulate: (contributionId: string, success: boolean) =>
-    api.post<{ status: string }>(`/contributions/${contributionId}/simulate`, { success }),
 };

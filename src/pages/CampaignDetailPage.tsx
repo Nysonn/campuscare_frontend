@@ -10,9 +10,10 @@ import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
 import Spinner from '../components/ui/Spinner';
+import Toast from '../components/ui/Toast';
 
 const PAYMENT_METHODS = [
-  { value: 'mobile_money', label: 'MTN Mobile Money' },
+  { value: 'mtn_momo', label: 'MTN Mobile Money' },
   { value: 'airtel_money', label: 'Airtel Money' },
   { value: 'visa', label: 'Visa Card' },
 ];
@@ -21,11 +22,10 @@ export default function CampaignDetailPage() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const [donateOpen, setDonateOpen] = useState(false);
-  const [step, setStep] = useState<'form' | 'simulate' | 'done'>('form');
-  const [contributionId, setContributionId] = useState('');
+  const [showToast, setShowToast] = useState(false);
   const [form, setForm] = useState({
     donor_name: '', donor_email: '', donor_phone: '', message: '',
-    amount: '', payment_method: 'mobile_money', is_anonymous: false,
+    amount: '', payment_method: 'mtn_momo', is_anonymous: false,
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -40,6 +40,7 @@ export default function CampaignDetailPage() {
   const { data: campaigns, isLoading } = useQuery({
     queryKey: ['campaigns'],
     queryFn: campaignsApi.list,
+    staleTime: 60_000,
   });
 
   const campaign = campaigns?.find(c => c.id === id);
@@ -52,7 +53,7 @@ export default function CampaignDetailPage() {
     }
     setSubmitting(true);
     try {
-      const res = await contributionsApi.create({
+      await contributionsApi.create({
         campaign_id: id!,
         donor_name: form.donor_name,
         donor_email: form.donor_email,
@@ -62,8 +63,8 @@ export default function CampaignDetailPage() {
         payment_method: form.payment_method,
         amount: Number(form.amount),
       });
-      setContributionId(res.contribution_id);
-      setStep('simulate');
+      resetDonate();
+      setShowToast(true);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
     } finally {
@@ -71,25 +72,13 @@ export default function CampaignDetailPage() {
     }
   };
 
-  const handleSimulate = async (success: boolean) => {
-    setSubmitting(true);
-    try {
-      await contributionsApi.simulate(contributionId, success);
-      setStep('done');
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Payment simulation failed.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const resetDonate = () => {
-    setStep('form');
-    setForm({ donor_name: '', donor_email: '', donor_phone: '', message: '', amount: '', payment_method: 'mobile_money', is_anonymous: false });
-    setContributionId('');
+    setForm({ donor_name: '', donor_email: '', donor_phone: '', message: '', amount: '', payment_method: 'mtn_momo', is_anonymous: false });
     setError('');
     setDonateOpen(false);
   };
+
+  const dismissToast = () => setShowToast(false);
 
   if (isLoading) return <div className="pt-24 flex justify-center"><Spinner size="lg" /></div>;
 
@@ -180,8 +169,7 @@ export default function CampaignDetailPage() {
         subtitle={campaign.title}
         maxWidth="max-w-lg"
       >
-        {step === 'form' && (
-          <div className="space-y-3">
+        <div className="space-y-3">
             {/* Row 1: Name + Email */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Input label="Full Name *" value={form.donor_name} onChange={e => setForm(f => ({ ...f, donor_name: e.target.value }))} placeholder="Jane Smith" />
@@ -238,51 +226,15 @@ export default function CampaignDetailPage() {
               <Heart size={16} /> Proceed to Payment
             </Button>
           </div>
-        )}
 
-        {step === 'simulate' && (
-          <div className="text-center space-y-6">
-            <div className="h-16 w-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto">
-              <Heart size={28} className="text-primary-600" />
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-semibold text-gray-900 mb-2">Simulate Payment</h3>
-              <p className="text-sm text-gray-500">
-                This is a demo payment. Choose to simulate a successful or failed transaction.
-              </p>
-            </div>
-            {error && (
-              <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
-                <AlertTriangle size={14} className="text-red-500 shrink-0" />
-                {error}
-              </div>
-            )}
-            <div className="flex gap-3">
-              <Button onClick={() => handleSimulate(true)} loading={submitting} className="flex-1">
-                ✓ Payment Success
-              </Button>
-              <Button onClick={() => handleSimulate(false)} variant="danger" loading={submitting} className="flex-1">
-                ✗ Payment Fail
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {step === 'done' && (
-          <div className="text-center space-y-5 py-4">
-            <div className="h-16 w-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto">
-              <Heart size={28} className="text-primary-600 fill-primary-300" />
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-semibold text-gray-900 mb-2">Thank You!</h3>
-              <p className="text-sm text-gray-500">
-                Your donation has been recorded. You'll receive a confirmation email shortly.
-              </p>
-            </div>
-            <Button onClick={resetDonate} className="w-full">Close</Button>
-          </div>
-        )}
       </Modal>
+
+      {showToast && (
+        <Toast
+          message="Thank you! Your donation has been received."
+          onClose={dismissToast}
+        />
+      )}
     </div>
   );
 }
