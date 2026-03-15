@@ -133,7 +133,17 @@ export default function CounselorDashboard() {
 
               {a.type === 'online' && a.status === 'accepted' && (
                 <div className="mt-3 pt-3 border-t border-gray-100 text-xs text-primary-600">
-                  Book a Google Meet and invite the student at their registered email. They have been notified via email.
+                  Book a Google Meet and invite the student at:{' '}
+                  {a.student_email ? (
+                    <a
+                      href={`mailto:${a.student_email}`}
+                      className="font-semibold underline hover:text-primary-800"
+                    >
+                      {a.student_email}
+                    </a>
+                  ) : (
+                    <span className="text-gray-400">email not available</span>
+                  )}
                 </div>
               )}
             </div>

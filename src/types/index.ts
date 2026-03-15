@@ -84,6 +84,7 @@ export interface CounselorBooking {
   id: string;
   student_id: string;
   student_name: string;
+  student_email?: string;
   type: 'online' | 'physical';
   start_time: string;
   end_time: string;

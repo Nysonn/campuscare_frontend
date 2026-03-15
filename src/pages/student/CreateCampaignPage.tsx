@@ -61,7 +61,7 @@ export default function CreateCampaignPage() {
         <p className="text-gray-500">Your campaign will be reviewed by an admin before going live.</p>
       </div>
 
-      <div className="max-w-2xl">
+      <div>
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7 space-y-5">
           <Input
             label="Campaign Title *"

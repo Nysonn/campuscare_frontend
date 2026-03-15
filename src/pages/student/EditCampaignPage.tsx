@@ -71,7 +71,7 @@ export default function EditCampaignPage() {
         <p className="text-gray-500">Your campaign will be re-submitted for approval after editing.</p>
       </div>
 
-      <div className="max-w-2xl">
+      <div>
         <form onSubmit={e => { e.preventDefault(); setError(''); mutation.mutate(); }} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7 space-y-5">
           <Input label="Campaign Title *" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
           <Textarea label="Description *" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={5} required />
