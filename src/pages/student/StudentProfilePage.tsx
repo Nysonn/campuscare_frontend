@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { CheckCircle2, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Camera } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setUser } from '../../store/authSlice';
 import { authApi } from '../../api/auth';
@@ -18,6 +18,25 @@ export default function StudentProfilePage() {
     location: '', avatar_url: '', is_anonymous: false,
   });
   const [success, setSuccess] = useState(false);
+  const [avatarError, setAvatarError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setAvatarError('Please select an image file.');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setAvatarError('Image must be under 2 MB.');
+      return;
+    }
+    setAvatarError('');
+    const reader = new FileReader();
+    reader.onload = () => setForm(f => ({ ...f, avatar_url: reader.result as string }));
+    reader.readAsDataURL(file);
+  }
 
   useEffect(() => {
     if (user) {
@@ -94,13 +113,44 @@ export default function StudentProfilePage() {
             onChange={e => setForm(f => ({ ...f, display_name: e.target.value }))}
             placeholder={`${user.first_name} ${user.last_name}`}
           />
-          <Input
-            label="Avatar URL"
-            type="url"
-            value={form.avatar_url}
-            onChange={e => setForm(f => ({ ...f, avatar_url: e.target.value }))}
-            placeholder="https://example.com/your-photo.jpg"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Profile Photo</label>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="relative group shrink-0"
+              >
+                <Avatar
+                  src={form.is_anonymous ? undefined : (form.avatar_url || undefined)}
+                  name={displayName}
+                  size="xl"
+                />
+                <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera size={20} className="text-white" />
+                </span>
+              </button>
+              <div className="text-sm text-gray-500">
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="text-primary-600 font-medium hover:underline">
+                  Choose photo
+                </button>
+                {' '}from your device
+                <p className="mt-0.5 text-xs text-gray-400">JPG, PNG or WebP · max 2 MB</p>
+              </div>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarChange}
+            />
+            {avatarError && (
+              <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+                <AlertTriangle size={12} /> {avatarError}
+              </p>
+            )}
+          </div>
           <Textarea
             label="Bio"
             value={form.bio}

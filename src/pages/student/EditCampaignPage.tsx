@@ -7,16 +7,42 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
 import Spinner from '../../components/ui/Spinner';
+import type { CampaignAttachment } from '../../types';
 
 const CATEGORIES = ['education', 'medical', 'emergency', 'mental health', 'other'];
+const URGENCY_LEVELS = [
+  { value: 'normal', label: 'Normal' },
+  { value: 'urgent', label: 'Urgent' },
+  { value: 'critical', label: 'Critical' },
+];
+const PROOF_LABELS = [
+  'Hospital Invoice',
+  'Fee Statement',
+  'Medical Report',
+  "Doctor's Letter",
+  'Acceptance Letter',
+  'Bank Statement',
+  'Other',
+];
 
 export default function EditCampaignPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [form, setForm] = useState({
-    title: '', description: '', target_amount: '', category: 'education',
-    is_anonymous: false, attachment_input: '', attachments: [] as string[],
+    title: '',
+    description: '',
+    target_amount: '',
+    category: 'education',
+    is_anonymous: false,
+    urgency_level: 'normal',
+    beneficiary_type: 'self',
+    beneficiary_name: '',
+    verification_contact_name: '',
+    verification_contact_info: '',
+    attachment_label: PROOF_LABELS[0],
+    attachment_url: '',
+    attachments: [] as CampaignAttachment[],
   });
   const [error, setError] = useState('');
 
@@ -31,7 +57,13 @@ export default function EditCampaignPage() {
         target_amount: String(c.target_amount),
         category: c.category,
         is_anonymous: c.is_anonymous,
-        attachment_input: '',
+        urgency_level: c.urgency_level ?? 'normal',
+        beneficiary_type: c.beneficiary_type ?? 'self',
+        beneficiary_name: c.beneficiary_name ?? '',
+        verification_contact_name: c.verification_contact_name ?? '',
+        verification_contact_info: c.verification_contact_info ?? '',
+        attachment_label: PROOF_LABELS[0],
+        attachment_url: '',
         attachments: c.attachments ?? [],
       });
     }
@@ -44,6 +76,11 @@ export default function EditCampaignPage() {
       target_amount: Number(form.target_amount),
       category: form.category,
       is_anonymous: form.is_anonymous,
+      urgency_level: form.urgency_level,
+      beneficiary_type: form.beneficiary_type,
+      beneficiary_name: form.beneficiary_type === 'other' ? form.beneficiary_name : '',
+      verification_contact_name: form.verification_contact_name,
+      verification_contact_info: form.verification_contact_info,
       attachments: form.attachments,
     }),
     onSuccess: () => {
@@ -54,9 +91,26 @@ export default function EditCampaignPage() {
   });
 
   const addAttachment = () => {
-    const url = form.attachment_input.trim();
+    const url = form.attachment_url.trim();
     if (!url) return;
-    setForm(f => ({ ...f, attachments: [...f.attachments, url], attachment_input: '' }));
+    setForm(f => ({
+      ...f,
+      attachments: [...f.attachments, { url, label: f.attachment_label }],
+      attachment_url: '',
+    }));
+  };
+
+  const removeAttachment = (i: number) =>
+    setForm(f => ({ ...f, attachments: f.attachments.filter((_, j) => j !== i) }));
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (form.beneficiary_type === 'other' && !form.beneficiary_name.trim()) {
+      setError('Please enter the name of the person this campaign is for.');
+      return;
+    }
+    mutation.mutate();
   };
 
   if (isLoading) return <div className="py-20 flex justify-center"><Spinner size="lg" /></div>;
@@ -71,57 +125,137 @@ export default function EditCampaignPage() {
         <p className="text-gray-500">Your campaign will be re-submitted for approval after editing.</p>
       </div>
 
-      <div>
-        <form onSubmit={e => { e.preventDefault(); setError(''); mutation.mutate(); }} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7 space-y-5">
-          <Input label="Campaign Title *" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
-          <Textarea label="Description *" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={5} required />
-          <Input label="Target Amount (UGX) *" type="number" value={form.target_amount} onChange={e => setForm(f => ({ ...f, target_amount: e.target.value }))} min="10000" required />
+      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7 space-y-6">
 
+        <Input label="Campaign Title *" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
+        <Textarea label="Description *" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={5} required />
+        <Input label="Target Amount (UGX) *" type="number" value={form.target_amount} onChange={e => setForm(f => ({ ...f, target_amount: e.target.value }))} min="10000" required />
+
+        <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">Category *</label>
-            <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+            <select
+              value={form.category}
+              onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
               {CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
             </select>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-700">Supporting Documents</label>
-            <div className="flex gap-2">
-              <input type="url" value={form.attachment_input} onChange={e => setForm(f => ({ ...f, attachment_input: e.target.value }))} placeholder="Paste a URL" className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
-              <Button type="button" variant="outline" size="sm" onClick={addAttachment}><Plus size={14} /> Add</Button>
-            </div>
-            {form.attachments.length > 0 && (
-              <ul className="space-y-1.5">
-                {form.attachments.map((url, i) => (
-                  <li key={i} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-600">
-                    <span className="flex-1 truncate">{url}</span>
-                    <button type="button" onClick={() => setForm(f => ({ ...f, attachments: f.attachments.filter((_, j) => j !== i) }))}>
-                      <X size={13} className="text-gray-400 hover:text-red-500 cursor-pointer" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">Urgency Level *</label>
+            <select
+              value={form.urgency_level}
+              onChange={e => setForm(f => ({ ...f, urgency_level: e.target.value }))}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              {URGENCY_LEVELS.map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
+            </select>
           </div>
+        </div>
 
-          <label className="flex items-center gap-3 cursor-pointer select-none">
-            <input type="checkbox" checked={form.is_anonymous} onChange={e => setForm(f => ({ ...f, is_anonymous: e.target.checked }))} className="accent-primary-600 h-4 w-4" />
-            <span className="text-sm text-gray-700">Keep me anonymous on the public card</span>
-          </label>
-
-          {error && (
-            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
-              <AlertTriangle size={14} className="text-red-500 shrink-0" />
-              {error}
-            </div>
+        {/* Who is this for */}
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-gray-700">Who is this campaign for? *</label>
+          <div className="flex gap-4">
+            {[{ value: 'self', label: 'Myself' }, { value: 'other', label: 'Someone else' }].map(opt => (
+              <label key={opt.value} className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="radio"
+                  name="beneficiary_type"
+                  value={opt.value}
+                  checked={form.beneficiary_type === opt.value}
+                  onChange={() => setForm(f => ({ ...f, beneficiary_type: opt.value, beneficiary_name: '' }))}
+                  className="accent-primary-600 h-4 w-4"
+                />
+                <span className="text-sm text-gray-700">{opt.label}</span>
+              </label>
+            ))}
+          </div>
+          {form.beneficiary_type === 'other' && (
+            <Input
+              placeholder="Full name of the beneficiary"
+              value={form.beneficiary_name}
+              onChange={e => setForm(f => ({ ...f, beneficiary_name: e.target.value }))}
+            />
           )}
+        </div>
 
-          <div className="flex gap-3 pt-2">
-            <Button variant="ghost" type="button" onClick={() => navigate(-1)}>Cancel</Button>
-            <Button type="submit" loading={mutation.isPending}>Save Changes</Button>
+        {/* Proof of Need */}
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-gray-700">Proof of Need (optional)</label>
+          <p className="text-xs text-gray-400">Attach labelled links to documents that support your campaign.</p>
+          <div className="flex gap-2">
+            <select
+              value={form.attachment_label}
+              onChange={e => setForm(f => ({ ...f, attachment_label: e.target.value }))}
+              className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 shrink-0"
+            >
+              {PROOF_LABELS.map(l => <option key={l} value={l}>{l}</option>)}
+            </select>
+            <input
+              type="url"
+              value={form.attachment_url}
+              onChange={e => setForm(f => ({ ...f, attachment_url: e.target.value }))}
+              placeholder="Paste document URL"
+              className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+            <Button type="button" variant="outline" size="sm" onClick={addAttachment}>
+              <Plus size={14} /> Add
+            </Button>
           </div>
-        </form>
-      </div>
+          {form.attachments.length > 0 && (
+            <ul className="space-y-1.5">
+              {form.attachments.map((att, i) => (
+                <li key={i} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-600">
+                  <span className="font-medium text-gray-700 shrink-0">{att.label}</span>
+                  <span className="text-gray-400">·</span>
+                  <span className="flex-1 truncate">{att.url}</span>
+                  <button type="button" onClick={() => removeAttachment(i)}>
+                    <X size={13} className="text-gray-400 hover:text-red-500 cursor-pointer" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Verification contact */}
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-gray-700">Verification Contact (optional)</label>
+          <p className="text-xs text-gray-400">A person who can confirm the legitimacy of this campaign.</p>
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              placeholder="Contact name"
+              value={form.verification_contact_name}
+              onChange={e => setForm(f => ({ ...f, verification_contact_name: e.target.value }))}
+            />
+            <Input
+              placeholder="Phone or email"
+              value={form.verification_contact_info}
+              onChange={e => setForm(f => ({ ...f, verification_contact_info: e.target.value }))}
+            />
+          </div>
+        </div>
+
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <input type="checkbox" checked={form.is_anonymous} onChange={e => setForm(f => ({ ...f, is_anonymous: e.target.checked }))} className="accent-primary-600 h-4 w-4" />
+          <span className="text-sm text-gray-700">Keep me anonymous on the public card</span>
+        </label>
+
+        {error && (
+          <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+            <AlertTriangle size={14} className="text-red-500 shrink-0" />
+            {error}
+          </div>
+        )}
+
+        <div className="flex gap-3 pt-2">
+          <Button variant="ghost" type="button" onClick={() => navigate(-1)}>Cancel</Button>
+          <Button type="submit" loading={mutation.isPending}>Save Changes</Button>
+        </div>
+      </form>
     </div>
   );
 }

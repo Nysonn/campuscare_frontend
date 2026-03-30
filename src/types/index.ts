@@ -48,6 +48,11 @@ export interface Campaign {
   category?: string;
 }
 
+export interface CampaignAttachment {
+  url: string;
+  label: string;
+}
+
 export interface MyCampaign {
   id: string;
   title: string;
@@ -58,7 +63,12 @@ export interface MyCampaign {
   created_at: string;
   is_anonymous: boolean;
   status?: string;
-  attachments?: string[];
+  attachments?: CampaignAttachment[];
+  urgency_level?: string;
+  beneficiary_type?: string;
+  beneficiary_name?: string;
+  verification_contact_name?: string;
+  verification_contact_info?: string;
 }
 
 export interface Counselor {

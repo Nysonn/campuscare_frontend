@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, GraduationCap, AlertTriangle } from 'lucide-react';
 import { authApi } from '../api/auth';
 import { setAuthToken } from '../api/client';
-import { useAppDispatch } from '../store';
+import { useAppDispatch } from '../store/hooks';
 import { setUser } from '../store/authSlice';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
