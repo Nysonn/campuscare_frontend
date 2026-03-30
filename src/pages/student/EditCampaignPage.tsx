@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Plus, X, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, X, AlertTriangle, Paperclip } from 'lucide-react';
 import { campaignsApi } from '../../api/campaigns';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -41,10 +41,11 @@ export default function EditCampaignPage() {
     verification_contact_name: '',
     verification_contact_info: '',
     attachment_label: PROOF_LABELS[0],
-    attachment_url: '',
     attachments: [] as CampaignAttachment[],
   });
   const [error, setError] = useState('');
+  const [attachError, setAttachError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: campaigns, isLoading } = useQuery({ queryKey: ['myCampaigns'], queryFn: campaignsApi.mine });
 
@@ -81,7 +82,7 @@ export default function EditCampaignPage() {
       beneficiary_name: form.beneficiary_type === 'other' ? form.beneficiary_name : '',
       verification_contact_name: form.verification_contact_name,
       verification_contact_info: form.verification_contact_info,
-      attachments: form.attachments,
+      attachments: form.attachments.map(({ url, label }) => ({ url, label })),
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['myCampaigns'] });
@@ -90,15 +91,29 @@ export default function EditCampaignPage() {
     onError: (e: Error) => setError(e.message),
   });
 
-  const addAttachment = () => {
-    const url = form.attachment_url.trim();
-    if (!url) return;
-    setForm(f => ({
-      ...f,
-      attachments: [...f.attachments, { url, label: f.attachment_label }],
-      attachment_url: '',
-    }));
-  };
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const allowed = ['image/', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats'];
+    if (!allowed.some(t => file.type.startsWith(t))) {
+      setAttachError('Only images, PDFs, or Word documents are allowed.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAttachError('File must be under 5 MB.');
+      return;
+    }
+    setAttachError('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      setForm(f => ({
+        ...f,
+        attachments: [...f.attachments, { url: reader.result as string, label: f.attachment_label, name: file.name }],
+      }));
+    };
+    reader.readAsDataURL(file);
+  }
 
   const removeAttachment = (i: number) =>
     setForm(f => ({ ...f, attachments: f.attachments.filter((_, j) => j !== i) }));
@@ -185,7 +200,7 @@ export default function EditCampaignPage() {
         {/* Proof of Need */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-gray-700">Proof of Need (optional)</label>
-          <p className="text-xs text-gray-400">Attach labelled links to documents that support your campaign.</p>
+          <p className="text-xs text-gray-400">Attach labelled documents that support your campaign. Images, PDFs, and Word docs accepted · max 5 MB each.</p>
           <div className="flex gap-2">
             <select
               value={form.attachment_label}
@@ -194,24 +209,35 @@ export default function EditCampaignPage() {
             >
               {PROOF_LABELS.map(l => <option key={l} value={l}>{l}</option>)}
             </select>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-400 hover:border-primary-400 hover:text-primary-600 transition-colors"
+            >
+              <Paperclip size={14} />
+              Choose file from device
+            </button>
             <input
-              type="url"
-              value={form.attachment_url}
-              onChange={e => setForm(f => ({ ...f, attachment_url: e.target.value }))}
-              placeholder="Paste document URL"
-              className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.pdf,.doc,.docx"
+              className="hidden"
+              onChange={handleFileChange}
             />
-            <Button type="button" variant="outline" size="sm" onClick={addAttachment}>
-              <Plus size={14} /> Add
-            </Button>
           </div>
+          {attachError && (
+            <p className="text-xs text-red-500 flex items-center gap-1">
+              <AlertTriangle size={12} /> {attachError}
+            </p>
+          )}
           {form.attachments.length > 0 && (
             <ul className="space-y-1.5">
               {form.attachments.map((att, i) => (
                 <li key={i} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-600">
+                  <Paperclip size={12} className="text-gray-400 shrink-0" />
                   <span className="font-medium text-gray-700 shrink-0">{att.label}</span>
                   <span className="text-gray-400">·</span>
-                  <span className="flex-1 truncate">{att.url}</span>
+                  <span className="flex-1 truncate">{att.name ?? att.url}</span>
                   <button type="button" onClick={() => removeAttachment(i)}>
                     <X size={13} className="text-gray-400 hover:text-red-500 cursor-pointer" />
                   </button>

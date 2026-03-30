@@ -51,6 +51,7 @@ export interface Campaign {
 export interface CampaignAttachment {
   url: string;
   label: string;
+  name?: string; // display filename (client-only, stripped before API call)
 }
 
 export interface MyCampaign {
