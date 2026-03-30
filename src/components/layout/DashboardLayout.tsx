@@ -4,6 +4,7 @@ import { LogOut, Menu } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/authSlice';
 import { authApi } from '../../api/auth';
+import { setAuthToken } from '../../api/client';
 import Avatar from '../ui/Avatar';
 
 interface NavItem {
@@ -35,6 +36,8 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
 
   const handleLogout = async () => {
     try { await authApi.logout(); } finally {
+      setAuthToken(null);
+      try { localStorage.removeItem('auth_token'); } catch {}
       dispatch(logout());
       navigate('/');
     }

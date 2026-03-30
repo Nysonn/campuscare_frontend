@@ -11,7 +11,7 @@ export const authApi = {
   }) => api.post<{ message: string; user_id: string }>('/register', data),
 
   login: (data: { email: string; password: string }) =>
-    api.post<{ message: string; user_id: string }>('/login', data),
+    api.post<{ message: string; user_id: string; token: string }>('/login', data),
 
   logout: () => api.post<{ message: string }>('/logout'),
 

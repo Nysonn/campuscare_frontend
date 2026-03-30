@@ -1,17 +1,32 @@
-const BASE_URL = 'https://campuscare-5zm2.onrender.com';
+const BASE_URL = 'https://campuscare-7jwj.onrender.com';
+
+let authToken: string | null = null;
+try { authToken = localStorage.getItem('auth_token'); } catch {}
+
+export function setAuthToken(token: string | null) {
+  authToken = token;
+}
+
+export function getAuthToken(): string | null {
+  return authToken;
+}
 
 interface RequestOptions extends RequestInit {
   body?: BodyInit | null;
 }
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string>),
+  };
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`;
+  }
+
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   });
 
   if (!res.ok) {

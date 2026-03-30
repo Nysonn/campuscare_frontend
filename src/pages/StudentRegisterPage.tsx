@@ -2,11 +2,15 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, GraduationCap, AlertTriangle } from 'lucide-react';
 import { authApi } from '../api/auth';
+import { setAuthToken } from '../api/client';
+import { useAppDispatch } from '../store';
+import { setUser } from '../store/authSlice';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 
 export default function StudentRegisterPage() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [form, setForm] = useState({ full_name: '', email: '', password: '', confirm_password: '', consent: false });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,7 +38,12 @@ export default function StudentRegisterPage() {
         full_name: form.full_name,
         consent: form.consent,
       });
-      navigate('/login', { state: { registered: true } });
+      const loginRes = await authApi.login({ email: form.email, password: form.password });
+      setAuthToken(loginRes.token);
+      try { localStorage.setItem('auth_token', loginRes.token); } catch {}
+      const profile = await authApi.getProfile();
+      dispatch(setUser(profile));
+      navigate('/student/dashboard');
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Registration failed. Please try again.');
     } finally {

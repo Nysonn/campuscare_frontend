@@ -4,6 +4,7 @@ import { Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { useAppDispatch } from '../store/hooks';
 import { setUser } from '../store/authSlice';
 import { authApi } from '../api/auth';
+import { setAuthToken } from '../api/client';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 
@@ -20,7 +21,9 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await authApi.login({ email: form.email, password: form.password });
+      const loginRes = await authApi.login({ email: form.email, password: form.password });
+      setAuthToken(loginRes.token);
+      try { localStorage.setItem('auth_token', loginRes.token); } catch {}
       const profile = await authApi.getProfile();
       dispatch(setUser(profile));
       const redirectMap = { student: '/student/dashboard', counselor: '/counselor/dashboard', admin: '/admin/dashboard' };
