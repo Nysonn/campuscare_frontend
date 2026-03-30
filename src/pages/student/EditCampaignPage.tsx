@@ -64,7 +64,6 @@ export default function EditCampaignPage() {
         verification_contact_name: c.verification_contact_name ?? '',
         verification_contact_info: c.verification_contact_info ?? '',
         attachment_label: PROOF_LABELS[0],
-        attachment_url: '',
         attachments: c.attachments ?? [],
       });
     }

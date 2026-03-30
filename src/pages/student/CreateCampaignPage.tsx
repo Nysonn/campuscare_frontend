@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Plus, X, AlertTriangle, Paperclip } from 'lucide-react';
+import { ArrowLeft, X, AlertTriangle, Paperclip } from 'lucide-react';
 import { campaignsApi } from '../../api/campaigns';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';

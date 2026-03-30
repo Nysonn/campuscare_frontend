@@ -116,11 +116,19 @@ export interface AdminUser {
 export interface AdminCampaign {
   id: string;
   student_id: string;
+  student_name: string;
   title: string;
   description: string;
   target_amount: number;
   category: string;
   created_at: string;
+  is_anonymous: boolean;
+  urgency_level: string;
+  beneficiary_type: string;
+  beneficiary_name: string;
+  verification_contact_name: string;
+  verification_contact_info: string;
+  attachments: CampaignAttachment[];
 }
 
 export interface AdminBooking {
