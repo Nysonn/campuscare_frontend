@@ -127,14 +127,14 @@ export default function Footer() {
                   <div>
                     <p className="text-[11px] text-gray-600 uppercase tracking-wide mb-0.5">Email</p>
                     <p className="text-sm text-gray-300 group-hover:text-primary-400 transition-colors">
-                      info@campuscare.com
+                      isaac@campuscare.me
                     </p>
                   </div>
                 </a>
               </li>
               <li>
                 <a
-                  href="tel:+256700000000"
+                  href="tel:+256708055707"
                   className="flex items-start gap-3 group"
                 >
                   <div className="h-8 w-8 rounded-xl bg-gray-800 group-hover:bg-primary-600/20 flex items-center justify-center shrink-0 transition-colors duration-200">
@@ -143,7 +143,7 @@ export default function Footer() {
                   <div>
                     <p className="text-[11px] text-gray-600 uppercase tracking-wide mb-0.5">Phone</p>
                     <p className="text-sm text-gray-300 group-hover:text-primary-400 transition-colors">
-                      +256 700 000 000
+                      +256 708 055 707
                     </p>
                   </div>
                 </a>
@@ -154,7 +154,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-[11px] text-gray-600 uppercase tracking-wide mb-0.5">Location</p>
-                  <p className="text-sm text-gray-300">Kampala, Uganda</p>
+                  <p className="text-sm text-gray-300">Mbarara, Uganda</p>
                 </div>
               </li>
             </ul>

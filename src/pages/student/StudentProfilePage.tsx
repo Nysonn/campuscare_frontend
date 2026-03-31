@@ -160,10 +160,10 @@ export default function StudentProfilePage() {
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="University" value={form.university} onChange={e => setForm(f => ({ ...f, university: e.target.value }))} placeholder="Makerere University" />
-            <Input label="Course" value={form.course} onChange={e => setForm(f => ({ ...f, course: e.target.value }))} placeholder="Computer Science" />
+            <Input label="University" value={form.university} onChange={e => setForm(f => ({ ...f, university: e.target.value }))} placeholder="Mbarara University" />
+            <Input label="Course" value={form.course} onChange={e => setForm(f => ({ ...f, course: e.target.value }))} placeholder="Information Technology" />
             <Input label="Year of Study" value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} placeholder="Year 3" />
-            <Input label="Location" value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} placeholder="Kampala" />
+            <Input label="Location" value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} placeholder="Mbarara" />
           </div>
 
           <div className="pt-2 border-t border-gray-100">

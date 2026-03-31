@@ -94,7 +94,7 @@ export default function StudentRegisterPage() {
                 label="Full Name"
                 value={form.full_name}
                 onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
-                placeholder="Leila Hassan"
+                placeholder="Isaac Kamukama"
                 required
               />
               <Input
@@ -102,7 +102,7 @@ export default function StudentRegisterPage() {
                 type="email"
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                placeholder="you@university.edu"
+                placeholder="2023bit119@std.must.ac.ug"
                 required
               />
               <div className="flex flex-col gap-1">

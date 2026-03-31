@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
 import {
   LayoutDashboard, Heart, Calendar, User, Users,
-  FileCheck, BookOpen, TrendingUp, HandHeart,
+  FileCheck, BookOpen, TrendingUp, HandHeart, Target, ClipboardList,
 } from 'lucide-react';
 
 import { store } from './store';
@@ -35,6 +35,8 @@ import BookCounselorPage from './pages/student/BookCounselorPage';
 import StudentProfilePage from './pages/student/StudentProfilePage';
 import SponsorsPage from './pages/student/SponsorsPage';
 import BecomeASponsorPage from './pages/student/BecomeASponsorPage';
+import BehaviourTrackingPage from './pages/student/BehaviourTrackingPage';
+import SelfEvaluationPage from './pages/student/SelfEvaluationPage';
 
 // Counselor pages
 import CounselorDashboard from './pages/counselor/CounselorDashboard';
@@ -55,11 +57,13 @@ const queryClient = new QueryClient({
 });
 
 const studentNav = [
-  { to: '/student/dashboard',       label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
-  { to: '/student/campaigns',       label: 'My Campaigns', icon: <Heart size={16} />           },
-  { to: '/student/bookings',        label: 'My Bookings',  icon: <Calendar size={16} />        },
-  { to: '/student/sponsors',        label: 'Sponsors',     icon: <HandHeart size={16} />       },
-  { to: '/student/profile',         label: 'My Profile',   icon: <User size={16} />            },
+  { to: '/student/dashboard',    label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
+  { to: '/student/campaigns',    label: 'My Campaigns', icon: <Heart size={16} />           },
+  { to: '/student/bookings',     label: 'My Bookings',  icon: <Calendar size={16} />        },
+  { to: '/student/sponsors',     label: 'Sponsors',     icon: <HandHeart size={16} />       },
+  { to: '/student/behaviour',    label: 'Behaviour',    icon: <Target size={16} />          },
+  { to: '/student/evaluation',   label: 'Self Check',   icon: <ClipboardList size={16} />   },
+  { to: '/student/profile',      label: 'My Profile',   icon: <User size={16} />            },
 ];
 
 const counselorNav = [
@@ -157,6 +161,8 @@ function AppRoutes() {
             <Route path="bookings/new" element={<BookCounselorPage />} />
             <Route path="sponsors" element={<SponsorsPage />} />
             <Route path="sponsors/become" element={<BecomeASponsorPage />} />
+            <Route path="behaviour" element={<BehaviourTrackingPage />} />
+            <Route path="evaluation" element={<SelfEvaluationPage />} />
             <Route path="profile" element={<StudentProfilePage />} />
           </Route>
 

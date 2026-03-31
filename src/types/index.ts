@@ -239,3 +239,58 @@ export interface ChatHistoryItem {
   content: string;
   created_at: string;
 }
+
+// ── Behaviour Tracking types ──────────────────────────────────────────────────
+
+export interface BehaviourLog {
+  log_date: string; // YYYY-MM-DD
+  did_it: boolean;
+}
+
+export interface BehaviourGoal {
+  id: string;
+  title: string;
+  direction: 'build' | 'quit';
+  start_date: string; // YYYY-MM-DD
+  end_date: string;   // YYYY-MM-DD
+  status: 'active' | 'completed';
+  created_at: string;
+}
+
+export interface BehaviourGoalWithLogs extends BehaviourGoal {
+  logs: BehaviourLog[];
+}
+
+export interface BehaviourStats {
+  title: string;
+  direction: 'build' | 'quit';
+  start_date: string;
+  end_date: string;
+  status: string;
+  total_days: number;
+  days_logged: number;
+  days_succeeded: number;
+  success_rate: number;
+}
+
+// ── Self-Evaluation types ─────────────────────────────────────────────────────
+
+export interface EvaluationQuestion {
+  id: number;
+  text: string;
+  options: string[]; // index 0 = score 1 (worst), index 3 = score 4 (best)
+}
+
+export interface EvaluationResult {
+  id: string;
+  score: number;
+  category: string;
+  message: string;
+}
+
+export interface EvaluationHistoryItem {
+  id: string;
+  score: number;
+  category: string;
+  taken_at: string;
+}
