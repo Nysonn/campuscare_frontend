@@ -10,6 +10,7 @@ import { sponsorsApi } from '../../api/sponsors';
 import type { ChatMessage, StudentProfile } from '../../types';
 import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
+import BecomeSponsorModal from '../../components/sponsor/BecomeSponsorModal';
 
 function cleanBotText(text: string) {
   return text.replace(/\s*\*\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
@@ -100,10 +101,12 @@ export default function StudentDashboard() {
     }
   };
 
+  const [sponsorModalOpen, setSponsorModalOpen] = useState(false);
+
   const studentUser = user?.role === 'student' ? (user as StudentProfile) : null;
   const isSponsor = studentUser?.is_sponsor ?? false;
 
-  const { data: sponsorStatus } = useQuery({
+  useQuery({
     queryKey: ['mySponsorStatus'],
     queryFn: sponsorsApi.myStatus,
     enabled: !!user,
@@ -221,13 +224,13 @@ export default function StudentDashboard() {
         ) : (
           /* Not a sponsor, no active sponsorship */
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Link to="/student/sponsors/become">
+            <button onClick={() => setSponsorModalOpen(true)} className="w-full text-left">
               <div className="border-2 border-dashed border-purple-200 rounded-xl p-4 text-center hover:border-purple-400 hover:bg-purple-50 transition-all cursor-pointer group">
                 <Users size={20} className="mx-auto mb-2 text-purple-400 group-hover:text-purple-600" />
                 <p className="text-xs font-medium text-purple-600 group-hover:text-purple-800">Become a Sponsor</p>
                 <p className="text-[11px] text-gray-400 mt-0.5">Support a fellow student</p>
               </div>
-            </Link>
+            </button>
             <Link to="/student/sponsors">
               <div className="border-2 border-dashed border-blue-200 rounded-xl p-4 text-center hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer group">
                 <ChevronRight size={20} className="mx-auto mb-2 text-blue-400 group-hover:text-blue-600" />
@@ -386,6 +389,8 @@ export default function StudentDashboard() {
           </div>
         </div>
       </div>
+
+      <BecomeSponsorModal open={sponsorModalOpen} onClose={() => setSponsorModalOpen(false)} />
     </div>
   );
 }

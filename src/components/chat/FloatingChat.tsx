@@ -100,7 +100,7 @@ function ChatWidget({
         if (!active) return;
 
         channelRef.current = ch;
-        setMessages(normaliseMessages(ch.state.messages));
+        setMessages(normaliseMessages(ch.state.messages as unknown as MessageResponse[]));
         setConnected(true);
 
         ch.on('message.new', event => {
