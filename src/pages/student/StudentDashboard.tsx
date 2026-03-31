@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Send, Bot, User, AlertTriangle, Calendar, Heart, Plus } from 'lucide-react';
+import { Send, Bot, User, AlertTriangle, Calendar, Heart, Plus, Users, UserCheck, ChevronRight, Bell } from 'lucide-react';
 import { useAppSelector } from '../../store/hooks';
 import { chatbotApi } from '../../api/chatbot';
 import { bookingsApi } from '../../api/bookings';
 import { campaignsApi } from '../../api/campaigns';
-import type { ChatMessage } from '../../types';
+import { sponsorsApi } from '../../api/sponsors';
+import type { ChatMessage, StudentProfile } from '../../types';
 import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
 
@@ -99,9 +100,32 @@ export default function StudentDashboard() {
     }
   };
 
+  const studentUser = user?.role === 'student' ? (user as StudentProfile) : null;
+  const isSponsor = studentUser?.is_sponsor ?? false;
+
+  const { data: sponsorStatus } = useQuery({
+    queryKey: ['mySponsorStatus'],
+    queryFn: sponsorsApi.myStatus,
+    enabled: !!user,
+  });
+
+  const { data: incomingRequests = [] } = useQuery({
+    queryKey: ['incomingRequests'],
+    queryFn: sponsorsApi.incomingRequests,
+    enabled: isSponsor,
+  });
+
+  const { data: sponsorshipData } = useQuery({
+    queryKey: ['mySponsorship'],
+    queryFn: sponsorsApi.mySponsorship,
+    enabled: !!user,
+  });
+
   const pendingBookings = (bookings ?? []).filter(b => b.status === 'pending').length;
   const acceptedBookings = (bookings ?? []).filter(b => b.status === 'accepted').length;
   const activeCampaigns = (myCampaigns ?? []).length;
+  const pendingIncoming = incomingRequests.filter(r => r.status === 'pending').length;
+  const hasActiveSponsorship = !!sponsorshipData?.sponsorship;
 
   return (
     <div>
@@ -129,6 +153,90 @@ export default function StudentDashboard() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* ── Sponsor Hub ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-xl bg-purple-50 flex items-center justify-center">
+              <Users size={16} className="text-purple-600" />
+            </div>
+            <h3 className="font-display font-semibold text-gray-900">Sponsor Hub</h3>
+          </div>
+          {hasActiveSponsorship && (
+            <span className="flex items-center gap-1.5 text-xs text-primary-600 bg-primary-50 px-2.5 py-1 rounded-full font-medium">
+              <UserCheck size={12} />
+              Active connection
+            </span>
+          )}
+        </div>
+
+        {hasActiveSponsorship ? (
+          /* Has active sponsorship */
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1 bg-primary-50 rounded-xl p-4 flex items-center gap-3">
+              <UserCheck size={18} className="text-primary-600 shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-primary-800">
+                  Connected with {sponsorshipData?.sponsorship?.partner_name}
+                </p>
+                <p className="text-xs text-primary-600 mt-0.5">
+                  Use the chat bubble in the bottom-right corner to message them.
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : isSponsor ? (
+          /* User is an active sponsor */
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Link to="/student/sponsors/become">
+              <div className="border border-gray-100 bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors cursor-pointer">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-medium text-gray-900">Sponsor Status</p>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Active</span>
+                </div>
+                <p className="text-xs text-gray-500">You are listed as a sponsor. Manage your profile.</p>
+              </div>
+            </Link>
+            <Link to="/student/sponsors/become">
+              <div className="border border-purple-100 bg-purple-50 rounded-xl p-4 hover:bg-purple-100 transition-colors cursor-pointer relative">
+                {pendingIncoming > 0 && (
+                  <span className="absolute top-3 right-3 h-5 w-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {pendingIncoming}
+                  </span>
+                )}
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Bell size={14} className="text-purple-600" />
+                  <p className="text-sm font-medium text-purple-900">Incoming Requests</p>
+                </div>
+                <p className="text-xs text-purple-600">
+                  {pendingIncoming > 0
+                    ? `${pendingIncoming} student${pendingIncoming > 1 ? 's' : ''} waiting for your response`
+                    : 'No pending requests right now'}
+                </p>
+              </div>
+            </Link>
+          </div>
+        ) : (
+          /* Not a sponsor, no active sponsorship */
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Link to="/student/sponsors/become">
+              <div className="border-2 border-dashed border-purple-200 rounded-xl p-4 text-center hover:border-purple-400 hover:bg-purple-50 transition-all cursor-pointer group">
+                <Users size={20} className="mx-auto mb-2 text-purple-400 group-hover:text-purple-600" />
+                <p className="text-xs font-medium text-purple-600 group-hover:text-purple-800">Become a Sponsor</p>
+                <p className="text-[11px] text-gray-400 mt-0.5">Support a fellow student</p>
+              </div>
+            </Link>
+            <Link to="/student/sponsors">
+              <div className="border-2 border-dashed border-blue-200 rounded-xl p-4 text-center hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer group">
+                <ChevronRight size={20} className="mx-auto mb-2 text-blue-400 group-hover:text-blue-600" />
+                <p className="text-xs font-medium text-blue-600 group-hover:text-blue-800">Find a Sponsor</p>
+                <p className="text-[11px] text-gray-400 mt-0.5">Connect with someone who cares</p>
+              </div>
+            </Link>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

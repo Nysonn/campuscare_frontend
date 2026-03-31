@@ -14,6 +14,72 @@ export interface StudentProfile {
   location: string;
   avatar_url: string;
   is_anonymous: boolean;
+  is_sponsor?: boolean;
+}
+
+// ── Sponsor feature types ─────────────────────────────────────────────────────
+
+export interface SponsorProfile {
+  id: string;
+  display_name: string;
+  bio: string;
+  university: string;
+  course: string;
+  avatar_url: string;
+  what_i_offer: string;
+  has_pending_request: boolean;
+  is_my_sponsor: boolean;
+  sponsor_is_busy: boolean;
+}
+
+export interface SponsorRequest {
+  id: string;
+  requester_id?: string;
+  sponsor_id?: string;
+  display_name: string;
+  bio?: string;
+  university: string;
+  course?: string;
+  avatar_url: string;
+  what_i_offer?: string;
+  status: 'pending' | 'accepted' | 'declined';
+  created_at: string;
+}
+
+export interface Sponsorship {
+  channel_id: string;
+  partner_id: string;
+  partner_name: string;
+  partner_avatar: string;
+  partner_role: 'sponsor' | 'sponsee';
+  created_at: string;
+}
+
+export interface MySponsorStatus {
+  is_sponsor: boolean;
+  what_i_offer: string;
+}
+
+export interface StreamTokenResponse {
+  token: string;
+  user_id: string;
+  api_key: string;
+}
+
+export interface AdminSponsor {
+  id: string;
+  display_name: string;
+  university: string;
+  avatar_url: string;
+  what_i_offer: string;
+  is_active: boolean;
+  created_at: string;
+  sponsee: {
+    id: string;
+    display_name: string;
+    avatar_url: string;
+    since: string;
+  } | null;
 }
 
 export interface CounselorProfile {

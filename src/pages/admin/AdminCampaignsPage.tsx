@@ -8,6 +8,20 @@ import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
 
+function openAttachment(url: string) {
+  if (url.startsWith('data:')) {
+    const [header, b64] = url.split(',');
+    const mime = header.match(/:(.*?);/)?.[1] ?? 'application/octet-stream';
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob = new Blob([bytes], { type: mime });
+    window.open(URL.createObjectURL(blob), '_blank');
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
 export default function AdminCampaignsPage() {
   const qc = useQueryClient();
   const [selected, setSelected] = useState<AdminCampaign | null>(null);
@@ -118,7 +132,7 @@ export default function AdminCampaignsPage() {
             <div className="flex flex-wrap gap-2">
               <Badge variant="yellow">Pending Review</Badge>
               <Badge variant="gray">{previewing.category}</Badge>
-              {previewing.urgency_level !== 'normal' && (
+              {previewing.urgency_level && previewing.urgency_level !== 'normal' && (
                 <Badge variant={previewing.urgency_level === 'critical' ? 'red' : 'yellow'}>
                   {previewing.urgency_level.charAt(0).toUpperCase() + previewing.urgency_level.slice(1)}
                 </Badge>
@@ -192,17 +206,15 @@ export default function AdminCampaignsPage() {
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Attachments ({previewing.attachments.length})</p>
                 <div className="space-y-2">
                   {previewing.attachments.map((att, i) => (
-                    <a
+                    <button
                       key={i}
-                      href={att.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2.5 bg-gray-50 hover:bg-primary-50 border border-gray-100 hover:border-primary-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 hover:text-primary-700 transition-colors"
+                      onClick={() => openAttachment(att.url)}
+                      className="w-full flex items-center gap-2.5 bg-gray-50 hover:bg-primary-50 border border-gray-100 hover:border-primary-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 hover:text-primary-700 transition-colors cursor-pointer"
                     >
                       <Paperclip size={14} className="shrink-0 text-gray-400" />
-                      <span className="flex-1 truncate">{att.label}</span>
+                      <span className="flex-1 text-left truncate">{att.label}</span>
                       <span className="text-xs text-gray-400 shrink-0">View →</span>
-                    </a>
+                    </button>
                   ))}
                 </div>
               </div>

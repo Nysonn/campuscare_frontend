@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { CheckCircle2, AlertTriangle, Camera } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Camera, ShieldOff } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setUser } from '../../store/authSlice';
 import { authApi } from '../../api/auth';
@@ -168,17 +168,34 @@ export default function StudentProfilePage() {
 
           <div className="pt-2 border-t border-gray-100">
             <h3 className="font-display font-semibold text-gray-900 mb-3">Privacy Settings</h3>
-            <label className="flex items-start gap-3 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={form.is_anonymous}
-                onChange={e => setForm(f => ({ ...f, is_anonymous: e.target.checked }))}
-                className="accent-primary-600 h-4 w-4 mt-0.5 shrink-0"
-              />
-              <span className="text-sm text-gray-700">
-                <strong>Anonymous mode</strong> — hide my name and profile photo on public campaign cards. Other students can still see my profile when logged in unless I set this on individual campaigns.
-              </span>
-            </label>
+            {user.is_sponsor ? (
+              <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                <ShieldOff size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-amber-800">Anonymous mode is unavailable for sponsors</p>
+                  <p className="text-sm text-amber-700 mt-0.5 leading-relaxed">
+                    Sponsors must remain visible so students can find and trust them.
+                    If you need to use anonymous mode, please{' '}
+                    <a href="/student/sponsors/become" className="underline font-medium hover:text-amber-900">
+                      opt out of being a sponsor
+                    </a>{' '}
+                    first.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={form.is_anonymous}
+                  onChange={e => setForm(f => ({ ...f, is_anonymous: e.target.checked }))}
+                  className="accent-primary-600 h-4 w-4 mt-0.5 shrink-0"
+                />
+                <span className="text-sm text-gray-700">
+                  <strong>Anonymous mode</strong> — hide my name and profile photo on public campaign cards. Other students can still see my profile when logged in unless I set this on individual campaigns.
+                </span>
+              </label>
+            )}
           </div>
 
           {success && (

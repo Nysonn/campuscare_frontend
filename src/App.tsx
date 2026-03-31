@@ -2,7 +2,10 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
-import { LayoutDashboard, Heart, Calendar, User, Users, FileCheck, BookOpen, TrendingUp } from 'lucide-react';
+import {
+  LayoutDashboard, Heart, Calendar, User, Users,
+  FileCheck, BookOpen, TrendingUp, HandHeart,
+} from 'lucide-react';
 
 import { store } from './store';
 import { useAppDispatch } from './store/hooks';
@@ -12,6 +15,7 @@ import { authApi } from './api/auth';
 import Header from './components/layout/Header';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import DashboardLayout from './components/layout/DashboardLayout';
+import FloatingChat from './components/chat/FloatingChat';
 
 // Public pages
 import LandingPage from './pages/LandingPage';
@@ -29,6 +33,8 @@ import EditCampaignPage from './pages/student/EditCampaignPage';
 import MyBookingsPage from './pages/student/MyBookingsPage';
 import BookCounselorPage from './pages/student/BookCounselorPage';
 import StudentProfilePage from './pages/student/StudentProfilePage';
+import SponsorsPage from './pages/student/SponsorsPage';
+import BecomeASponsorPage from './pages/student/BecomeASponsorPage';
 
 // Counselor pages
 import CounselorDashboard from './pages/counselor/CounselorDashboard';
@@ -40,6 +46,7 @@ import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminCampaignsPage from './pages/admin/AdminCampaignsPage';
 import AdminBookingsPage from './pages/admin/AdminBookingsPage';
 import AdminContributionsPage from './pages/admin/AdminContributionsPage';
+import AdminSponsorsPage from './pages/admin/AdminSponsorsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,23 +55,25 @@ const queryClient = new QueryClient({
 });
 
 const studentNav = [
-  { to: '/student/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={16} /> },
-  { to: '/student/campaigns', label: 'My Campaigns', icon: <Heart size={16} /> },
-  { to: '/student/bookings', label: 'My Bookings', icon: <Calendar size={16} /> },
-  { to: '/student/profile', label: 'My Profile', icon: <User size={16} /> },
+  { to: '/student/dashboard',       label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
+  { to: '/student/campaigns',       label: 'My Campaigns', icon: <Heart size={16} />           },
+  { to: '/student/bookings',        label: 'My Bookings',  icon: <Calendar size={16} />        },
+  { to: '/student/sponsors',        label: 'Sponsors',     icon: <HandHeart size={16} />       },
+  { to: '/student/profile',         label: 'My Profile',   icon: <User size={16} />            },
 ];
 
 const counselorNav = [
   { to: '/counselor/dashboard', label: 'Appointments', icon: <Calendar size={16} /> },
-  { to: '/counselor/profile', label: 'My Profile', icon: <User size={16} /> },
+  { to: '/counselor/profile',   label: 'My Profile',   icon: <User size={16} />     },
 ];
 
 const adminNav = [
-  { to: '/admin/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={16} /> },
-  { to: '/admin/users', label: 'Users', icon: <Users size={16} /> },
-  { to: '/admin/campaigns', label: 'Campaigns', icon: <FileCheck size={16} /> },
-  { to: '/admin/bookings', label: 'Bookings', icon: <BookOpen size={16} /> },
-  { to: '/admin/contributions', label: 'Contributions', icon: <TrendingUp size={16} /> },
+  { to: '/admin/dashboard',     label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
+  { to: '/admin/users',         label: 'Users',        icon: <Users size={16} />           },
+  { to: '/admin/campaigns',     label: 'Campaigns',    icon: <FileCheck size={16} />       },
+  { to: '/admin/bookings',      label: 'Bookings',     icon: <BookOpen size={16} />        },
+  { to: '/admin/contributions', label: 'Contributions',icon: <TrendingUp size={16} />      },
+  { to: '/admin/sponsors',      label: 'Sponsors',     icon: <HandHeart size={16} />       },
 ];
 
 function SessionHydrator({ children }: { children: React.ReactNode }) {
@@ -94,6 +103,8 @@ function StudentLayout() {
       <DashboardLayout navItems={studentNav} title="Student">
         <Outlet />
       </DashboardLayout>
+      {/* Floating sponsor chat — renders only when an active sponsorship exists */}
+      <FloatingChat />
     </ProtectedRoute>
   );
 }
@@ -144,6 +155,8 @@ function AppRoutes() {
             <Route path="campaigns/:id/edit" element={<EditCampaignPage />} />
             <Route path="bookings" element={<MyBookingsPage />} />
             <Route path="bookings/new" element={<BookCounselorPage />} />
+            <Route path="sponsors" element={<SponsorsPage />} />
+            <Route path="sponsors/become" element={<BecomeASponsorPage />} />
             <Route path="profile" element={<StudentProfilePage />} />
           </Route>
 
@@ -162,6 +175,7 @@ function AppRoutes() {
             <Route path="campaigns" element={<AdminCampaignsPage />} />
             <Route path="bookings" element={<AdminBookingsPage />} />
             <Route path="contributions" element={<AdminContributionsPage />} />
+            <Route path="sponsors" element={<AdminSponsorsPage />} />
           </Route>
 
           {/* Fallback */}
