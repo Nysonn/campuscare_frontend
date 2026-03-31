@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, X, AlertTriangle, Paperclip } from 'lucide-react';
+import { ArrowLeft, X, AlertTriangle, Paperclip, Banknote } from 'lucide-react';
 import { campaignsApi } from '../../api/campaigns';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -38,6 +38,10 @@ export default function CreateCampaignPage() {
     beneficiary_name: '',
     verification_contact_name: '',
     verification_contact_info: '',
+    beneficiary_org_name: '',
+    bank_name: '',
+    account_number: '',
+    account_holder_name: '',
     attachment_label: PROOF_LABELS[0],
     attachments: [] as CampaignAttachment[],
   });
@@ -57,6 +61,10 @@ export default function CreateCampaignPage() {
       beneficiary_name: form.beneficiary_type === 'other' ? form.beneficiary_name : '',
       verification_contact_name: form.verification_contact_name,
       verification_contact_info: form.verification_contact_info,
+      beneficiary_org_name: form.beneficiary_org_name,
+      bank_name: form.bank_name,
+      account_number: form.account_number,
+      account_holder_name: form.account_holder_name,
       attachments: form.attachments.map(({ url, label }) => ({ url, label })),
     }),
     onSuccess: () => {
@@ -102,6 +110,10 @@ export default function CreateCampaignPage() {
     }
     if (form.beneficiary_type === 'other' && !form.beneficiary_name.trim()) {
       setError('Please enter the name of the person this campaign is for.');
+      return;
+    }
+    if (!form.beneficiary_org_name.trim() || !form.bank_name.trim() || !form.account_number.trim() || !form.account_holder_name.trim()) {
+      setError('Please fill in all payment destination fields so the admin can verify the account.');
       return;
     }
     mutation.mutate();
@@ -267,6 +279,46 @@ export default function CreateCampaignPage() {
               placeholder="Phone or email"
               value={form.verification_contact_info}
               onChange={e => setForm(f => ({ ...f, verification_contact_info: e.target.value }))}
+            />
+          </div>
+        </div>
+
+        {/* Payment Destination */}
+        <div className="flex flex-col gap-3 p-4 rounded-xl bg-primary-50 border border-primary-100">
+          <div className="flex items-start gap-2">
+            <Banknote size={16} className="text-primary-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-gray-800">Payment Destination *</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Provide the bank account where donated funds will be sent. The admin will verify
+                these details before your campaign can receive payments.
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Input
+              label="Organisation / Institution Name *"
+              placeholder="e.g. Makerere University"
+              value={form.beneficiary_org_name}
+              onChange={e => setForm(f => ({ ...f, beneficiary_org_name: e.target.value }))}
+            />
+            <Input
+              label="Account Holder Name *"
+              placeholder="Full name on the account"
+              value={form.account_holder_name}
+              onChange={e => setForm(f => ({ ...f, account_holder_name: e.target.value }))}
+            />
+            <Input
+              label="Bank Name *"
+              placeholder="e.g. Stanbic Bank Uganda"
+              value={form.bank_name}
+              onChange={e => setForm(f => ({ ...f, bank_name: e.target.value }))}
+            />
+            <Input
+              label="Account Number *"
+              placeholder="Bank account number"
+              value={form.account_number}
+              onChange={e => setForm(f => ({ ...f, account_number: e.target.value }))}
             />
           </div>
         </div>

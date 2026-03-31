@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Calendar, Tag, Heart, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Calendar, Tag, Heart, AlertTriangle, CheckCircle, Info, CreditCard } from 'lucide-react';
 import { campaignsApi } from '../api/campaigns';
 import { contributionsApi } from '../api/contributions';
 import Avatar from '../components/ui/Avatar';
@@ -23,18 +23,19 @@ export default function CampaignDetailPage() {
   const location = useLocation();
   const [donateOpen, setDonateOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
   const [form, setForm] = useState({
     donor_name: '', donor_email: '', donor_phone: '', message: '',
     amount: '', payment_method: 'mtn_momo', is_anonymous: false,
   });
+  const [visaForm, setVisaForm] = useState({
+    card_holder_name: '', card_number: '', expiry: '', cvc: '',
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  // Auto-open modal when navigating with #donate hash
   useEffect(() => {
-    if (location.hash === '#donate') {
-      setDonateOpen(true);
-    }
+    if (location.hash === '#donate') setDonateOpen(true);
   }, [location.hash]);
 
   const { data: campaigns, isLoading } = useQuery({
@@ -45,15 +46,38 @@ export default function CampaignDetailPage() {
 
   const campaign = campaigns?.find(c => c.id === id);
 
+  const isCompleted = campaign?.status === 'completed';
+  const accountVerified = campaign?.account_status === 'verified';
+
   const handleDonate = async () => {
     setError('');
     if (!form.donor_name || !form.donor_email || !form.donor_phone || !form.amount) {
       setError('Please fill in all required fields.');
       return;
     }
+    if (form.payment_method === 'visa') {
+      if (!visaForm.card_holder_name.trim()) {
+        setError('Please enter the cardholder name.');
+        return;
+      }
+      const digitsOnly = visaForm.card_number.replace(/\s/g, '');
+      if (!/^\d{16}$/.test(digitsOnly)) {
+        setError('Card number must be 16 digits.');
+        return;
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(visaForm.expiry)) {
+        setError('Expiry date must be in MM/YY format.');
+        return;
+      }
+      if (!/^\d{3}$/.test(visaForm.cvc)) {
+        setError('CVC must be 3 digits.');
+        return;
+      }
+    }
+
     setSubmitting(true);
     try {
-      await contributionsApi.create({
+      const result = await contributionsApi.create({
         campaign_id: id!,
         donor_name: form.donor_name,
         donor_email: form.donor_email,
@@ -64,6 +88,11 @@ export default function CampaignDetailPage() {
         amount: Number(form.amount),
       });
       resetDonate();
+      if ((result as { status?: string }).status === 'pending') {
+        setToastMsg('Thank you! Your donation is being held pending account verification and will be released once the admin verifies the campaign\'s bank details.');
+      } else {
+        setToastMsg('Thank you! Your donation has been received.');
+      }
       setShowToast(true);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
@@ -74,11 +103,24 @@ export default function CampaignDetailPage() {
 
   const resetDonate = () => {
     setForm({ donor_name: '', donor_email: '', donor_phone: '', message: '', amount: '', payment_method: 'mtn_momo', is_anonymous: false });
+    setVisaForm({ card_holder_name: '', card_number: '', expiry: '', cvc: '' });
     setError('');
     setDonateOpen(false);
   };
 
-  const dismissToast = () => setShowToast(false);
+  // Format card number with spaces every 4 digits
+  const handleCardNumberChange = (val: string) => {
+    const digits = val.replace(/\D/g, '').slice(0, 16);
+    const formatted = digits.replace(/(.{4})/g, '$1 ').trim();
+    setVisaForm(v => ({ ...v, card_number: formatted }));
+  };
+
+  // Format expiry as MM/YY
+  const handleExpiryChange = (val: string) => {
+    const digits = val.replace(/\D/g, '').slice(0, 4);
+    const formatted = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+    setVisaForm(v => ({ ...v, expiry: formatted }));
+  };
 
   if (isLoading) return <div className="pt-24 flex justify-center"><Spinner size="lg" /></div>;
 
@@ -103,7 +145,7 @@ export default function CampaignDetailPage() {
         </Link>
 
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="h-2 bg-linear-to-r from-primary-400 to-primary-600" />
+          <div className={`h-2 ${isCompleted ? 'bg-emerald-400' : 'bg-linear-to-r from-primary-400 to-primary-600'}`} />
 
           <div className="p-8">
             {/* Author + meta */}
@@ -124,6 +166,11 @@ export default function CampaignDetailPage() {
                       <Tag size={10} /> {campaign.category}
                     </span>
                   )}
+                  {isCompleted && (
+                    <span className="flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">
+                      <CheckCircle size={10} /> Fully Funded
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -135,7 +182,7 @@ export default function CampaignDetailPage() {
             <p className="text-gray-600 leading-relaxed whitespace-pre-wrap mb-8">{campaign.description}</p>
 
             {/* Progress */}
-            <div className="bg-primary-50 rounded-2xl p-6 mb-8">
+            <div className="bg-primary-50 rounded-2xl p-6 mb-6">
               <div className="flex justify-between items-center mb-3">
                 <div>
                   <p className="font-display text-2xl font-bold text-primary-700">
@@ -151,11 +198,32 @@ export default function CampaignDetailPage() {
               <ProgressBar current={campaign.current_amount} target={campaign.target_amount} />
             </div>
 
+            {/* Held-funds notice */}
+            {!isCompleted && !accountVerified && (
+              <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mb-6">
+                <Info size={15} className="text-amber-500 shrink-0 mt-0.5" />
+                <p className="text-sm text-amber-800 leading-relaxed">
+                  Donations to this campaign are currently <strong>held pending bank account verification</strong>.
+                  Your funds will be released once the admin verifies the campaign's payment details.
+                </p>
+              </div>
+            )}
+
             {/* CTA */}
             <div id="donate">
-              <Button size="lg" className="w-full sm:w-auto" onClick={() => setDonateOpen(true)}>
-                <Heart size={18} /> Donate to this Campaign
-              </Button>
+              {isCompleted ? (
+                <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-100 rounded-2xl px-6 py-4">
+                  <CheckCircle size={22} className="text-emerald-600 shrink-0" />
+                  <div>
+                    <p className="font-semibold text-emerald-800">This campaign has been fully funded!</p>
+                    <p className="text-sm text-emerald-600 mt-0.5">Thank you to everyone who donated. No further contributions are accepted.</p>
+                  </div>
+                </div>
+              ) : (
+                <Button size="lg" className="w-full sm:w-auto" onClick={() => setDonateOpen(true)}>
+                  <Heart size={18} /> Donate to this Campaign
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -170,70 +238,113 @@ export default function CampaignDetailPage() {
         maxWidth="max-w-lg"
       >
         <div className="space-y-3">
-            {/* Row 1: Name + Email */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Input label="Full Name *" value={form.donor_name} onChange={e => setForm(f => ({ ...f, donor_name: e.target.value }))} placeholder="Jane Smith" />
-              <Input label="Email Address *" type="email" value={form.donor_email} onChange={e => setForm(f => ({ ...f, donor_email: e.target.value }))} placeholder="jane@example.com" />
-            </div>
-
-            {/* Row 2: Phone + Amount */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Input label="Phone Number *" value={form.donor_phone} onChange={e => setForm(f => ({ ...f, donor_phone: e.target.value }))} placeholder="+256 700 000 000" />
-              <Input label="Amount (UGX) *" type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="50000" min="1000" />
-            </div>
-
-            {/* Payment method */}
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">Payment Method *</label>
-              <select
-                value={form.payment_method}
-                onChange={e => setForm(f => ({ ...f, payment_method: e.target.value }))}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
-              >
-                {PAYMENT_METHODS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-              </select>
-            </div>
-
-            {/* Message */}
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">Message <span className="text-gray-400 font-normal">(optional)</span></label>
-              <textarea
-                value={form.message}
-                onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-                placeholder="Leave a heartfelt message..."
-                rows={2}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-
-            {/* Anonymous toggle */}
-            <label className="flex items-center gap-2.5 cursor-pointer select-none p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-              <input type="checkbox" checked={form.is_anonymous} onChange={e => setForm(f => ({ ...f, is_anonymous: e.target.checked }))} className="accent-primary-600 h-4 w-4" />
-              <div>
-                <p className="text-sm font-medium text-gray-700">Donate anonymously</p>
-                <p className="text-xs text-gray-400">Your name won't appear on the campaign</p>
-              </div>
-            </label>
-
-            {error && (
-              <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
-                <AlertTriangle size={14} className="text-red-500 shrink-0" />
-                {error}
-              </div>
-            )}
-
-            <Button onClick={handleDonate} loading={submitting} className="w-full">
-              <Heart size={16} /> Proceed to Payment
-            </Button>
+          {/* Row 1: Name + Email */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Input label="Full Name *" value={form.donor_name} onChange={e => setForm(f => ({ ...f, donor_name: e.target.value }))} placeholder="Jane Smith" />
+            <Input label="Email Address *" type="email" value={form.donor_email} onChange={e => setForm(f => ({ ...f, donor_email: e.target.value }))} placeholder="jane@example.com" />
           </div>
 
+          {/* Row 2: Phone + Amount */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Input label="Phone Number *" value={form.donor_phone} onChange={e => setForm(f => ({ ...f, donor_phone: e.target.value }))} placeholder="+256 700 000 000" />
+            <Input label="Amount (UGX) *" type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="50000" min="1000" />
+          </div>
+
+          {/* Payment method */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">Payment Method *</label>
+            <select
+              value={form.payment_method}
+              onChange={e => setForm(f => ({ ...f, payment_method: e.target.value }))}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+            >
+              {PAYMENT_METHODS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+            </select>
+          </div>
+
+          {/* Visa card fields */}
+          {form.payment_method === 'visa' && (
+            <div className="flex flex-col gap-3 p-4 rounded-xl bg-gray-50 border border-gray-200">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <CreditCard size={15} className="text-primary-600" />
+                Card Details
+              </div>
+              <Input
+                label="Cardholder Name *"
+                value={visaForm.card_holder_name}
+                onChange={e => setVisaForm(v => ({ ...v, card_holder_name: e.target.value }))}
+                placeholder="Name as it appears on card"
+              />
+              <Input
+                label="Card Number *"
+                value={visaForm.card_number}
+                onChange={e => handleCardNumberChange(e.target.value)}
+                placeholder="0000 0000 0000 0000"
+                maxLength={19}
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  label="Expiry Date *"
+                  value={visaForm.expiry}
+                  onChange={e => handleExpiryChange(e.target.value)}
+                  placeholder="MM/YY"
+                  maxLength={5}
+                />
+                <Input
+                  label="CVC *"
+                  value={visaForm.cvc}
+                  onChange={e => setVisaForm(v => ({ ...v, cvc: e.target.value.replace(/\D/g, '').slice(0, 3) }))}
+                  placeholder="123"
+                  maxLength={3}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Message */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">Message <span className="text-gray-400 font-normal">(optional)</span></label>
+            <textarea
+              value={form.message}
+              onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+              placeholder="Leave a heartfelt message..."
+              rows={2}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+
+          {/* Anonymous toggle */}
+          <label className="flex items-center gap-2.5 cursor-pointer select-none p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+            <input type="checkbox" checked={form.is_anonymous} onChange={e => setForm(f => ({ ...f, is_anonymous: e.target.checked }))} className="accent-primary-600 h-4 w-4" />
+            <div>
+              <p className="text-sm font-medium text-gray-700">Donate anonymously</p>
+              <p className="text-xs text-gray-400">Your name won't appear on the campaign</p>
+            </div>
+          </label>
+
+          {/* Held-funds reminder inside modal */}
+          {!accountVerified && (
+            <div className="flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5">
+              <Info size={13} className="text-amber-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-700">Your donation will be held until the campaign's bank account is verified by an admin.</p>
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
+              <AlertTriangle size={14} className="text-red-500 shrink-0" />
+              {error}
+            </div>
+          )}
+
+          <Button onClick={handleDonate} loading={submitting} className="w-full">
+            <Heart size={16} /> Proceed to Payment
+          </Button>
+        </div>
       </Modal>
 
       {showToast && (
-        <Toast
-          message="Thank you! Your donation has been received."
-          onClose={dismissToast}
-        />
+        <Toast message={toastMsg} onClose={() => setShowToast(false)} />
       )}
     </div>
   );

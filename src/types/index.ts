@@ -112,6 +112,8 @@ export interface Campaign {
   author: string;
   avatar_url: string;
   category?: string;
+  status?: string;
+  account_status?: string;
 }
 
 export interface CampaignAttachment {
@@ -130,12 +132,17 @@ export interface MyCampaign {
   created_at: string;
   is_anonymous: boolean;
   status?: string;
+  account_status?: string;
   attachments?: CampaignAttachment[];
   urgency_level?: string;
   beneficiary_type?: string;
   beneficiary_name?: string;
   verification_contact_name?: string;
   verification_contact_info?: string;
+  beneficiary_org_name?: string;
+  bank_name?: string;
+  account_number?: string;
+  account_holder_name?: string;
 }
 
 export interface Counselor {
@@ -194,6 +201,11 @@ export interface AdminCampaign {
   beneficiary_name: string;
   verification_contact_name: string;
   verification_contact_info: string;
+  beneficiary_org_name: string;
+  bank_name: string;
+  account_number: string;
+  account_holder_name: string;
+  account_status: string;
   attachments: CampaignAttachment[];
 }
 

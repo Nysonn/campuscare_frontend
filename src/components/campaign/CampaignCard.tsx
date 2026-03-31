@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Calendar, Tag } from 'lucide-react';
+import { Calendar, Tag, CheckCircle } from 'lucide-react';
 import type { Campaign } from '../../types';
 import Avatar from '../ui/Avatar';
 import ProgressBar from '../ui/ProgressBar';
@@ -13,6 +13,7 @@ interface CampaignCardProps {
 export default function CampaignCard({ campaign, showDonate = true }: CampaignCardProps) {
   const authorName = campaign.is_anonymous ? 'Anonymous' : (campaign.author || 'Student');
   const avatarSrc = campaign.is_anonymous ? undefined : campaign.avatar_url || undefined;
+  const isCompleted = campaign.status === 'completed';
 
   const createdDate = new Date(campaign.created_at).toLocaleDateString('en-UG', {
     day: 'numeric',
@@ -23,7 +24,7 @@ export default function CampaignCard({ campaign, showDonate = true }: CampaignCa
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden group">
       {/* Header strip */}
-      <div className="h-1.5 bg-gradient-to-r from-primary-400 to-primary-600 rounded-t-2xl" />
+      <div className={`h-1.5 rounded-t-2xl ${isCompleted ? 'bg-emerald-400' : 'bg-linear-to-r from-primary-400 to-primary-600'}`} />
 
       <div className="p-5 flex flex-col flex-1 gap-4">
         {/* Author row */}
@@ -36,7 +37,11 @@ export default function CampaignCard({ campaign, showDonate = true }: CampaignCa
               <span>{createdDate}</span>
             </div>
           </div>
-          {campaign.category && (
+          {isCompleted ? (
+            <span className="ml-auto flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">
+              <CheckCircle size={10} /> Fully Funded
+            </span>
+          ) : campaign.category && (
             <span className="ml-auto flex items-center gap-1 text-xs text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full capitalize">
               <Tag size={10} />
               {campaign.category}
@@ -66,7 +71,7 @@ export default function CampaignCard({ campaign, showDonate = true }: CampaignCa
           <Link to={`/campaigns/${campaign.id}`} className="flex-1">
             <Button variant="outline" size="sm" className="w-full">View Details</Button>
           </Link>
-          {showDonate && (
+          {showDonate && !isCompleted && (
             <Link to={`/campaigns/${campaign.id}#donate`} className="flex-1">
               <Button variant="primary" size="sm" className="w-full">Donate</Button>
             </Link>

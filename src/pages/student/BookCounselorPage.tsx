@@ -9,6 +9,7 @@ import Button from '../../components/ui/Button';
 import Textarea from '../../components/ui/Textarea';
 import Avatar from '../../components/ui/Avatar';
 import Spinner from '../../components/ui/Spinner';
+import CounselorProfileModal from '../../components/counselor/CounselorProfileModal';
 
 export default function BookCounselorPage() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function BookCounselorPage() {
   const [form, setForm] = useState({
     start_time: '', end_time: '', type: 'online' as 'online' | 'physical', notes: '',
   });
+  const [viewProfileId, setViewProfileId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
@@ -88,11 +90,10 @@ export default function BookCounselorPage() {
           ) : (
             <div className="space-y-3">
               {(counselors ?? []).map(c => (
-                <button
+                <div
                   key={c.id}
-                  type="button"
                   onClick={() => setSelected(c)}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                  className={`w-full p-4 rounded-xl border-2 transition-all cursor-pointer ${
                     selected?.id === c.id
                       ? 'border-primary-500 bg-primary-50'
                       : 'border-gray-100 hover:border-primary-200 hover:bg-gray-50'
@@ -105,9 +106,18 @@ export default function BookCounselorPage() {
                       {c.specialization && <p className="text-xs text-primary-600 font-medium">{c.specialization}</p>}
                       {c.bio && <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{c.bio}</p>}
                     </div>
-                    {selected?.id === c.id && <CheckCircle size={18} className="text-primary-600 shrink-0" />}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={e => { e.stopPropagation(); setViewProfileId(c.id); }}
+                        className="text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline cursor-pointer px-2 py-1 rounded-lg hover:bg-primary-50 transition-colors"
+                      >
+                        View Profile
+                      </button>
+                      {selected?.id === c.id && <CheckCircle size={18} className="text-primary-600" />}
+                    </div>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           )}
@@ -184,6 +194,11 @@ export default function BookCounselorPage() {
           </div>
         </form>
       </div>
+
+      <CounselorProfileModal
+        counselorId={viewProfileId}
+        onClose={() => setViewProfileId(null)}
+      />
     </div>
   );
 }

@@ -23,6 +23,11 @@ export const adminApi = {
   deleteCampaign: (campaignId: string) =>
     api.delete<{ message: string }>(`/admin/campaigns/${campaignId}`),
 
+  pendingAccountCampaigns: () => api.get<AdminCampaign[]>('/admin/campaigns/accounts'),
+
+  verifyAccount: (campaignId: string, accountStatus: 'verified' | 'rejected') =>
+    api.put<{ message: string }>(`/admin/campaigns/${campaignId}/account`, { account_status: accountStatus }),
+
   bookings: () => api.get<AdminBooking[]>('/admin/bookings'),
 
   contributions: () => api.get<AdminContribution[]>('/admin/contributions'),

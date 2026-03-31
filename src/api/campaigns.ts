@@ -13,6 +13,10 @@ interface CampaignPayload {
   beneficiary_name?: string;
   verification_contact_name?: string;
   verification_contact_info?: string;
+  beneficiary_org_name?: string;
+  bank_name?: string;
+  account_number?: string;
+  account_holder_name?: string;
 }
 
 export const campaignsApi = {
