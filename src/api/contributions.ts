@@ -1,4 +1,5 @@
 import { api } from './client';
+import type { ContributionCreateResponse, PaymentMethod } from '../types';
 
 export const contributionsApi = {
   create: (data: {
@@ -8,8 +9,8 @@ export const contributionsApi = {
     donor_phone: string;
     message?: string;
     is_anonymous: boolean;
-    payment_method: string;
+    payment_method: PaymentMethod;
     amount: number;
-  }) => api.post<{ contribution_id: string; status: string }>('/contributions', data),
+  }) => api.post<ContributionCreateResponse>('/contributions', data),
 
 };

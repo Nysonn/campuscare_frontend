@@ -267,7 +267,7 @@ export default function CreateCampaignPage() {
 
         {/* Verification contact */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">Verification Contact (optional)</label>
+          <label className="text-sm font-medium text-gray-700">Verification Contact</label>
           <p className="text-xs text-gray-400">A person who can confirm the legitimacy of this campaign — a counselor, lecturer, or university official.</p>
           <div className="grid grid-cols-2 gap-3">
             <Input
@@ -298,7 +298,7 @@ export default function CreateCampaignPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
               label="Organisation / Institution Name *"
-              placeholder="e.g. Makerere University"
+              placeholder="e.g. Mbarara University"
               value={form.beneficiary_org_name}
               onChange={e => setForm(f => ({ ...f, beneficiary_org_name: e.target.value }))}
             />

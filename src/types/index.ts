@@ -1,5 +1,7 @@
 export type UserRole = 'student' | 'counselor' | 'admin';
 
+export type PaymentMethod = 'mtn_momo' | 'airtel_money' | 'visa';
+
 export interface StudentProfile {
   id: string;
   email: string;
@@ -226,8 +228,13 @@ export interface AdminContribution {
   donor_name: string;
   donor_email: string;
   amount: number;
-  status: string;
+  status: 'pending' | 'success' | 'failed';
   created_at: string;
+}
+
+export interface ContributionCreateResponse {
+  contribution_id: string;
+  status: 'success' | 'pending';
 }
 
 export interface AdminDashboard {

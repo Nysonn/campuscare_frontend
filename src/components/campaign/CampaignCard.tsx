@@ -13,7 +13,7 @@ interface CampaignCardProps {
 export default function CampaignCard({ campaign, showDonate = true }: CampaignCardProps) {
   const authorName = campaign.is_anonymous ? 'Anonymous' : (campaign.author || 'Student');
   const avatarSrc = campaign.is_anonymous ? undefined : campaign.avatar_url || undefined;
-  const isCompleted = campaign.status === 'completed';
+  const isCompleted = campaign.status === 'completed' || campaign.current_amount >= campaign.target_amount;
 
   const createdDate = new Date(campaign.created_at).toLocaleDateString('en-UG', {
     day: 'numeric',

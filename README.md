@@ -459,7 +459,7 @@ Update the constant at the top of `src/api/client.ts` before building. If multip
 
 ## Known Limitations
 
-- **Payment simulation only.** The contribution flow calls `POST /contributions/:id/simulate` to mark a payment as successful or failed. There is no real payment gateway integration. This is intentional for the current project scope.
+- **Donation processing is status-based.** The contribution flow calls `POST /contributions` and receives either `success` for immediately released donations or `pending` for donations held until the campaign bank account is verified by an admin. There is no real payment gateway integration yet.
 - **No image upload UI.** Avatar and attachment URLs must be externally hosted (e.g., Cloudinary) and pasted in as text. The API accepts URLs, not binary uploads.
 - **Online session links are external.** For online counselling bookings, the counsellor arranges the Google Meet link outside the platform and sends it directly to the student's email. The platform does not generate or store meeting links.
 - **Backend cold starts.** The API is hosted on Render's free tier, which spins down after inactivity. The first request after a period of inactivity may take 30–60 seconds. This is a backend infrastructure constraint, not a frontend issue.

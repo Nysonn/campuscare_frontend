@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Calendar, Tag, Heart, AlertTriangle, CheckCircle, Info, CreditCard } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Calendar, Tag, Heart, AlertTriangle, CheckCircle, CreditCard } from 'lucide-react';
 import { campaignsApi } from '../api/campaigns';
 import { contributionsApi } from '../api/contributions';
+import type { PaymentMethod } from '../types';
 import Avatar from '../components/ui/Avatar';
 import ProgressBar from '../components/ui/ProgressBar';
 import Button from '../components/ui/Button';
@@ -21,12 +22,13 @@ const PAYMENT_METHODS = [
 export default function CampaignDetailPage() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
+  const qc = useQueryClient();
   const [donateOpen, setDonateOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [form, setForm] = useState({
     donor_name: '', donor_email: '', donor_phone: '', message: '',
-    amount: '', payment_method: 'mtn_momo', is_anonymous: false,
+    amount: '', payment_method: 'mtn_momo' as PaymentMethod, is_anonymous: false,
   });
   const [visaForm, setVisaForm] = useState({
     card_holder_name: '', card_number: '', expiry: '', cvc: '',
@@ -46,13 +48,20 @@ export default function CampaignDetailPage() {
 
   const campaign = campaigns?.find(c => c.id === id);
 
-  const isCompleted = campaign?.status === 'completed';
-  const accountVerified = campaign?.account_status === 'verified';
+  const isCompleted = campaign?.status === 'completed' || (campaign?.current_amount ?? 0) >= (campaign?.target_amount ?? 1);
 
   const handleDonate = async () => {
     setError('');
     if (!form.donor_name || !form.donor_email || !form.donor_phone || !form.amount) {
       setError('Please fill in all required fields.');
+      return;
+    }
+    if (!PAYMENT_METHODS.some(method => method.value === form.payment_method)) {
+      setError('Please choose a valid payment method.');
+      return;
+    }
+    if (Number(form.amount) <= 0) {
+      setError('Donation amount must be greater than zero.');
       return;
     }
     if (form.payment_method === 'visa') {
@@ -77,7 +86,7 @@ export default function CampaignDetailPage() {
 
     setSubmitting(true);
     try {
-      const result = await contributionsApi.create({
+      await contributionsApi.create({
         campaign_id: id!,
         donor_name: form.donor_name,
         donor_email: form.donor_email,
@@ -87,12 +96,9 @@ export default function CampaignDetailPage() {
         payment_method: form.payment_method,
         amount: Number(form.amount),
       });
+      await qc.invalidateQueries({ queryKey: ['campaigns'] });
       resetDonate();
-      if ((result as { status?: string }).status === 'pending') {
-        setToastMsg('Thank you! Your donation is being held pending account verification and will be released once the admin verifies the campaign\'s bank details.');
-      } else {
-        setToastMsg('Thank you! Your donation has been received.');
-      }
+      setToastMsg('Thank you! Your donation has been received.');
       setShowToast(true);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
@@ -198,17 +204,6 @@ export default function CampaignDetailPage() {
               <ProgressBar current={campaign.current_amount} target={campaign.target_amount} />
             </div>
 
-            {/* Held-funds notice */}
-            {!isCompleted && !accountVerified && (
-              <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mb-6">
-                <Info size={15} className="text-amber-500 shrink-0 mt-0.5" />
-                <p className="text-sm text-amber-800 leading-relaxed">
-                  Donations to this campaign are currently <strong>held pending bank account verification</strong>.
-                  Your funds will be released once the admin verifies the campaign's payment details.
-                </p>
-              </div>
-            )}
-
             {/* CTA */}
             <div id="donate">
               {isCompleted ? (
@@ -255,7 +250,7 @@ export default function CampaignDetailPage() {
             <label className="text-sm font-medium text-gray-700">Payment Method *</label>
             <select
               value={form.payment_method}
-              onChange={e => setForm(f => ({ ...f, payment_method: e.target.value }))}
+              onChange={e => setForm(f => ({ ...f, payment_method: e.target.value as PaymentMethod }))}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
             >
               {PAYMENT_METHODS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
@@ -321,14 +316,6 @@ export default function CampaignDetailPage() {
               <p className="text-xs text-gray-400">Your name won't appear on the campaign</p>
             </div>
           </label>
-
-          {/* Held-funds reminder inside modal */}
-          {!accountVerified && (
-            <div className="flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5">
-              <Info size={13} className="text-amber-500 shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-700">Your donation will be held until the campaign's bank account is verified by an admin.</p>
-            </div>
-          )}
 
           {error && (
             <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">

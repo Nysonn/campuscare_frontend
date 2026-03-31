@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Download, TrendingUp } from 'lucide-react';
 import { adminApi } from '../../api/admin';
+import type { AdminContribution } from '../../types';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
@@ -28,6 +29,12 @@ export default function AdminContributionsPage() {
   const totalRaised = (contributions ?? [])
     .filter(c => c.status === 'success')
     .reduce((sum, c) => sum + c.amount, 0);
+
+  const getStatusVariant = (status: AdminContribution['status']) => {
+    if (status === 'success') return 'green';
+    if (status === 'pending') return 'yellow';
+    return 'red';
+  };
 
   return (
     <div>
@@ -63,7 +70,7 @@ export default function AdminContributionsPage() {
       ) : (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-150">
+            <table className="w-full min-w-175">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
                   {['Donor', 'Email', 'Amount', 'Status', 'Date'].map(h => (
@@ -80,7 +87,7 @@ export default function AdminContributionsPage() {
                       UGX {c.amount.toLocaleString()}
                     </td>
                     <td className="px-5 py-3.5">
-                      <Badge variant={c.status === 'success' ? 'green' : 'red'}>{c.status}</Badge>
+                      <Badge variant={getStatusVariant(c.status)}>{c.status}</Badge>
                     </td>
                     <td className="px-5 py-3.5 text-sm text-gray-500">
                       {new Date(c.created_at).toLocaleDateString('en-UG', { dateStyle: 'medium' })}
