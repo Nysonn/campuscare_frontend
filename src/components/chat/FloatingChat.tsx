@@ -325,7 +325,7 @@ function ChatWidget({
                     {!isMe && (
                       <span className="text-[10px] text-gray-400 px-1">{msg.userName}</span>
                     )}
-                    <div className={`px-3 py-2 rounded-2xl text-sm leading-relaxed break-words ${
+                    <div className={`px-3 py-2 rounded-2xl text-sm leading-relaxed wrap-break-word ${
                       isMe
                         ? 'bg-primary-600 text-white rounded-tr-sm'
                         : 'bg-white text-gray-800 border border-gray-200 rounded-tl-sm'

@@ -50,6 +50,9 @@ import AdminBookingsPage from './pages/admin/AdminBookingsPage';
 import AdminContributionsPage from './pages/admin/AdminContributionsPage';
 import AdminSponsorsPage from './pages/admin/AdminSponsorsPage';
 
+import NotFoundPage from './pages/NotFoundPage';
+import ErrorBoundary from './components/ErrorBoundary';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 1000 * 60 },
@@ -185,7 +188,7 @@ function AppRoutes() {
           </Route>
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </SessionHydrator>
@@ -194,10 +197,12 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <AppRoutes />
-      </QueryClientProvider>
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <AppRoutes />
+        </QueryClientProvider>
+      </Provider>
+    </ErrorBoundary>
   );
 }

@@ -14,7 +14,7 @@ export default function IncomingCallCard({ callerName, callerAvatar, onAccept, o
   useRingtone(true, 'incoming');
 
   return (
-    <div className="fixed bottom-24 right-4 sm:right-6 z-[60] bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 w-72 flex flex-col gap-3 animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed bottom-24 right-4 sm:right-6 z-60 bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 w-72 flex flex-col gap-3 animate-in slide-in-from-bottom-4 duration-300">
       {/* Pulsing ring indicator */}
       <div className="absolute -inset-0.5 rounded-2xl bg-green-400 opacity-20 animate-ping pointer-events-none" />
 

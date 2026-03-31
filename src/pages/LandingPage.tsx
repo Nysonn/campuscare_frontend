@@ -21,8 +21,8 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-primary-50 min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center">
 
         {/* Decorative background blobs */}
-        <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] bg-primary-100 rounded-full blur-3xl opacity-40" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-primary-200 rounded-full blur-3xl opacity-30" aria-hidden="true" />
+        <div className="pointer-events-none absolute -top-32 -right-32 w-125 h-125 bg-primary-100 rounded-full blur-3xl opacity-40" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-32 -left-32 w-100 h-100 bg-primary-200 rounded-full blur-3xl opacity-30" aria-hidden="true" />
 
         {/* Dot-grid texture */}
         <div
@@ -255,12 +255,12 @@ export default function LandingPage() {
       </section>
 
       {/* Counselor CTA Section */}
-      <section className="py-24 bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 relative overflow-hidden">
+      <section className="py-24 bg-linear-to-br from-primary-700 via-primary-600 to-primary-800 relative overflow-hidden">
 
         {/* Background texture */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:40px_40px]" />
-          <div className="absolute -top-28 -right-28 w-[420px] h-[420px] bg-primary-500 rounded-full blur-3xl opacity-25" />
+          <div className="absolute -top-28 -right-28 w-105 h-105 bg-primary-500 rounded-full blur-3xl opacity-25" />
           <div className="absolute -bottom-28 -left-28 w-80 h-80 bg-primary-900 rounded-full blur-3xl opacity-35" />
         </div>
 
