@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Send, Bot, User, AlertTriangle, Calendar, Heart, Plus, Users, UserCheck, ChevronRight, Bell } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Send, Bot, User, AlertTriangle, Calendar, Heart, Plus, Users, UserCheck, ChevronRight, Bell, LogOut, Loader2 } from 'lucide-react';
 import { useAppSelector } from '../../store/hooks';
 import { chatbotApi } from '../../api/chatbot';
 import { bookingsApi } from '../../api/bookings';
@@ -17,6 +17,7 @@ function cleanBotText(text: string) {
 }
 
 export default function StudentDashboard() {
+  const queryClient = useQueryClient();
   const user = useAppSelector(s => s.auth.user);
   const displayName = user?.role === 'student'
     ? (user.display_name || user.first_name || 'Student')
@@ -102,6 +103,15 @@ export default function StudentDashboard() {
   };
 
   const [sponsorModalOpen, setSponsorModalOpen] = useState(false);
+  const [confirmEndSponsorship, setConfirmEndSponsorship] = useState(false);
+
+  const terminateSponsorship = useMutation({
+    mutationFn: sponsorsApi.terminateSponsorship,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['mySponsorship'] });
+      setConfirmEndSponsorship(false);
+    },
+  });
 
   const studentUser = user?.role === 'student' ? (user as StudentProfile) : null;
   const isSponsor = studentUser?.is_sponsor ?? false;
@@ -177,10 +187,10 @@ export default function StudentDashboard() {
 
         {hasActiveSponsorship ? (
           /* Has active sponsorship */
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex-1 bg-primary-50 rounded-xl p-4 flex items-center gap-3">
+          <div className="bg-primary-50 rounded-xl p-4 space-y-3">
+            <div className="flex items-center gap-3">
               <UserCheck size={18} className="text-primary-600 shrink-0" />
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-primary-800">
                   Connected with {sponsorshipData?.sponsorship?.partner_name}
                 </p>
@@ -188,7 +198,37 @@ export default function StudentDashboard() {
                   Use the chat bubble in the bottom-right corner to message them.
                 </p>
               </div>
+              {!confirmEndSponsorship && (
+                <button
+                  onClick={() => setConfirmEndSponsorship(true)}
+                  className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-rose-600 bg-white border border-rose-200 hover:bg-rose-50 transition-colors"
+                >
+                  <LogOut size={11} />
+                  End
+                </button>
+              )}
             </div>
+            {confirmEndSponsorship && (
+              <div className="flex items-center justify-between gap-3 pt-2 border-t border-primary-200">
+                <p className="text-xs text-primary-700">End this sponsorship?</p>
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    onClick={() => setConfirmEndSponsorship(false)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => terminateSponsorship.mutate()}
+                    disabled={terminateSponsorship.isPending}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-50 transition-colors"
+                  >
+                    {terminateSponsorship.isPending && <Loader2 size={11} className="animate-spin" />}
+                    Yes, End It
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ) : isSponsor ? (
           /* User is an active sponsor */

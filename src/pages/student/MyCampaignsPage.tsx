@@ -79,11 +79,13 @@ export default function MyCampaignsPage() {
                 </div>
               </div>
               <div className="flex gap-2 items-start shrink-0">
-                <Link to={`/student/campaigns/${c.id}/edit`}>
-                  <Button variant="outline" size="sm">
-                    <Pencil size={14} /> Edit
-                  </Button>
-                </Link>
+                {c.status !== 'approved' && (
+                  <Link to={`/student/campaigns/${c.id}/edit`}>
+                    <Button variant="outline" size="sm">
+                      <Pencil size={14} /> Edit
+                    </Button>
+                  </Link>
+                )}
                 <Button variant="danger" size="sm" onClick={() => setDeleteId(c.id)}>
                   <Trash2 size={14} /> Delete
                 </Button>

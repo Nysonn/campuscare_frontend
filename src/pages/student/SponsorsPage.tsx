@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Search, Clock, CheckCircle2, UserCheck, Loader2, AlertTriangle, X } from 'lucide-react';
+import { Users, Search, Clock, CheckCircle2, UserCheck, Loader2, AlertTriangle, X, LogOut } from 'lucide-react';
 import { sponsorsApi } from '../../api/sponsors';
 import type { SponsorProfile, SponsorRequest } from '../../types';
 import Avatar from '../../components/ui/Avatar';
@@ -29,6 +29,17 @@ export default function SponsorsPage() {
   });
 
   const hasActiveSponsorship = !!sponsorshipData?.sponsorship;
+  const [confirmEnd, setConfirmEnd] = useState(false);
+
+  const terminateSponsorship = useMutation({
+    mutationFn: sponsorsApi.terminateSponsorship,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['mySponsorship'] });
+      qc.invalidateQueries({ queryKey: ['sponsors'] });
+      setConfirmEnd(false);
+    },
+    onError: (err: Error) => setActionError(err.message),
+  });
 
   const sendRequest = useMutation({
     mutationFn: (sponsorId: string) => sponsorsApi.sendRequest(sponsorId),
@@ -67,16 +78,50 @@ export default function SponsorsPage() {
 
       {/* Active sponsorship banner */}
       {hasActiveSponsorship && (
-        <div className="mb-6 bg-primary-50 border border-primary-200 rounded-2xl px-5 py-4 flex items-center gap-3">
-          <UserCheck size={20} className="text-primary-600 shrink-0" />
-          <div>
-            <p className="text-sm font-semibold text-primary-800">
-              You already have an active sponsor — {sponsorshipData?.sponsorship?.partner_name}
-            </p>
-            <p className="text-xs text-primary-600 mt-0.5">
-              Use the chat bubble in the bottom-right corner to talk with them.
-            </p>
+        <div className="mb-6 bg-primary-50 border border-primary-200 rounded-2xl px-5 py-4">
+          <div className="flex items-center gap-3">
+            <UserCheck size={20} className="text-primary-600 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-primary-800">
+                Active connection with {sponsorshipData?.sponsorship?.partner_name}
+              </p>
+              <p className="text-xs text-primary-600 mt-0.5">
+                Use the chat bubble in the bottom-right corner to talk with them.
+              </p>
+            </div>
+            {!confirmEnd && (
+              <button
+                onClick={() => setConfirmEnd(true)}
+                className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors"
+              >
+                <LogOut size={12} />
+                End
+              </button>
+            )}
           </div>
+          {confirmEnd && (
+            <div className="mt-3 pt-3 border-t border-primary-200 flex items-center justify-between gap-3">
+              <p className="text-xs text-primary-700">
+                Are you sure you want to end this sponsorship? This cannot be undone.
+              </p>
+              <div className="flex gap-2 shrink-0">
+                <button
+                  onClick={() => setConfirmEnd(false)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => terminateSponsorship.mutate()}
+                  disabled={terminateSponsorship.isPending}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-50 transition-colors"
+                >
+                  {terminateSponsorship.isPending ? <Loader2 size={11} className="animate-spin" /> : null}
+                  Yes, End It
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

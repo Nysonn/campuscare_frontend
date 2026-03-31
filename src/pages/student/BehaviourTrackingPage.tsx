@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Target, Plus, CheckCircle2, XCircle, Trophy, Calendar, TrendingUp, ChevronDown, ChevronUp, Flag } from 'lucide-react';
 import { behaviourApi } from '../../api/behaviour';
-import type { BehaviourGoalWithLogs, BehaviourGoal, BehaviourStats } from '../../types';
+import type { BehaviourGoalWithLogs, BehaviourGoal } from '../../types';
 import Spinner from '../../components/ui/Spinner';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -73,8 +73,8 @@ function CreateGoalForm({ onCreated }: { onCreated: () => void }) {
     <div className="max-w-lg mx-auto">
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
         <div className="flex items-center gap-3 mb-6">
-          <div className="h-10 w-10 rounded-xl bg-violet-50 flex items-center justify-center">
-            <Target size={20} className="text-violet-600" />
+          <div className="h-10 w-10 rounded-xl bg-primary-50 flex items-center justify-center">
+            <Target size={20} className="text-primary-600" />
           </div>
           <div>
             <h2 className="font-display font-bold text-gray-900">Set a New Goal</h2>
@@ -93,7 +93,7 @@ function CreateGoalForm({ onCreated }: { onCreated: () => void }) {
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Exercise daily, Quit social media scrolling"
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
 
@@ -149,7 +149,7 @@ function CreateGoalForm({ onCreated }: { onCreated: () => void }) {
                 value={startDate}
                 min={today}
                 onChange={e => setStartDate(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -159,7 +159,7 @@ function CreateGoalForm({ onCreated }: { onCreated: () => void }) {
                 value={endDate}
                 min={startDate || today}
                 onChange={e => setEndDate(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -171,7 +171,7 @@ function CreateGoalForm({ onCreated }: { onCreated: () => void }) {
           <button
             type="submit"
             disabled={mutation.isPending}
-            className="w-full py-3 rounded-xl bg-violet-600 text-white font-semibold text-sm hover:bg-violet-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 rounded-xl bg-primary-600 text-white font-semibold text-sm hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
             {mutation.isPending ? <Spinner size="sm" /> : <Plus size={16} />}
             {mutation.isPending ? 'Creating…' : 'Start Tracking'}
@@ -310,7 +310,7 @@ function ActiveGoalView({ goal }: { goal: BehaviourGoalWithLogs }) {
             <h2 className="font-display text-xl font-bold text-gray-900">{goal.title}</h2>
           </div>
           <div className="text-right shrink-0">
-            <p className="font-display text-2xl font-bold text-violet-600">{daysRemaining}</p>
+            <p className="font-display text-2xl font-bold text-primary-600">{daysRemaining}</p>
             <p className="text-xs text-gray-400">days left</p>
           </div>
         </div>
@@ -322,7 +322,7 @@ function ActiveGoalView({ goal }: { goal: BehaviourGoalWithLogs }) {
         </div>
         <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
           <div
-            className="h-full bg-violet-500 rounded-full transition-all duration-500"
+            className="h-full bg-primary-500 rounded-full transition-all duration-500"
             style={{ width: `${progressPct}%` }}
           />
         </div>
@@ -331,7 +331,7 @@ function ActiveGoalView({ goal }: { goal: BehaviourGoalWithLogs }) {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Total Days', value: totalDays, color: 'text-violet-600 bg-violet-50' },
+          { label: 'Total Days', value: totalDays, color: 'text-primary-600 bg-primary-50' },
           { label: 'Successful', value: daysSucceeded, color: 'text-emerald-600 bg-emerald-50' },
           { label: 'Success Rate', value: `${successRate}%`, color: 'text-blue-600 bg-blue-50' },
         ].map(s => (
@@ -345,7 +345,7 @@ function ActiveGoalView({ goal }: { goal: BehaviourGoalWithLogs }) {
       {/* Calendar grid */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <h3 className="font-display font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <Calendar size={16} className="text-violet-600" />
+          <Calendar size={16} className="text-primary-600" />
           Daily Check-in
         </h3>
         <p className="text-xs text-gray-400 mb-4">
@@ -383,7 +383,7 @@ function ActiveGoalView({ goal }: { goal: BehaviourGoalWithLogs }) {
             <button
               onClick={() => completeMutation.mutate()}
               disabled={completeMutation.isPending}
-              className="px-4 py-2 rounded-xl text-sm bg-violet-600 text-white font-semibold hover:bg-violet-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 rounded-xl text-sm bg-primary-600 text-white font-semibold hover:bg-primary-700 disabled:opacity-50 transition-colors"
             >
               {completeMutation.isPending ? 'Completing…' : 'Confirm'}
             </button>
@@ -391,7 +391,7 @@ function ActiveGoalView({ goal }: { goal: BehaviourGoalWithLogs }) {
         ) : (
           <button
             onClick={() => setShowConfirm(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm bg-violet-50 text-violet-700 font-semibold hover:bg-violet-100 transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm bg-primary-50 text-primary-700 font-semibold hover:bg-primary-100 transition-colors"
           >
             <Trophy size={14} />
             Complete Goal
@@ -455,11 +455,11 @@ function PastGoalCard({ goal }: { goal: BehaviourGoal }) {
                   <p className="text-xs text-gray-400">{s.label}</p>
                 </div>
               ))}
-              <div className="col-span-3 bg-violet-50 rounded-xl p-3 text-center">
-                <p className="font-display text-2xl font-bold text-violet-700">
+              <div className="col-span-3 bg-primary-50 rounded-xl p-3 text-center">
+                <p className="font-display text-2xl font-bold text-primary-700">
                   {Math.round(stats.success_rate)}%
                 </p>
-                <p className="text-xs text-violet-500">Success Rate</p>
+                <p className="text-xs text-primary-500">Success Rate</p>
               </div>
             </div>
           ) : null}
@@ -513,13 +513,13 @@ export default function BehaviourTrackingPage() {
         <ActiveGoalView goal={activeGoal} />
       ) : (
         <>
-          <div className="bg-violet-50 border border-violet-100 rounded-2xl p-5 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-xl bg-violet-100 flex items-center justify-center shrink-0">
-              <Target size={20} className="text-violet-600" />
+          <div className="bg-primary-50 border border-primary-100 rounded-2xl p-5 flex items-center gap-4">
+            <div className="h-10 w-10 rounded-xl bg-primary-100 flex items-center justify-center shrink-0">
+              <Target size={20} className="text-primary-600" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-violet-900">No active goal</p>
-              <p className="text-xs text-violet-600">Create a goal below to start tracking your behaviour.</p>
+              <p className="text-sm font-semibold text-primary-900">No active goal</p>
+              <p className="text-xs text-primary-600">Create a goal below to start tracking your behaviour.</p>
             </div>
           </div>
           <CreateGoalForm onCreated={handleCreated} />

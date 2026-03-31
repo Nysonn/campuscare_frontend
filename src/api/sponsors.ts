@@ -43,6 +43,9 @@ export const sponsorsApi = {
   mySponsorship: () =>
     api.get<{ sponsorship: Sponsorship | null }>('/sponsorships/mine'),
 
+  terminateSponsorship: () =>
+    api.delete<{ message: string }>('/sponsorships/mine'),
+
   getStreamToken: () =>
     api.get<StreamTokenResponse>('/stream/token'),
 
