@@ -68,6 +68,7 @@ function ChatWidget({
   // ── Video call state ──────────────────────────────────────────────────────
   const [activeCall, setActiveCall]     = useState<Call | null>(null);
   const [incomingCall, setIncomingCall] = useState<Call | null>(null);
+  const [activeCallMode, setActiveCallMode] = useState<'incoming' | 'outgoing' | null>(null);
   const [startingCall, setStartingCall] = useState(false);
   const videoClientRef = useRef<StreamVideoClient | null>(null);
 
@@ -155,7 +156,6 @@ function ChatWidget({
         // Listen for incoming calls (ring events)
         videoClient.on('call.ring', event => {
           if (!active) return;
-          // @ts-expect-error Stream SDK event type
           const callObj: Call = videoClient.call(event.call.type, event.call.id);
           setIncomingCall(callObj);
         });
@@ -197,12 +197,21 @@ function ChatWidget({
     const vc = videoClientRef.current;
     if (!vc || startingCall) return;
     setStartingCall(true);
+    setError(null);
     try {
       const call = vc.call('default', callId);
-      await call.ring({ members: [{ user_id: userId }, { user_id: partnerId }] });
+      await call.getOrCreate({
+        data: {
+          members: [{ user_id: userId }, { user_id: partnerId }],
+        },
+        ring: true,
+        video: true,
+      });
+      await call.join();
+      setActiveCallMode('outgoing');
       setActiveCall(call);
     } catch {
-      // ignore — user can retry
+      setError('Could not start the video call. Please try again.');
     } finally {
       setStartingCall(false);
     }
@@ -211,8 +220,8 @@ function ChatWidget({
   const handleAcceptCall = async () => {
     if (!incomingCall) return;
     try {
-      await incomingCall.accept();
       await incomingCall.join();
+      setActiveCallMode('incoming');
       setActiveCall(incomingCall);
     } finally {
       setIncomingCall(null);
@@ -229,6 +238,7 @@ function ChatWidget({
 
   const handleCloseCall = () => {
     setActiveCall(null);
+    setActiveCallMode(null);
   };
 
   const handleSend = async () => {
@@ -389,6 +399,7 @@ function ChatWidget({
         <VideoCallModal
           videoClient={videoClientRef.current}
           call={activeCall}
+          mode={activeCallMode ?? 'outgoing'}
           partnerName={partnerName}
           partnerAvatar={partnerAvatar}
           onClose={handleCloseCall}
