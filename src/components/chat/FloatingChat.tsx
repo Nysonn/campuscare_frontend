@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { MessageCircle, X, Send, Loader2, ChevronDown, User } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, ChevronDown, User, Video } from 'lucide-react';
 import { StreamChat, type Channel, type MessageResponse } from 'stream-chat';
+import { StreamVideoClient, type Call } from '@stream-io/video-react-sdk';
 import { sponsorsApi } from '../../api/sponsors';
 import { useAppSelector } from '../../store/hooks';
 import Avatar from '../ui/Avatar';
+import IncomingCallCard from './IncomingCallCard';
+import VideoCallModal from './VideoCallModal';
 
 interface ChatMessage {
   id: string;
@@ -26,15 +29,24 @@ export default function FloatingChat() {
 
   if (sponsorshipLoading || !sponsorship) return null;
 
-  return <ChatWidget channelId={sponsorship.channel_id} partnerName={sponsorship.partner_name} partnerAvatar={sponsorship.partner_avatar} />;
+  return (
+    <ChatWidget
+      channelId={sponsorship.channel_id}
+      partnerId={sponsorship.partner_id}
+      partnerName={sponsorship.partner_name}
+      partnerAvatar={sponsorship.partner_avatar}
+    />
+  );
 }
 
 function ChatWidget({
   channelId,
+  partnerId,
   partnerName,
   partnerAvatar,
 }: {
   channelId: string;
+  partnerId: string;
   partnerName: string;
   partnerAvatar: string;
 }) {
@@ -52,6 +64,12 @@ function ChatWidget({
   const [sending, setSending]         = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [error, setError]             = useState<string | null>(null);
+
+  // ── Video call state ──────────────────────────────────────────────────────
+  const [activeCall, setActiveCall]     = useState<Call | null>(null);
+  const [incomingCall, setIncomingCall] = useState<Call | null>(null);
+  const [startingCall, setStartingCall] = useState(false);
+  const videoClientRef = useRef<StreamVideoClient | null>(null);
 
   const clientRef  = useRef<StreamChat | null>(null);
   const channelRef = useRef<Channel | null>(null);
@@ -78,7 +96,7 @@ function ChatWidget({
       })),
   []);
 
-  // Initialise the Stream Chat client once tokenData is ready.
+  // Initialise Stream Chat + Video clients once tokenData is ready.
   useEffect(() => {
     if (!tokenData || !userId) return;
 
@@ -86,6 +104,7 @@ function ChatWidget({
 
     const init = async () => {
       try {
+        // ── Chat ──────────────────────────────────────────────────────────────
         const client = StreamChat.getInstance(tokenData.api_key);
 
         if (!client.userID) {
@@ -120,6 +139,26 @@ function ChatWidget({
             setUnreadCount(c => c + 1);
           }
         });
+
+        // ── Video ─────────────────────────────────────────────────────────────
+        const videoClient = new StreamVideoClient({
+          apiKey: tokenData.api_key,
+          user:   { id: userId, name: userName },
+          token:  tokenData.token,
+        });
+        if (!active) {
+          videoClient.disconnectUser().catch(() => {});
+          return;
+        }
+        videoClientRef.current = videoClient;
+
+        // Listen for incoming calls (ring events)
+        videoClient.on('call.ring', event => {
+          if (!active) return;
+          // @ts-expect-error Stream SDK event type
+          const callObj: Call = videoClient.call(event.call.type, event.call.id);
+          setIncomingCall(callObj);
+        });
       } catch (e) {
         if (active) setError('Could not connect to chat. Please refresh.');
       }
@@ -133,6 +172,8 @@ function ChatWidget({
       clientRef.current?.disconnectUser().catch(() => {});
       clientRef.current  = null;
       channelRef.current = null;
+      videoClientRef.current?.disconnectUser().catch(() => {});
+      videoClientRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenData, userId]);
@@ -147,6 +188,47 @@ function ChatWidget({
   const handleOpen = () => {
     setIsOpen(true);
     setUnreadCount(0);
+  };
+
+  // ── Video handlers ──────────────────────────────────────────────────────────
+  const callId = channelId.replace(/^spo-/, 'call-');
+
+  const handleStartCall = async () => {
+    const vc = videoClientRef.current;
+    if (!vc || startingCall) return;
+    setStartingCall(true);
+    try {
+      const call = vc.call('default', callId);
+      await call.ring({ members: [{ user_id: userId }, { user_id: partnerId }] });
+      setActiveCall(call);
+    } catch {
+      // ignore — user can retry
+    } finally {
+      setStartingCall(false);
+    }
+  };
+
+  const handleAcceptCall = async () => {
+    if (!incomingCall) return;
+    try {
+      await incomingCall.accept();
+      await incomingCall.join();
+      setActiveCall(incomingCall);
+    } finally {
+      setIncomingCall(null);
+    }
+  };
+
+  const handleDeclineCall = async () => {
+    try {
+      await incomingCall?.reject();
+    } finally {
+      setIncomingCall(null);
+    }
+  };
+
+  const handleCloseCall = () => {
+    setActiveCall(null);
   };
 
   const handleSend = async () => {
@@ -189,6 +271,15 @@ function ChatWidget({
               ) : 'Connecting…'}
             </p>
           </div>
+          {/* Video call button */}
+          <button
+            onClick={handleStartCall}
+            disabled={!connected || startingCall || !!activeCall}
+            className="text-primary-200 hover:text-white transition-colors p-1 rounded-lg hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Start video call"
+          >
+            {startingCall ? <Loader2 size={18} className="animate-spin" /> : <Video size={18} />}
+          </button>
           <button
             onClick={() => setIsOpen(false)}
             className="text-primary-200 hover:text-white transition-colors p-1 rounded-lg hover:bg-primary-700"
@@ -282,6 +373,27 @@ function ChatWidget({
           </>
         )}
       </button>
+
+      {/* ── Incoming call card ── */}
+      {incomingCall && !activeCall && (
+        <IncomingCallCard
+          callerName={partnerName}
+          callerAvatar={partnerAvatar}
+          onAccept={handleAcceptCall}
+          onDecline={handleDeclineCall}
+        />
+      )}
+
+      {/* ── Video call modal ── */}
+      {activeCall && videoClientRef.current && (
+        <VideoCallModal
+          videoClient={videoClientRef.current}
+          call={activeCall}
+          partnerName={partnerName}
+          partnerAvatar={partnerAvatar}
+          onClose={handleCloseCall}
+        />
+      )}
     </>
   );
 }
