@@ -1,94 +1,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ClipboardList, ChevronRight, ChevronLeft, CheckCircle, RotateCcw, Clock, BarChart2 } from 'lucide-react';
+import { ClipboardList, ChevronRight, ChevronLeft, CheckCircle, RotateCcw, Clock, BarChart2, Sparkles } from 'lucide-react';
 import { evaluationApi } from '../../api/evaluation';
-import type { EvaluationResult, EvaluationHistoryItem } from '../../types';
+import type { EvaluationQuestion, EvaluationResult, EvaluationHistoryItem } from '../../types';
 import Spinner from '../../components/ui/Spinner';
-
-// ── Static questions (mirrors backend) ───────────────────────────────────────
-
-const QUESTIONS = [
-  {
-    id: 1,
-    text: 'How would you rate your sleep quality over the past week?',
-    options: [
-      'Very poor — I barely slept or woke up constantly',
-      'Poor — I often had trouble sleeping',
-      'Fair — My sleep was okay most nights',
-      'Good — I slept well most nights',
-    ],
-  },
-  {
-    id: 2,
-    text: 'How would you describe your overall mood this week?',
-    options: [
-      'Very low — I felt sad or empty most of the time',
-      'Low — I struggled to feel positive',
-      'Moderate — My mood had ups and downs',
-      'Good — I felt generally positive and upbeat',
-    ],
-  },
-  {
-    id: 3,
-    text: 'How stressed have you been with your academic workload?',
-    options: [
-      'Overwhelmed — I feel I cannot cope',
-      'Very stressed — It is affecting my daily life',
-      'Somewhat stressed — I am managing but it is tough',
-      'Managing well — I feel in control of my studies',
-    ],
-  },
-  {
-    id: 4,
-    text: 'How connected do you feel to friends and family?',
-    options: [
-      'Very isolated — I feel completely alone',
-      'Somewhat isolated — I rarely connect with others',
-      'Somewhat connected — I have some social interaction',
-      'Well connected — I feel supported by people around me',
-    ],
-  },
-  {
-    id: 5,
-    text: 'How well have you been able to focus on tasks this week?',
-    options: [
-      'Cannot focus — My mind is constantly distracted',
-      'Struggle to focus — I get very little done',
-      'Moderate focus — I can focus with some effort',
-      'Good focus — I concentrate and stay on task well',
-    ],
-  },
-  {
-    id: 6,
-    text: 'How physically active have you been this week?',
-    options: [
-      'Not active at all — I have been mostly sedentary',
-      'Slightly active — I moved a little',
-      'Moderately active — I had some exercise or walks',
-      'Very active — I exercised regularly',
-    ],
-  },
-  {
-    id: 7,
-    text: 'How often have you felt anxious or worried this week?',
-    options: [
-      'Almost always — I feel anxious most of the time',
-      'Often — Anxiety is frequently on my mind',
-      'Sometimes — I get anxious but it passes',
-      'Rarely — I feel mostly calm and at ease',
-    ],
-  },
-  {
-    id: 8,
-    text: 'Overall, how would you rate your sense of wellbeing right now?',
-    options: [
-      'Very poor — I am really struggling',
-      'Poor — Things do not feel right',
-      'Fair — I am getting by day to day',
-      'Good — I feel well overall',
-    ],
-  },
-];
 
 // ── Category config ───────────────────────────────────────────────────────────
 
@@ -268,16 +183,36 @@ function HistoryTab() {
 
 // ── Quiz ──────────────────────────────────────────────────────────────────────
 
-function EvaluationQuiz({ onComplete }: { onComplete: (result: EvaluationResult) => void }) {
+function EvaluationQuiz({
+  quizKey,
+  onComplete,
+}: {
+  quizKey: number;
+  onComplete: (result: EvaluationResult) => void;
+}) {
   const queryClient = useQueryClient();
-  const [step, setStep] = useState(0); // 0-indexed question index
-  const [answers, setAnswers] = useState<Record<string, number>>({}); // { "1": 3, ... }
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
   const [error, setError] = useState('');
 
-  const currentQ = QUESTIONS[step];
-  const totalSteps = QUESTIONS.length;
-  const progressPct = Math.round((step / totalSteps) * 100);
-  const selectedScore = answers[String(currentQ.id)];
+  // Fetch AI-generated questions fresh on every quiz attempt.
+  const {
+    data: questionsData,
+    isLoading: questionsLoading,
+    isError: questionsError,
+    refetch: refetchQuestions,
+  } = useQuery({
+    queryKey: ['evaluationQuestions', quizKey],
+    queryFn: evaluationApi.getQuestions,
+    staleTime: Infinity, // keep for the duration of this quiz attempt only
+    retry: 1,
+  });
+
+  const questions: EvaluationQuestion[] = questionsData?.questions ?? [];
+  const totalSteps = questions.length;
+  const currentQ = questions[step];
+  const progressPct = totalSteps > 0 ? Math.round((step / totalSteps) * 100) : 0;
+  const selectedScore = currentQ ? answers[String(currentQ.id)] : undefined;
 
   const mutation = useMutation({
     mutationFn: evaluationApi.submit,
@@ -289,6 +224,7 @@ function EvaluationQuiz({ onComplete }: { onComplete: (result: EvaluationResult)
   });
 
   const handleSelect = (score: number) => {
+    if (!currentQ) return;
     setAnswers(prev => ({ ...prev, [String(currentQ.id)]: score }));
     setError('');
   };
@@ -301,7 +237,6 @@ function EvaluationQuiz({ onComplete }: { onComplete: (result: EvaluationResult)
     if (step < totalSteps - 1) {
       setStep(s => s + 1);
     } else {
-      // Submit
       mutation.mutate(answers);
     }
   };
@@ -309,6 +244,46 @@ function EvaluationQuiz({ onComplete }: { onComplete: (result: EvaluationResult)
   const handleBack = () => {
     if (step > 0) setStep(s => s - 1);
   };
+
+  // ── Loading state while Groq generates questions ──────────────────────────
+
+  if (questionsLoading) {
+    return (
+      <div className="max-w-lg mx-auto">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 flex flex-col items-center gap-4 text-center">
+          <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center">
+            <Sparkles size={22} className="text-primary-500 animate-pulse" />
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 text-sm">Preparing your evaluation</p>
+            <p className="text-xs text-gray-400 mt-1">Our AI is crafting personalised questions for you…</p>
+          </div>
+          <Spinner size="md" />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Error state ───────────────────────────────────────────────────────────
+
+  if (questionsError || questions.length === 0) {
+    return (
+      <div className="max-w-lg mx-auto">
+        <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-8 flex flex-col items-center gap-4 text-center">
+          <p className="text-sm font-semibold text-red-600">Could not load questions</p>
+          <p className="text-xs text-gray-400">There was a problem connecting to the AI. Please try again.</p>
+          <button
+            onClick={() => refetchQuestions()}
+            className="px-5 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Quiz UI ───────────────────────────────────────────────────────────────
 
   return (
     <div className="max-w-lg mx-auto">
@@ -337,7 +312,7 @@ function EvaluationQuiz({ onComplete }: { onComplete: (result: EvaluationResult)
 
         <div className="space-y-3">
           {currentQ.options.map((option, idx) => {
-            const score = idx + 1; // idx 0 → score 1, idx 3 → score 4
+            const score = idx + 1;
             const isSelected = selectedScore === score;
             return (
               <button
@@ -399,7 +374,7 @@ type Tab = 'evaluate' | 'history';
 export default function SelfEvaluationPage() {
   const [tab, setTab] = useState<Tab>('evaluate');
   const [result, setResult] = useState<EvaluationResult | null>(null);
-  const [quizKey, setQuizKey] = useState(0); // reset quiz on retake
+  const [quizKey, setQuizKey] = useState(0);
 
   const handleComplete = (res: EvaluationResult) => {
     setResult(res);
@@ -407,7 +382,7 @@ export default function SelfEvaluationPage() {
 
   const handleRetake = () => {
     setResult(null);
-    setQuizKey(k => k + 1);
+    setQuizKey(k => k + 1); // increment forces a fresh Groq question fetch
     setTab('evaluate');
   };
 
@@ -445,7 +420,7 @@ export default function SelfEvaluationPage() {
         result ? (
           <ResultCard result={result} onRetake={handleRetake} />
         ) : (
-          <EvaluationQuiz key={quizKey} onComplete={handleComplete} />
+          <EvaluationQuiz key={quizKey} quizKey={quizKey} onComplete={handleComplete} />
         )
       ) : (
         <HistoryTab />

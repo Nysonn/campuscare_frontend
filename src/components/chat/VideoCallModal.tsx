@@ -12,6 +12,7 @@ import {
 } from '@stream-io/video-react-sdk';
 import { Mic, MicOff, Video as VideoIcon, VideoOff, PhoneOff, Loader2 } from 'lucide-react';
 import Avatar from '../ui/Avatar';
+import { useRingtone } from './useRingtone';
 
 // ── Call controls & layout ────────────────────────────────────────────────────
 
@@ -59,6 +60,9 @@ function CallUI({ mode, partnerName, partnerAvatar, onClose }: CallUIProps) {
   useEffect(() => {
     if (isIdle) onClose();
   }, [isIdle, onClose]);
+
+  // Play ringback tone while the outgoing call is waiting to be answered
+  useRingtone(isCalling, 'outgoing');
 
   const isPending = isCalling || isRinging || isJoining;
 

@@ -1,5 +1,6 @@
 import { Phone, PhoneOff } from 'lucide-react';
 import Avatar from '../ui/Avatar';
+import { useRingtone } from './useRingtone';
 
 interface Props {
   callerName: string;
@@ -9,6 +10,9 @@ interface Props {
 }
 
 export default function IncomingCallCard({ callerName, callerAvatar, onAccept, onDecline }: Props) {
+  // Play the incoming ring tone for as long as this card is mounted
+  useRingtone(true, 'incoming');
+
   return (
     <div className="fixed bottom-24 right-4 sm:right-6 z-[60] bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 w-72 flex flex-col gap-3 animate-in slide-in-from-bottom-4 duration-300">
       {/* Pulsing ring indicator */}
