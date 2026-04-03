@@ -1,10 +1,16 @@
 import { Link } from 'react-router-dom';
 import { Home, Search } from 'lucide-react';
+import SEO from '../components/seo/SEO';
 import Button from '../components/ui/Button';
 
 export default function NotFoundPage() {
   return (
     <div className="relative min-h-screen bg-linear-to-br from-primary-50 via-white to-primary-50 flex flex-col items-center justify-center overflow-hidden px-4">
+      <SEO
+        title="Page Not Found"
+        description="The page you're looking for doesn't exist. Return to CampusCare and find mental health resources, student campaigns, or book a counselling session."
+        noindex
+      />
       {/* Decorative blobs */}
       <div
         className="pointer-events-none absolute -top-32 -right-32 w-125 h-125 bg-primary-100 rounded-full blur-3xl opacity-40"

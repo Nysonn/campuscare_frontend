@@ -11,6 +11,7 @@ import type { ChatMessage, StudentProfile } from '../../types';
 import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
 import BecomeSponsorModal from '../../components/sponsor/BecomeSponsorModal';
+import SEO from '../../components/seo/SEO';
 
 function cleanBotText(text: string) {
   return text.replace(/\s*\*\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
@@ -142,6 +143,11 @@ export default function StudentDashboard() {
 
   return (
     <div>
+      <SEO
+        title="My Dashboard"
+        description="Manage your CampusCare account, view campaigns, bookings, and access mental health resources."
+        noindex
+      />
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">
           Good day, {displayName}

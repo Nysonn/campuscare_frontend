@@ -12,6 +12,7 @@ import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
 import Spinner from '../components/ui/Spinner';
 import Toast from '../components/ui/Toast';
+import SEO from '../components/seo/SEO';
 
 const PAYMENT_METHODS = [
   { value: 'mtn_momo', label: 'MTN Mobile Money' },
@@ -143,8 +144,46 @@ export default function CampaignDetailPage() {
   const authorName = campaign.is_anonymous ? 'Anonymous' : (campaign.author || 'Student');
   const pct = Math.min(100, Math.round((campaign.current_amount / campaign.target_amount) * 100));
 
+  const campaignUrl = `https://campuscare.me/campaigns/${id}`;
+  const seoDescription = campaign.description.slice(0, 155);
+
+  const creativeWorkSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: campaign.title,
+    description: campaign.description.slice(0, 200),
+    url: campaignUrl,
+    author: {
+      '@type': 'Person',
+      name: authorName,
+    },
+    dateCreated: campaign.created_at,
+    provider: {
+      '@type': 'Organization',
+      name: 'CampusCare',
+      url: 'https://campuscare.me',
+    },
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://campuscare.me' },
+      { '@type': 'ListItem', position: 2, name: 'Campaigns', item: 'https://campuscare.me/campaigns' },
+      { '@type': 'ListItem', position: 3, name: campaign.title, item: campaignUrl },
+    ],
+  };
+
   return (
     <div className="pt-16 min-h-screen bg-gray-50">
+      <SEO
+        title={campaign.title}
+        description={seoDescription}
+        type="article"
+        url={campaignUrl}
+        additionalSchemas={[creativeWorkSchema, breadcrumbSchema]}
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
         <Link to="/campaigns" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600 transition-colors mb-6">
           <ArrowLeft size={16} /> Back to campaigns

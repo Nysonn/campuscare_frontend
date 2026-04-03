@@ -3,7 +3,7 @@ import type { EvaluationQuestion, EvaluationResult, EvaluationHistoryItem } from
 
 export const evaluationApi = {
   getQuestions: () =>
-    api.get<{ questions: EvaluationQuestion[] }>('/evaluations/questions'),
+    api.get<{ questions: EvaluationQuestion[] }>(`/evaluations/questions?seed=${Date.now()}`),
 
   submit: (answers: Record<string, number>) =>
     api.post<EvaluationResult>('/evaluations', { answers }),

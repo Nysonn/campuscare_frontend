@@ -7,6 +7,7 @@ import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
+import SEO from '../../components/seo/SEO';
 
 const statusBadge: Record<string, 'yellow' | 'green' | 'red' | 'gray'> = {
   pending: 'yellow',
@@ -33,6 +34,11 @@ export default function MyCampaignsPage() {
 
   return (
     <div>
+      <SEO
+        title="My Campaigns"
+        description="Manage your fundraising campaigns on CampusCare."
+        noindex
+      />
       <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">My Campaigns</h1>

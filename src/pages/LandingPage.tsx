@@ -6,6 +6,23 @@ import CampaignCard from '../components/campaign/CampaignCard';
 import CampaignCardSkeleton from '../components/campaign/CampaignCardSkeleton';
 import Button from '../components/ui/Button';
 import Footer from '../components/layout/Footer';
+import SEO from '../components/seo/SEO';
+
+const WEBSITE_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'CampusCare',
+  url: 'https://campuscare.me',
+  description: 'University-based crowdfunding platform for student mental health support in Uganda',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: 'https://campuscare.me/campaigns?search={search_term_string}',
+    },
+    'query-input': 'required name=search_term_string',
+  },
+};
 
 export default function LandingPage() {
   const { data: campaigns, isLoading, isError, refetch } = useQuery({
@@ -17,6 +34,14 @@ export default function LandingPage() {
 
   return (
     <div>
+      <SEO
+        title="You're Not Alone in This Journey"
+        description="CampusCare connects university students with mental health resources, confidential counselling, and community crowdfunding. Join thousands of students in Uganda getting the support they deserve."
+        keywords="student mental health Uganda, university counselling, student crowdfunding Uganda, campus mental health support, student wellbeing"
+        url="https://campuscare.me"
+        includeOrgSchema
+        additionalSchemas={[WEBSITE_SCHEMA]}
+      />
       {/* ── Hero Section ─────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-primary-50 min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center">
 

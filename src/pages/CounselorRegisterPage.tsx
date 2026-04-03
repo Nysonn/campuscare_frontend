@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import SEO from '../components/seo/SEO';
 import { Eye, EyeOff, Stethoscope, AlertTriangle } from 'lucide-react';
 import { authApi } from '../api/auth';
 import { setAuthToken } from '../api/client';
@@ -51,31 +52,47 @@ export default function CounselorRegisterPage() {
 
   return (
     <div className="min-h-screen flex bg-gray-50">
+      <SEO
+        title="Join as a Counsellor"
+        description="Join CampusCare as a certified mental health counsellor. Connect with university students, manage appointments, and grow your professional practice in Uganda."
+        keywords="counsellor Uganda, mental health professional, university counsellor jobs"
+      />
       {/* Left panel */}
-      <div className="hidden lg:flex flex-col justify-between w-1/2 bg-linear-to-br from-primary-700 to-primary-900 p-12 text-white">
-        <Link to="/" className="flex items-center gap-2.5">
-          <img src="/logo.png" alt="CampusCare" className="h-9 w-9 object-contain" />
-          <span className="font-display font-bold text-xl">CampusCare</span>
-        </Link>
-        <div>
-          <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
-            <Stethoscope size={32} className="text-white" />
+      <div
+        className="hidden lg:flex flex-col justify-between w-1/2 p-12 text-white relative overflow-hidden"
+        style={{
+          backgroundImage: 'url(https://res.cloudinary.com/df3lhzzy7/image/upload/v1775223629/therapies_zpwseg.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-primary-900/65" />
+        <div className="relative z-10 flex flex-col justify-between h-full">
+          <Link to="/" className="flex items-center gap-2.5">
+            <img src="/logo.png" alt="CampusCare" className="h-9 w-9 object-contain" />
+            <span className="font-display font-bold text-xl">CampusCare</span>
+          </Link>
+          <div>
+            <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
+              <Stethoscope size={32} className="text-white" />
+            </div>
+            <h2 className="font-display text-4xl font-bold leading-tight mb-4">
+              Support students who need you most.
+            </h2>
+            <p className="text-white/70 text-lg">
+              Manage appointments, conduct online and physical sessions, and make a real difference in student lives.
+            </p>
+            <ul className="mt-6 space-y-2 text-white/70 text-sm">
+              {['Flexible session scheduling', 'Online (Google Meet) & physical sessions', 'Email notifications for bookings', 'Manage your professional profile'].map(f => (
+                <li key={f} className="flex items-center gap-2">
+                  <span className="text-primary-300">✓</span> {f}
+                </li>
+              ))}
+            </ul>
           </div>
-          <h2 className="font-display text-4xl font-bold leading-tight mb-4">
-            Support students who need you most.
-          </h2>
-          <p className="text-white/70 text-lg">
-            Manage appointments, conduct online and physical sessions, and make a real difference in student lives.
-          </p>
-          <ul className="mt-6 space-y-2 text-white/70 text-sm">
-            {['Flexible session scheduling', 'Online (Google Meet) & physical sessions', 'Email notifications for bookings', 'Manage your professional profile'].map(f => (
-              <li key={f} className="flex items-center gap-2">
-                <span className="text-primary-300">✓</span> {f}
-              </li>
-            ))}
-          </ul>
+          <p className="text-white/40 text-sm">© {new Date().getFullYear()} CampusCare</p>
         </div>
-        <p className="text-white/40 text-sm">© {new Date().getFullYear()} CampusCare</p>
       </div>
 
       {/* Right */}

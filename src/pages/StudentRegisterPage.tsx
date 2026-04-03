@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import SEO from '../components/seo/SEO';
 import { Eye, EyeOff, GraduationCap, AlertTriangle } from 'lucide-react';
 import { authApi } from '../api/auth';
 import { setAuthToken } from '../api/client';
@@ -53,24 +54,40 @@ export default function StudentRegisterPage() {
 
   return (
     <div className="min-h-screen flex bg-gray-50">
+      <SEO
+        title="Join as a Student"
+        description="Create your free CampusCare student account. Access mental health resources, start crowdfunding campaigns, book counselling sessions, and connect with a community that cares."
+        keywords="join student mental health platform, student support Uganda, register campuscare"
+      />
       {/* Left panel */}
-      <div className="hidden lg:flex flex-col justify-between w-1/2 bg-linear-to-br from-primary-600 to-primary-800 p-12 text-white">
-        <Link to="/" className="flex items-center gap-2.5">
-          <img src="/logo.png" alt="CampusCare" className="h-9 w-9 object-contain" />
-          <span className="font-display font-bold text-xl">CampusCare</span>
-        </Link>
-        <div>
-          <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
-            <GraduationCap size={32} className="text-white" />
+      <div
+        className="hidden lg:flex flex-col justify-between w-1/2 p-12 text-white relative overflow-hidden"
+        style={{
+          backgroundImage: 'url(https://res.cloudinary.com/df3lhzzy7/image/upload/v1775223629/therapies_zpwseg.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-primary-900/65" />
+        <div className="relative z-10 flex flex-col justify-between h-full">
+          <Link to="/" className="flex items-center gap-2.5">
+            <img src="/logo.png" alt="CampusCare" className="h-9 w-9 object-contain" />
+            <span className="font-display font-bold text-xl">CampusCare</span>
+          </Link>
+          <div>
+            <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
+              <GraduationCap size={32} className="text-white" />
+            </div>
+            <h2 className="font-display text-4xl font-bold leading-tight mb-4">
+              Join a community that has your back.
+            </h2>
+            <p className="text-white/70 text-lg">
+              Create campaigns, book counselling, and connect with peers — all in one safe place.
+            </p>
           </div>
-          <h2 className="font-display text-4xl font-bold leading-tight mb-4">
-            Join a community that has your back.
-          </h2>
-          <p className="text-white/70 text-lg">
-            Create campaigns, book counselling, and connect with peers — all in one safe place.
-          </p>
+          <p className="text-white/40 text-sm">© {new Date().getFullYear()} CampusCare</p>
         </div>
-        <p className="text-white/40 text-sm">© {new Date().getFullYear()} CampusCare</p>
       </div>
 
       {/* Right panel */}

@@ -7,6 +7,7 @@ import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
+import SEO from '../../components/seo/SEO';
 
 type RoleFilter = '' | 'student' | 'counselor' | 'admin';
 
@@ -33,6 +34,11 @@ export default function AdminUsersPage() {
 
   return (
     <div>
+      <SEO
+        title="Manage Users"
+        description="Manage platform users on CampusCare."
+        noindex
+      />
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Users</h1>
         <p className="text-gray-500">Manage platform users.</p>

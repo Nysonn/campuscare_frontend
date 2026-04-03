@@ -6,6 +6,7 @@ import type { SponsorProfile, SponsorRequest } from '../../types';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
+import SEO from '../../components/seo/SEO';
 
 export default function SponsorsPage() {
   const qc = useQueryClient();
@@ -68,6 +69,11 @@ export default function SponsorsPage() {
 
   return (
     <div>
+      <SEO
+        title="Find a Sponsor"
+        description="Connect with a student sponsor on CampusCare for one-on-one peer support."
+        noindex
+      />
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Find a Sponsor</h1>
         <p className="text-gray-500">

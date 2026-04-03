@@ -13,6 +13,7 @@ import type { SponsorRequest } from '../../types';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
+import SEO from '../../components/seo/SEO';
 import Spinner from '../../components/ui/Spinner';
 
 const whatItMeans = [
@@ -92,6 +93,11 @@ export default function BecomeASponsorPage() {
   if (step === 'info') {
     return (
       <div>
+        <SEO
+          title="Become a Sponsor"
+          description="Become a peer sponsor on CampusCare and support a fellow student through difficult times."
+          noindex
+        />
         <div className="mb-8">
           <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Become a Sponsor</h1>
           <p className="text-gray-500">

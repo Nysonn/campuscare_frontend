@@ -40,7 +40,7 @@ export default function CounselorProfileModal({ counselorId, onClose }: Counselo
         <div className="space-y-6">
           {/* Header */}
           <div className="flex flex-col items-center text-center gap-3 pb-4 border-b border-gray-100">
-            <Avatar name={counselor.full_name} size="xl" />
+            <Avatar src={counselor.avatar_url || undefined} name={counselor.full_name} size="xl" />
             <div>
               <h3 className="font-display text-xl font-bold text-gray-900">{counselor.full_name}</h3>
               {counselor.specialization && (

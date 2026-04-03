@@ -5,6 +5,7 @@ import type { AdminContribution } from '../../types';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
+import SEO from '../../components/seo/SEO';
 
 export default function AdminContributionsPage() {
   const { data: contributions, isLoading } = useQuery({
@@ -38,6 +39,11 @@ export default function AdminContributionsPage() {
 
   return (
     <div>
+      <SEO
+        title="Manage Contributions"
+        description="View and manage all donation contributions across the CampusCare platform."
+        noindex
+      />
       <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Contributions</h1>

@@ -32,7 +32,10 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
       ? user.full_name
       : 'Admin';
 
-  const avatarUrl = user?.role === 'student' ? user.avatar_url : undefined;
+  const avatarUrl =
+    user?.role === 'student' ? user.avatar_url
+    : user?.role === 'counselor' ? user.avatar_url
+    : undefined;
 
   const handleLogout = async () => {
     try { await authApi.logout(); } finally {

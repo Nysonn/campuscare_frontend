@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar, Plus, Clock, CheckCircle, XCircle, Video, MapPin } from 'lucide-react';
 import { bookingsApi } from '../../api/bookings';
+import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
+import SEO from '../../components/seo/SEO';
 
 const statusIcon = {
   pending: <Clock size={14} className="text-yellow-500" />,
@@ -20,6 +22,11 @@ export default function MyBookingsPage() {
 
   return (
     <div>
+      <SEO
+        title="My Bookings"
+        description="View and manage your counselling session bookings on CampusCare."
+        noindex
+      />
       <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">My Bookings</h1>
@@ -47,9 +54,7 @@ export default function MyBookingsPage() {
             <div key={b.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="h-12 w-12 rounded-2xl bg-primary-100 flex items-center justify-center shrink-0">
-                    {b.type === 'online' ? <Video size={20} className="text-primary-600" /> : <MapPin size={20} className="text-primary-600" />}
-                  </div>
+                  <Avatar src={b.counselor_avatar || undefined} name={b.counselor_name} size="md" />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <p className="font-semibold text-gray-900 truncate">{b.counselor_name}</p>

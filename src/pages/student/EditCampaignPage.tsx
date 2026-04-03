@@ -8,6 +8,7 @@ import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
 import Spinner from '../../components/ui/Spinner';
 import type { CampaignAttachment } from '../../types';
+import SEO from '../../components/seo/SEO';
 
 const CATEGORIES = ['education', 'medical', 'emergency', 'mental health', 'other'];
 const URGENCY_LEVELS = [
@@ -131,6 +132,11 @@ export default function EditCampaignPage() {
 
   return (
     <div>
+      <SEO
+        title="Edit Campaign"
+        description="Edit and update your CampusCare fundraising campaign."
+        noindex
+      />
       <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600 mb-6 cursor-pointer">
         <ArrowLeft size={16} /> Back
       </button>

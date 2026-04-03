@@ -7,6 +7,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
 import type { CampaignAttachment } from '../../types';
+import SEO from '../../components/seo/SEO';
 
 const CATEGORIES = ['education', 'medical', 'emergency', 'mental health', 'other'];
 const URGENCY_LEVELS = [
@@ -121,6 +122,11 @@ export default function CreateCampaignPage() {
 
   return (
     <div>
+      <SEO
+        title="Create a Campaign"
+        description="Start a new crowdfunding campaign on CampusCare to raise funds for tuition, medical, or emergency needs."
+        noindex
+      />
       <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600 transition-colors mb-6 cursor-pointer">
         <ArrowLeft size={16} /> Back
       </button>

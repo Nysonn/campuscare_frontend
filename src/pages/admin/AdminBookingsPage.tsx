@@ -3,6 +3,7 @@ import { Calendar } from 'lucide-react';
 import { adminApi } from '../../api/admin';
 import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
+import SEO from '../../components/seo/SEO';
 
 export default function AdminBookingsPage() {
   const { data: bookings, isLoading } = useQuery({
@@ -12,6 +13,11 @@ export default function AdminBookingsPage() {
 
   return (
     <div>
+      <SEO
+        title="Manage Bookings"
+        description="View all counselling session bookings across the CampusCare platform."
+        noindex
+      />
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">All Bookings</h1>
         <p className="text-gray-500">All counselling session bookings across the platform.</p>

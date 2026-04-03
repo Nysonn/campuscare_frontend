@@ -4,6 +4,7 @@ import { Target, Plus, CheckCircle2, XCircle, Trophy, Calendar, TrendingUp, Chev
 import { behaviourApi } from '../../api/behaviour';
 import type { BehaviourGoalWithLogs, BehaviourGoal } from '../../types';
 import Spinner from '../../components/ui/Spinner';
+import SEO from '../../components/seo/SEO';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -502,6 +503,11 @@ export default function BehaviourTrackingPage() {
 
   return (
     <div className="space-y-8">
+      <SEO
+        title="Behaviour Tracking"
+        description="Set goals and track your daily habits and mental health behaviours on CampusCare."
+        noindex
+      />
       {/* Page header */}
       <div>
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Behaviour Tracking</h1>

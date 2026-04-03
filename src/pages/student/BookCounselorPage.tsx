@@ -10,6 +10,7 @@ import Textarea from '../../components/ui/Textarea';
 import Avatar from '../../components/ui/Avatar';
 import Spinner from '../../components/ui/Spinner';
 import CounselorProfileModal from '../../components/counselor/CounselorProfileModal';
+import SEO from '../../components/seo/SEO';
 
 export default function BookCounselorPage() {
   const navigate = useNavigate();
@@ -71,6 +72,11 @@ export default function BookCounselorPage() {
 
   return (
     <div>
+      <SEO
+        title="Book a Counsellor"
+        description="Schedule a confidential counselling session with a certified campus counsellor on CampusCare."
+        noindex
+      />
       <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600 mb-6 cursor-pointer">
         <ArrowLeft size={16} /> Back
       </button>
@@ -100,7 +106,7 @@ export default function BookCounselorPage() {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Avatar name={c.full_name} size="md" />
+                    <Avatar src={c.avatar_url || undefined} name={c.full_name} size="md" />
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 text-sm">{c.full_name}</p>
                       {c.specialization && <p className="text-xs text-primary-600 font-medium">{c.specialization}</p>}

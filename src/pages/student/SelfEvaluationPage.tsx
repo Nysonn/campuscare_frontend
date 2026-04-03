@@ -4,6 +4,7 @@ import { ClipboardList, ChevronRight, ChevronLeft, CheckCircle, RotateCcw, Clock
 import { evaluationApi } from '../../api/evaluation';
 import type { EvaluationQuestion, EvaluationResult, EvaluationHistoryItem } from '../../types';
 import Spinner from '../../components/ui/Spinner';
+import SEO from '../../components/seo/SEO';
 
 // ── Category config ───────────────────────────────────────────────────────────
 
@@ -388,6 +389,11 @@ export default function SelfEvaluationPage() {
 
   return (
     <div className="space-y-6">
+      <SEO
+        title="Self Evaluation"
+        description="Take a mental health self-check on CampusCare to understand your wellbeing."
+        noindex
+      />
       {/* Page header */}
       <div>
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Self Evaluation</h1>

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { Search, Heart, RefreshCw, LayoutGrid } from 'lucide-react';
+import SEO from '../components/seo/SEO';
 import Button from '../components/ui/Button';
 import { campaignsApi } from '../api/campaigns';
 import CampaignCard from '../components/campaign/CampaignCard';
@@ -10,8 +12,33 @@ import Footer from '../components/layout/Footer';
 const CATEGORIES = ['All', 'Education', 'Medical', 'Emergency', 'Mental Health', 'Other'];
 
 export default function AllCampaignsPage() {
-  const [search, setSearch] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [inputValue, setInputValue] = useState(searchParams.get('search') ?? '');
   const [category, setCategory] = useState('All');
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Keep inputValue in sync if URL changes externally
+  const search = searchParams.get('search') ?? '';
+
+  useEffect(() => {
+    setInputValue(search);
+  }, [search]);
+
+  const handleSearchChange = (value: string) => {
+    setInputValue(value);
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      setSearchParams(prev => {
+        const next = new URLSearchParams(prev);
+        if (value) {
+          next.set('search', value);
+        } else {
+          next.delete('search');
+        }
+        return next;
+      }, { replace: true });
+    }, 300);
+  };
 
   const { data: campaigns, isLoading, isError, refetch } = useQuery({
     queryKey: ['campaigns'],
@@ -30,6 +57,12 @@ export default function AllCampaignsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        title="Browse Student Campaigns"
+        description="Support university students in Uganda through crowdfunding. Browse active campaigns for tuition fees, medical emergencies, and mental health needs. Every donation makes a difference."
+        keywords="student fundraising Uganda, university crowdfunding, donate to students, student emergency fund"
+        url="https://campuscare.me/campaigns"
+      />
 
       {/* ── Hero / Page Header ─────────────────────────────────────── */}
       <div className="relative pt-16 bg-linear-to-br from-primary-50 via-white to-primary-50 border-b border-primary-100 overflow-hidden">
@@ -66,8 +99,8 @@ export default function AllCampaignsPage() {
               <input
                 type="text"
                 placeholder="Search campaigns..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
+                value={inputValue}
+                onChange={e => handleSearchChange(e.target.value)}
                 className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-white text-sm shadow-sm
                            focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent
                            placeholder:text-gray-400 transition"

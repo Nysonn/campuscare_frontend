@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import SEO from '../components/seo/SEO';
 import { Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { useAppDispatch } from '../store/hooks';
 import { setUser } from '../store/authSlice';
@@ -37,21 +38,37 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex bg-gray-50">
+      <SEO
+        title="Sign In"
+        description="Sign in to your CampusCare account to manage campaigns, book counselling sessions, and connect with the student support community."
+        noindex
+      />
       {/* Left panel */}
-      <div className="hidden lg:flex flex-col justify-between w-1/2 bg-linear-to-br from-primary-600 to-primary-800 p-12 text-white">
-        <Link to="/" className="flex items-center gap-2.5">
-          <img src="/logo.png" alt="CampusCare" className="h-9 w-9 object-contain" />
-          <span className="font-display font-bold text-xl">CampusCare</span>
-        </Link>
-        <div>
-          <h2 className="font-display text-4xl font-bold leading-tight mb-4">
-            Welcome back.<br />You're in a safe place.
-          </h2>
-          <p className="text-white/70 text-lg leading-relaxed">
-            Sign in to access your dashboard, manage campaigns, and connect with our support community.
-          </p>
+      <div
+        className="hidden lg:flex flex-col justify-between w-1/2 p-12 text-white relative overflow-hidden"
+        style={{
+          backgroundImage: 'url(https://res.cloudinary.com/df3lhzzy7/image/upload/v1775223629/therapies_zpwseg.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-primary-900/65" />
+        <div className="relative z-10 flex flex-col justify-between h-full">
+          <Link to="/" className="flex items-center gap-2.5">
+            <img src="/logo.png" alt="CampusCare" className="h-9 w-9 object-contain" />
+            <span className="font-display font-bold text-xl">CampusCare</span>
+          </Link>
+          <div>
+            <h2 className="font-display text-4xl font-bold leading-tight mb-4">
+              Welcome back.<br />You're in a safe place.
+            </h2>
+            <p className="text-white/70 text-lg leading-relaxed">
+              Sign in to access your dashboard, manage campaigns, and connect with our support community.
+            </p>
+          </div>
+          <p className="text-white/40 text-sm">© {new Date().getFullYear()} CampusCare</p>
         </div>
-        <p className="text-white/40 text-sm">© {new Date().getFullYear()} CampusCare</p>
       </div>
 
       {/* Right panel */}

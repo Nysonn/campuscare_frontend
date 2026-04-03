@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Users, Heart, Calendar, TrendingUp } from 'lucide-react';
 import { adminApi } from '../../api/admin';
 import Spinner from '../../components/ui/Spinner';
+import SEO from '../../components/seo/SEO';
 
 export default function AdminDashboard() {
   const { data, isLoading } = useQuery({
@@ -24,6 +25,11 @@ export default function AdminDashboard() {
 
   return (
     <div>
+      <SEO
+        title="Admin Dashboard"
+        description="Manage users, campaigns, bookings, and platform statistics on CampusCare."
+        noindex
+      />
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Admin Dashboard</h1>
         <p className="text-gray-500">Platform overview and statistics.</p>

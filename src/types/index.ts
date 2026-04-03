@@ -92,6 +92,7 @@ export interface CounselorProfile {
   specialization: string;
   bio: string;
   phone: string;
+  avatar_url: string;
 }
 
 export interface AdminProfile {
@@ -152,12 +153,14 @@ export interface Counselor {
   full_name: string;
   specialization: string;
   bio: string;
+  avatar_url: string;
 }
 
 export interface Booking {
   id: string;
   counselor_id: string;
   counselor_name: string;
+  counselor_avatar: string;
   type: 'online' | 'physical';
   start_time: string;
   end_time: string;

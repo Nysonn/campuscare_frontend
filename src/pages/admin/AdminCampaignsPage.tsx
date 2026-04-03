@@ -10,6 +10,7 @@ import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
+import SEO from '../../components/seo/SEO';
 
 function openAttachment(url: string) {
   if (url.startsWith('data:')) {
@@ -61,6 +62,11 @@ export default function AdminCampaignsPage() {
 
   return (
     <div>
+      <SEO
+        title="Manage Campaigns"
+        description="Review and approve student fundraising campaigns on CampusCare."
+        noindex
+      />
       <div className="mb-6">
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Campaign Management</h1>
         <p className="text-gray-500">Review and approve student fundraising campaigns.</p>

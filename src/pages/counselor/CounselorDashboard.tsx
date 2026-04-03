@@ -7,6 +7,7 @@ import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
+import SEO from '../../components/seo/SEO';
 
 type StatusFilter = '' | 'pending' | 'accepted' | 'declined';
 
@@ -36,6 +37,11 @@ export default function CounselorDashboard() {
 
   return (
     <div>
+      <SEO
+        title="Counsellor Dashboard"
+        description="Manage your counselling appointments and student sessions on CampusCare."
+        noindex
+      />
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">My Appointments</h1>
         <p className="text-gray-500">Manage your counselling session requests.</p>

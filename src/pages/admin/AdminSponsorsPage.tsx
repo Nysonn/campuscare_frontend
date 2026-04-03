@@ -4,6 +4,7 @@ import { sponsorsApi } from '../../api/sponsors';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
+import SEO from '../../components/seo/SEO';
 
 export default function AdminSponsorsPage() {
   const { data: sponsors = [], isLoading } = useQuery({
@@ -17,6 +18,11 @@ export default function AdminSponsorsPage() {
 
   return (
     <div>
+      <SEO
+        title="Manage Sponsors"
+        description="View and manage student sponsor partnerships on CampusCare."
+        noindex
+      />
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Sponsors</h1>
         <p className="text-gray-500">

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /campaigns
+Allow: /campaigns/
+Disallow: /student/
+Disallow: /counselor/
+Disallow: /admin/
+Disallow: /register/
+Disallow: /login
+Sitemap: https://campuscare.me/sitemap.xml

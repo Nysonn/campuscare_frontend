@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { CheckCircle2, AlertTriangle, Camera, ShieldOff } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Camera, ShieldOff, Loader2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setUser } from '../../store/authSlice';
 import { authApi } from '../../api/auth';
+import { uploadToCloudinary } from '../../api/cloudinary';
 import type { StudentProfile } from '../../types';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
 import Avatar from '../../components/ui/Avatar';
+import SEO from '../../components/seo/SEO';
 
 export default function StudentProfilePage() {
   const dispatch = useAppDispatch();
@@ -19,23 +21,31 @@ export default function StudentProfilePage() {
   });
   const [success, setSuccess] = useState(false);
   const [avatarError, setAvatarError] = useState('');
+  const [avatarLoading, setAvatarLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    e.target.value = '';
     if (!file.type.startsWith('image/')) {
       setAvatarError('Please select an image file.');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      setAvatarError('Image must be under 2 MB.');
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError('Image must be under 5 MB.');
       return;
     }
     setAvatarError('');
-    const reader = new FileReader();
-    reader.onload = () => setForm(f => ({ ...f, avatar_url: reader.result as string }));
-    reader.readAsDataURL(file);
+    setAvatarLoading(true);
+    try {
+      const url = await uploadToCloudinary(file);
+      setForm(f => ({ ...f, avatar_url: url }));
+    } catch (err) {
+      setAvatarError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
+    } finally {
+      setAvatarLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -78,9 +88,13 @@ export default function StudentProfilePage() {
 
   return (
     <div>
+      <SEO
+        title="My Profile"
+        description="Manage your CampusCare student profile and privacy settings."
+        noindex
+      />
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">My Profile</h1>
-        <p className="text-gray-500">Manage your public profile and privacy settings.</p>
       </div>
 
       <div className="space-y-6">
@@ -118,7 +132,8 @@ export default function StudentProfilePage() {
             <div className="flex items-center gap-4">
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => !avatarLoading && fileInputRef.current?.click()}
+                disabled={avatarLoading}
                 className="relative group shrink-0"
               >
                 <Avatar
@@ -127,15 +142,23 @@ export default function StudentProfilePage() {
                   size="xl"
                 />
                 <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera size={20} className="text-white" />
+                  {avatarLoading
+                    ? <Loader2 size={20} className="text-white animate-spin" />
+                    : <Camera size={20} className="text-white" />}
                 </span>
               </button>
               <div className="text-sm text-gray-500">
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="text-primary-600 font-medium hover:underline">
-                  Choose photo
-                </button>
-                {' '}from your device
-                <p className="mt-0.5 text-xs text-gray-400">JPG, PNG or WebP · max 2 MB</p>
+                {avatarLoading ? (
+                  <span className="text-primary-600 font-medium flex items-center gap-1.5">
+                    <Loader2 size={13} className="animate-spin" /> Uploading…
+                  </span>
+                ) : (
+                  <button type="button" onClick={() => fileInputRef.current?.click()} className="text-primary-600 font-medium hover:underline">
+                    Choose photo
+                  </button>
+                )}
+                {!avatarLoading && <>{' '}from your device</>}
+                <p className="mt-0.5 text-xs text-gray-400">JPG, PNG or WebP · max 5 MB</p>
               </div>
             </div>
             <input
