@@ -93,6 +93,11 @@ export interface CounselorProfile {
   bio: string;
   phone: string;
   avatar_url: string;
+  location: string;
+  age: number | null;
+  years_of_experience: string;
+  licence_url: string;
+  verification_status: 'pending' | 'approved' | 'rejected';
 }
 
 export interface AdminProfile {
@@ -117,6 +122,9 @@ export interface Campaign {
   category?: string;
   status?: string;
   account_status?: string;
+  bank_name?: string;
+  account_number?: string;
+  account_holder_name?: string;
 }
 
 export interface CampaignAttachment {
@@ -154,6 +162,25 @@ export interface Counselor {
   specialization: string;
   bio: string;
   avatar_url: string;
+  location: string;
+  age: number | null;
+  years_of_experience: string;
+}
+
+export interface AdminCounselor {
+  id: string;
+  email: string;
+  full_name: string;
+  specialization: string;
+  bio: string;
+  phone: string;
+  avatar_url: string;
+  location: string;
+  age: number | null;
+  years_of_experience: string;
+  licence_url: string;
+  verification_status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
 }
 
 export interface Booking {

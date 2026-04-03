@@ -7,6 +7,7 @@ import Button from '../components/ui/Button';
 import { campaignsApi } from '../api/campaigns';
 import CampaignCard from '../components/campaign/CampaignCard';
 import CampaignCardSkeleton from '../components/campaign/CampaignCardSkeleton';
+import CampaignDetailModal from '../components/campaign/CampaignDetailModal';
 import Footer from '../components/layout/Footer';
 
 const CATEGORIES = ['All', 'Education', 'Medical', 'Emergency', 'Mental Health', 'Other'];
@@ -15,6 +16,8 @@ export default function AllCampaignsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [inputValue, setInputValue] = useState(searchParams.get('search') ?? '');
   const [category, setCategory] = useState('All');
+  const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
+  const [campaignModalTab, setCampaignModalTab] = useState<'details' | 'donate'>('details');
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Keep inputValue in sync if URL changes externally
@@ -154,13 +157,27 @@ export default function AllCampaignsPage() {
           <>
             <p className="text-sm text-gray-500 mb-5">{filtered.length} campaign{filtered.length !== 1 ? 's' : ''} found</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map(c => <CampaignCard key={c.id} campaign={c} />)}
+              {filtered.map(c => (
+                <CampaignCard
+                  key={c.id}
+                  campaign={c}
+                  onViewDetails={id => { setSelectedCampaignId(id); setCampaignModalTab('details'); }}
+                  onDonate={id => { setSelectedCampaignId(id); setCampaignModalTab('donate'); }}
+                />
+              ))}
             </div>
           </>
         )}
       </div>
 
       <Footer />
+
+      <CampaignDetailModal
+        campaignId={selectedCampaignId}
+        open={!!selectedCampaignId}
+        initialTab={campaignModalTab}
+        onClose={() => setSelectedCampaignId(null)}
+      />
     </div>
   );
 }

@@ -15,7 +15,8 @@ import SEO from '../../components/seo/SEO';
 export default function CounselorProfilePage() {
   const dispatch = useAppDispatch();
   const user = useAppSelector(s => s.auth.user) as CounselorProfile | null;
-  const [form, setForm] = useState({ full_name: '', specialization: '', bio: '', phone: '', avatar_url: '' });
+  const EXPERIENCE_RANGES = ['0–2 years', '3–5 years', '6–10 years', '10+ years'];
+  const [form, setForm] = useState({ full_name: '', specialization: '', bio: '', phone: '', avatar_url: '', location: '', years_of_experience: '' });
   const [success, setSuccess] = useState(false);
   const [avatarError, setAvatarError] = useState('');
   const [avatarLoading, setAvatarLoading] = useState(false);
@@ -29,6 +30,8 @@ export default function CounselorProfilePage() {
         bio: user.bio || '',
         phone: user.phone || '',
         avatar_url: user.avatar_url || '',
+        location: user.location || '',
+        years_of_experience: user.years_of_experience || '',
       });
     }
   }, [user]);
@@ -65,6 +68,8 @@ export default function CounselorProfilePage() {
       bio: form.bio || undefined,
       phone: form.phone || undefined,
       avatar_url: form.avatar_url || undefined,
+      location: form.location || undefined,
+      years_of_experience: form.years_of_experience || undefined,
     }),
     onSuccess: async () => {
       const updated = await authApi.getProfile();
@@ -179,6 +184,42 @@ export default function CounselorProfilePage() {
             onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
             placeholder="+256 700 000 000"
           />
+
+          <Input
+            label="Location"
+            value={form.location}
+            onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
+            placeholder="Kampala, Uganda"
+          />
+
+          {/* Age — set at registration, read-only here */}
+          {user.age != null && (
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-gray-700">Age</label>
+              <p className="px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-sm text-gray-600">{user.age}</p>
+              <p className="text-xs text-gray-400">Age is set at registration and cannot be changed here.</p>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-gray-700">Years of Experience</label>
+            <div className="grid grid-cols-2 gap-2">
+              {EXPERIENCE_RANGES.map(range => (
+                <button
+                  key={range}
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, years_of_experience: range }))}
+                  className={`px-3 py-2 rounded-xl border text-sm font-medium transition-all ${
+                    form.years_of_experience === range
+                      ? 'bg-primary-600 border-primary-600 text-white'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-primary-300'
+                  }`}
+                >
+                  {range}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {success && (
             <div className="bg-primary-50 border border-primary-100 rounded-xl px-4 py-3 text-sm text-primary-700 flex items-center gap-2">

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Calendar, Tag, Heart, AlertTriangle, CheckCircle, CreditCard } from 'lucide-react';
+import { ArrowLeft, Calendar, Tag, Heart, AlertTriangle, CheckCircle, CreditCard, Building2 } from 'lucide-react';
 import { campaignsApi } from '../api/campaigns';
 import { contributionsApi } from '../api/contributions';
 import type { PaymentMethod } from '../types';
@@ -41,13 +41,12 @@ export default function CampaignDetailPage() {
     if (location.hash === '#donate') setDonateOpen(true);
   }, [location.hash]);
 
-  const { data: campaigns, isLoading } = useQuery({
-    queryKey: ['campaigns'],
-    queryFn: campaignsApi.list,
+  const { data: campaign, isLoading } = useQuery({
+    queryKey: ['campaign', id],
+    queryFn: () => campaignsApi.get(id!),
     staleTime: 60_000,
+    enabled: !!id,
   });
-
-  const campaign = campaigns?.find(c => c.id === id);
 
   const isCompleted = campaign?.status === 'completed' || (campaign?.current_amount ?? 0) >= (campaign?.target_amount ?? 1);
 
@@ -97,7 +96,7 @@ export default function CampaignDetailPage() {
         payment_method: form.payment_method,
         amount: Number(form.amount),
       });
-      await qc.invalidateQueries({ queryKey: ['campaigns'] });
+      await qc.invalidateQueries({ queryKey: ['campaign', id] });
       resetDonate();
       setToastMsg('Thank you! Your donation has been received.');
       setShowToast(true);
@@ -272,6 +271,36 @@ export default function CampaignDetailPage() {
         maxWidth="max-w-lg"
       >
         <div className="space-y-3">
+          {/* Payment destination info */}
+          {(campaign.bank_name || campaign.account_number || campaign.account_holder_name) && (
+            <div className="flex flex-col gap-1.5 bg-primary-50 border border-primary-100 rounded-xl px-4 py-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-primary-800">
+                <Building2 size={14} className="shrink-0" />
+                Send your payment to this account
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 text-sm">
+                {campaign.account_holder_name && (
+                  <div>
+                    <p className="text-xs text-primary-500 font-medium">Account Holder</p>
+                    <p className="text-gray-800 font-semibold">{campaign.account_holder_name}</p>
+                  </div>
+                )}
+                {campaign.bank_name && (
+                  <div>
+                    <p className="text-xs text-primary-500 font-medium">Bank / Provider</p>
+                    <p className="text-gray-800 font-semibold">{campaign.bank_name}</p>
+                  </div>
+                )}
+                {campaign.account_number && (
+                  <div>
+                    <p className="text-xs text-primary-500 font-medium">Account Number</p>
+                    <p className="text-gray-800 font-semibold tracking-wide">{campaign.account_number}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Row 1: Name + Email */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input label="Full Name *" value={form.donor_name} onChange={e => setForm(f => ({ ...f, donor_name: e.target.value }))} placeholder="Jane Smith" />

@@ -8,6 +8,10 @@ export const authApi = {
     role: 'student' | 'counselor';
     full_name: string;
     consent: boolean;
+    location?: string;
+    age?: number;
+    years_of_experience?: string;
+    licence_url?: string;
   }) => api.post<{ message: string; user_id: string }>('/register', data),
 
   login: (data: { email: string; password: string }) =>

@@ -22,6 +22,8 @@ interface CampaignPayload {
 export const campaignsApi = {
   list: () => api.get<Campaign[]>('/campaigns'),
 
+  get: (id: string) => api.get<Campaign>(`/campaigns/${id}`),
+
   mine: () => api.get<MyCampaign[]>('/campaigns/mine'),
 
   create: (data: CampaignPayload) =>

@@ -8,9 +8,11 @@ import Button from '../ui/Button';
 interface CampaignCardProps {
   campaign: Campaign;
   showDonate?: boolean;
+  onViewDetails?: (id: string) => void;
+  onDonate?: (id: string) => void;
 }
 
-export default function CampaignCard({ campaign, showDonate = true }: CampaignCardProps) {
+export default function CampaignCard({ campaign, showDonate = true, onViewDetails, onDonate }: CampaignCardProps) {
   const authorName = campaign.is_anonymous ? 'Anonymous' : (campaign.author || 'Student');
   const avatarSrc = campaign.is_anonymous ? undefined : campaign.avatar_url || undefined;
   const isCompleted = campaign.status === 'completed' || campaign.current_amount >= campaign.target_amount;
@@ -68,13 +70,25 @@ export default function CampaignCard({ campaign, showDonate = true }: CampaignCa
 
         {/* Actions */}
         <div className="flex gap-2 pt-1">
-          <Link to={`/campaigns/${campaign.id}`} className="flex-1">
-            <Button variant="outline" size="sm" className="w-full">View Details</Button>
-          </Link>
-          {showDonate && !isCompleted && (
-            <Link to={`/campaigns/${campaign.id}#donate`} className="flex-1">
-              <Button variant="primary" size="sm" className="w-full">Donate</Button>
+          {onViewDetails ? (
+            <Button variant="outline" size="sm" className="flex-1" onClick={() => onViewDetails(campaign.id)}>
+              View Details
+            </Button>
+          ) : (
+            <Link to={`/campaigns/${campaign.id}`} className="flex-1">
+              <Button variant="outline" size="sm" className="w-full">View Details</Button>
             </Link>
+          )}
+          {showDonate && !isCompleted && (
+            onDonate ? (
+              <Button variant="primary" size="sm" className="flex-1" onClick={() => onDonate(campaign.id)}>
+                Donate
+              </Button>
+            ) : (
+              <Link to={`/campaigns/${campaign.id}#donate`} className="flex-1">
+                <Button variant="primary" size="sm" className="w-full">Donate</Button>
+              </Link>
+            )
           )}
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import SEO from '../components/seo/SEO';
-import { Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { Eye, EyeOff, AlertTriangle, Clock } from 'lucide-react';
 import { useAppDispatch } from '../store/hooks';
 import { setUser } from '../store/authSlice';
 import { authApi } from '../api/auth';
@@ -12,6 +12,8 @@ import Input from '../components/ui/Input';
 export default function LoginPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isPendingCounselor = searchParams.get('pending') === 'counselor';
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -87,6 +89,18 @@ export default function LoginPage() {
               <h1 className="font-display text-2xl font-bold text-gray-900 mb-1">Sign In</h1>
               <p className="text-sm text-gray-500">Enter your credentials to continue</p>
             </div>
+
+            {isPendingCounselor && (
+              <div className="mb-5 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                <Clock size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-amber-800">Application submitted — pending review</p>
+                  <p className="text-xs text-amber-700 mt-0.5">
+                    Your counsellor account is awaiting admin verification. You will receive an email once approved and can then sign in.
+                  </p>
+                </div>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <Input

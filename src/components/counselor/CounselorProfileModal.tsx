@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { UserCircle, Briefcase, FileText } from 'lucide-react';
+import { UserCircle, Briefcase, FileText, MapPin, Clock } from 'lucide-react';
 import { counselorsApi } from '../../api/counselors';
 import Modal from '../ui/Modal';
 import Avatar from '../ui/Avatar';
@@ -74,6 +74,33 @@ export default function CounselorProfileModal({ counselorId, onClose }: Counselo
                 </p>
               </div>
             </div>
+
+            {counselor.location && (
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 h-8 w-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+                  <MapPin size={15} className="text-primary-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Location</p>
+                  <p className="text-sm text-gray-700">{counselor.location}</p>
+                </div>
+              </div>
+            )}
+
+            {(counselor.age != null || counselor.years_of_experience) && (
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 h-8 w-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+                  <Clock size={15} className="text-primary-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Experience</p>
+                  <p className="text-sm text-gray-700">
+                    {counselor.years_of_experience || '—'}
+                    {counselor.age != null ? ` · Age ${counselor.age}` : ''}
+                  </p>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-start gap-3">
               <div className="mt-0.5 h-8 w-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">

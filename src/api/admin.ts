@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { AdminUser, AdminCampaign, AdminBooking, AdminContribution, AdminDashboard } from '../types';
+import type { AdminUser, AdminCampaign, AdminBooking, AdminContribution, AdminDashboard, AdminCounselor } from '../types';
 
 export const adminApi = {
   dashboard: () => api.get<AdminDashboard>('/admin/dashboard'),
@@ -25,6 +25,12 @@ export const adminApi = {
 
   deleteCampaign: (campaignId: string) =>
     api.delete<{ message: string }>(`/admin/campaigns/${campaignId}`),
+
+  counselors: (status: 'pending' | 'approved' | 'rejected' | 'all' = 'pending') =>
+    api.get<AdminCounselor[]>(`/admin/counselors?status=${status}`),
+
+  verifyCounselor: (id: string, status: 'approved' | 'rejected') =>
+    api.put<{ message: string }>(`/admin/counselors/${id}/verify`, { status }),
 
   bookings: () => api.get<AdminBooking[]>('/admin/bookings'),
 

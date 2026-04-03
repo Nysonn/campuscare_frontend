@@ -143,6 +143,32 @@ export default function AdminCampaignsPage() {
                     <span>By: <strong className="text-gray-600">{c.student_name || 'Unknown'}</strong></span>
                     <span>{new Date(c.created_at).toLocaleDateString('en-UG', { dateStyle: 'medium' })}</span>
                   </div>
+                  {c.status === 'pending' && (c.bank_name || c.account_number || c.beneficiary_org_name) && (
+                    <div className="mt-3 flex items-center gap-2">
+                      {c.account_status === 'verified' ? (
+                        <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
+                          <ShieldCheck size={11} /> Account Verified
+                        </span>
+                      ) : c.account_status === 'rejected' ? (
+                        <span className="flex items-center gap-1 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-full px-2 py-0.5">
+                          <ShieldX size={11} /> Account Rejected
+                        </span>
+                      ) : (
+                        <>
+                          <span className="flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                            <Lock size={11} /> Account Unverified
+                          </span>
+                          <button
+                            onClick={() => accountMutation.mutate({ id: c.id, account_status: 'verified' })}
+                            disabled={accountMutation.isPending}
+                            className="flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5 hover:bg-emerald-100 transition-colors disabled:opacity-50"
+                          >
+                            <ShieldCheck size={11} /> Approve Account
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2 shrink-0 items-start">
                   <Button variant="ghost" size="sm" onClick={() => setPreviewing(c)} title="View full details">
@@ -370,12 +396,51 @@ export default function AdminCampaignsPage() {
           : 'Delete Campaign'
         }
       >
-        <div className="text-center space-y-5">
-          <p className="text-sm text-gray-600">
-            {action === 'approved' && `Approve "${selected?.title}"? It will become publicly visible on the platform.`}
-            {action === 'rejected' && `Reject "${selected?.title}"? The student will need to edit and resubmit.`}
-            {action === 'delete' && `Permanently delete "${selected?.title}"? This cannot be undone.`}
-          </p>
+        <div className="space-y-4">
+          {action === 'approved' && selected && (() => {
+            const hasPayment = !!(selected.bank_name || selected.account_number || selected.beneficiary_org_name);
+            const verified = selected.account_status === 'verified';
+            return hasPayment ? (
+              <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Payment Destination</p>
+                  {verified
+                    ? <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5"><ShieldCheck size={11} /> Verified</span>
+                    : <span className="flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5"><Lock size={11} /> Unverified</span>
+                  }
+                </div>
+                <div className="text-sm text-gray-700 space-y-0.5">
+                  {selected.beneficiary_org_name && <p><span className="text-gray-400">Org:</span> {selected.beneficiary_org_name}</p>}
+                  {selected.bank_name && <p><span className="text-gray-400">Bank:</span> {selected.bank_name}</p>}
+                  {selected.account_number && <p><span className="text-gray-400">Account No:</span> {selected.account_number}</p>}
+                  {selected.account_holder_name && <p><span className="text-gray-400">Holder:</span> {selected.account_holder_name}</p>}
+                </div>
+                {!verified && (
+                  <button
+                    onClick={() => {
+                      accountMutation.mutate({ id: selected.id, account_status: 'verified' });
+                      setSelected(prev => prev ? { ...prev, account_status: 'verified' } : prev);
+                    }}
+                    disabled={accountMutation.isPending}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors disabled:opacity-50"
+                  >
+                    <ShieldCheck size={13} /> Approve Account
+                  </button>
+                )}
+                {!verified && (
+                  <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-700">
+                    <Lock size={12} className="shrink-0" />
+                    Approve the payment account before confirming the campaign.
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-600 text-center">Approve <strong>"{selected.title}"</strong>? It will become publicly visible on the platform.</p>
+            );
+          })()}
+          {(action === 'rejected') && <p className="text-sm text-gray-600 text-center">Reject <strong>"{selected?.title}"</strong>? The student will need to edit and resubmit.</p>}
+          {(action === 'delete') && <p className="text-sm text-gray-600 text-center">Permanently delete <strong>"{selected?.title}"</strong>? This cannot be undone.</p>}
+
           {(statusMutation.isError || deleteMutation.isError) && (
             <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 flex items-center gap-2">
               <AlertTriangle size={14} className="text-red-500 shrink-0" />
@@ -387,6 +452,11 @@ export default function AdminCampaignsPage() {
             <Button
               variant={action === 'approved' ? 'primary' : 'danger'}
               className="flex-1"
+              disabled={
+                action === 'approved' &&
+                !!(selected?.bank_name || selected?.account_number || selected?.beneficiary_org_name) &&
+                selected?.account_status !== 'verified'
+              }
               loading={statusMutation.isPending || deleteMutation.isPending}
               onClick={() => {
                 if (!selected) return;

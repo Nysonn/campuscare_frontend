@@ -49,6 +49,7 @@ import AdminCampaignsPage from './pages/admin/AdminCampaignsPage';
 import AdminBookingsPage from './pages/admin/AdminBookingsPage';
 import AdminContributionsPage from './pages/admin/AdminContributionsPage';
 import AdminSponsorsPage from './pages/admin/AdminSponsorsPage';
+import AdminCounselorsPage from './pages/admin/AdminCounselorsPage';
 
 import NotFoundPage from './pages/NotFoundPage';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -77,6 +78,7 @@ const counselorNav = [
 const adminNav = [
   { to: '/admin/dashboard',     label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
   { to: '/admin/users',         label: 'Users',        icon: <Users size={16} />           },
+  { to: '/admin/counselors',    label: 'Counsellors',  icon: <User size={16} />            },
   { to: '/admin/campaigns',     label: 'Campaigns',    icon: <FileCheck size={16} />       },
   { to: '/admin/bookings',      label: 'Bookings',     icon: <BookOpen size={16} />        },
   { to: '/admin/contributions', label: 'Contributions',icon: <TrendingUp size={16} />      },
@@ -181,6 +183,7 @@ function AppRoutes() {
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsersPage />} />
+            <Route path="counselors" element={<AdminCounselorsPage />} />
             <Route path="campaigns" element={<AdminCampaignsPage />} />
             <Route path="bookings" element={<AdminBookingsPage />} />
             <Route path="contributions" element={<AdminContributionsPage />} />
