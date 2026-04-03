@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   X, Heart, Calendar, Tag, CheckCircle, AlertTriangle,
-  CreditCard, Building2, User,
+  CreditCard, Building2,
 } from 'lucide-react';
 import { campaignsApi } from '../../api/campaigns';
 import { contributionsApi } from '../../api/contributions';
