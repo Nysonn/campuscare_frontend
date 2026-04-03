@@ -198,8 +198,10 @@ export interface AdminCampaign {
   title: string;
   description: string;
   target_amount: number;
+  current_amount: number;
   category: string;
   created_at: string;
+  status: string;
   is_anonymous: boolean;
   urgency_level: string;
   beneficiary_type: string;

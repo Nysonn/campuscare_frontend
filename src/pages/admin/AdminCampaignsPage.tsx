@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Check, X, Trash2, Heart, AlertTriangle, Eye, Paperclip,
-  User, Target, Tag, Zap,
+  User, Target, Tag, Zap, TrendingUp,
 } from 'lucide-react';
 import { adminApi } from '../../api/admin';
 import type { AdminCampaign } from '../../types';
@@ -11,6 +11,23 @@ import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
 import SEO from '../../components/seo/SEO';
+
+type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
+
+const STATUS_TABS: { key: StatusFilter; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'pending', label: 'Pending' },
+  { key: 'approved', label: 'Approved' },
+  { key: 'rejected', label: 'Rejected' },
+];
+
+function statusBadge(status: string) {
+  switch (status) {
+    case 'approved': return <Badge variant="green">Approved</Badge>;
+    case 'rejected': return <Badge variant="red">Rejected</Badge>;
+    default:         return <Badge variant="yellow">Pending Review</Badge>;
+  }
+}
 
 function openAttachment(url: string) {
   if (url.startsWith('data:')) {
@@ -28,19 +45,16 @@ function openAttachment(url: string) {
 
 export default function AdminCampaignsPage() {
   const qc = useQueryClient();
-
-  // Content review state
+  const [filter, setFilter] = useState<StatusFilter>('pending');
   const [selected, setSelected] = useState<AdminCampaign | null>(null);
   const [action, setAction] = useState<'approved' | 'rejected' | 'delete' | null>(null);
   const [previewing, setPreviewing] = useState<AdminCampaign | null>(null);
 
-  // Queries
   const { data: campaigns, isLoading } = useQuery({
-    queryKey: ['adminCampaigns'],
-    queryFn: adminApi.unapprovedCampaigns,
+    queryKey: ['adminCampaigns', filter],
+    queryFn: () => adminApi.campaigns(filter),
   });
 
-  // Mutations
   const statusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: 'approved' | 'rejected' }) =>
       adminApi.updateCampaignStatus(id, status),
@@ -58,7 +72,7 @@ export default function AdminCampaignsPage() {
     },
   });
 
-  const pendingCount = (campaigns ?? []).length;
+  const list = campaigns ?? [];
 
   return (
     <div>
@@ -69,44 +83,71 @@ export default function AdminCampaignsPage() {
       />
       <div className="mb-6">
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Campaign Management</h1>
-        <p className="text-gray-500">Review and approve student fundraising campaigns.</p>
+        <p className="text-gray-500">Review and manage all student fundraising campaigns.</p>
+      </div>
+
+      {/* Filter tabs */}
+      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit mb-6">
+        {STATUS_TABS.map(t => (
+          <button
+            key={t.key}
+            onClick={() => setFilter(t.key)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              filter === t.key
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       {isLoading ? (
         <div className="py-16 flex justify-center"><Spinner size="lg" /></div>
-      ) : pendingCount === 0 ? (
+      ) : list.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center">
           <Heart size={48} className="mx-auto mb-4 text-gray-300" />
-          <h3 className="font-display text-lg text-gray-600 mb-1">No pending campaigns</h3>
-          <p className="text-sm text-gray-400">All campaigns have been reviewed.</p>
+          <h3 className="font-display text-lg text-gray-600 mb-1">No campaigns found</h3>
+          <p className="text-sm text-gray-400">
+            {filter === 'pending' ? 'All campaigns have been reviewed.' : `No ${filter} campaigns yet.`}
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
-          {(campaigns ?? []).map(c => (
+          {list.map(c => (
             <div key={c.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     <h3 className="font-display font-semibold text-gray-900">{c.title}</h3>
-                    <Badge variant="yellow">Pending Review</Badge>
+                    {statusBadge(c.status)}
                     <Badge variant="gray">{c.category}</Badge>
                   </div>
                   <p className="text-sm text-gray-500 mb-3 line-clamp-2">{c.description}</p>
-                  <div className="flex gap-4 text-xs text-gray-400">
+                  <div className="flex flex-wrap gap-4 text-xs text-gray-400">
                     <span>Goal: <strong className="text-primary-700">UGX {c.target_amount.toLocaleString()}</strong></span>
-                    <span>Submitted: {new Date(c.created_at).toLocaleDateString('en-UG', { dateStyle: 'medium' })}</span>
+                    {c.current_amount > 0 && (
+                      <span>Raised: <strong className="text-emerald-700">UGX {c.current_amount.toLocaleString()}</strong></span>
+                    )}
+                    <span>By: <strong className="text-gray-600">{c.student_name || 'Unknown'}</strong></span>
+                    <span>{new Date(c.created_at).toLocaleDateString('en-UG', { dateStyle: 'medium' })}</span>
                   </div>
                 </div>
                 <div className="flex gap-2 shrink-0 items-start">
                   <Button variant="ghost" size="sm" onClick={() => setPreviewing(c)} title="View full details">
                     <Eye size={14} />
                   </Button>
-                  <Button size="sm" onClick={() => { setSelected(c); setAction('approved'); }}>
-                    <Check size={14} /> Approve
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => { setSelected(c); setAction('rejected'); }}>
-                    <X size={14} /> Reject
-                  </Button>
+                  {c.status === 'pending' && (
+                    <>
+                      <Button size="sm" onClick={() => { setSelected(c); setAction('approved'); }}>
+                        <Check size={14} /> Approve
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => { setSelected(c); setAction('rejected'); }}>
+                        <X size={14} /> Reject
+                      </Button>
+                    </>
+                  )}
                   <Button variant="danger" size="sm" onClick={() => { setSelected(c); setAction('delete'); }}>
                     <Trash2 size={14} />
                   </Button>
@@ -117,7 +158,7 @@ export default function AdminCampaignsPage() {
         </div>
       )}
 
-      {/* ── Detail preview modal (Content Review) ── */}
+      {/* ── Detail preview modal ── */}
       <Modal
         open={!!previewing}
         onClose={() => setPreviewing(null)}
@@ -128,7 +169,7 @@ export default function AdminCampaignsPage() {
         {previewing && (
           <div className="space-y-5">
             <div className="flex flex-wrap gap-2">
-              <Badge variant="yellow">Pending Review</Badge>
+              {statusBadge(previewing.status)}
               <Badge variant="gray">{previewing.category}</Badge>
               {previewing.urgency_level && previewing.urgency_level !== 'normal' && (
                 <Badge variant={previewing.urgency_level === 'critical' ? 'red' : 'yellow'}>
@@ -158,6 +199,15 @@ export default function AdminCampaignsPage() {
                   <p className="text-sm font-semibold text-gray-800">UGX {previewing.target_amount.toLocaleString()}</p>
                 </div>
               </div>
+              {previewing.current_amount > 0 && (
+                <div className="bg-gray-50 rounded-xl p-3 flex items-start gap-2.5">
+                  <TrendingUp size={15} className="text-emerald-600 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400">Amount Raised</p>
+                    <p className="text-sm font-semibold text-emerald-700">UGX {previewing.current_amount.toLocaleString()}</p>
+                  </div>
+                </div>
+              )}
               <div className="bg-gray-50 rounded-xl p-3 flex items-start gap-2.5">
                 <Tag size={15} className="text-primary-600 mt-0.5 shrink-0" />
                 <div>
@@ -184,7 +234,6 @@ export default function AdminCampaignsPage() {
               </div>
             </div>
 
-            {/* Payment destination */}
             {(previewing.beneficiary_org_name || previewing.bank_name || previewing.account_number) && (
               <div>
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Payment Destination</p>
@@ -226,19 +275,21 @@ export default function AdminCampaignsPage() {
               </div>
             )}
 
-            <div className="flex gap-3 pt-1 border-t border-gray-100">
-              <Button className="flex-1" onClick={() => { setPreviewing(null); setSelected(previewing); setAction('approved'); }}>
-                <Check size={14} /> Approve
-              </Button>
-              <Button variant="outline" className="flex-1" onClick={() => { setPreviewing(null); setSelected(previewing); setAction('rejected'); }}>
-                <X size={14} /> Reject
-              </Button>
-            </div>
+            {previewing.status === 'pending' && (
+              <div className="flex gap-3 pt-1 border-t border-gray-100">
+                <Button className="flex-1" onClick={() => { setPreviewing(null); setSelected(previewing); setAction('approved'); }}>
+                  <Check size={14} /> Approve
+                </Button>
+                <Button variant="outline" className="flex-1" onClick={() => { setPreviewing(null); setSelected(previewing); setAction('rejected'); }}>
+                  <X size={14} /> Reject
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </Modal>
 
-      {/* ── Confirm content action modal ── */}
+      {/* ── Confirm action modal ── */}
       <Modal
         open={!!selected && !!action}
         onClose={() => { setSelected(null); setAction(null); }}
@@ -277,7 +328,6 @@ export default function AdminCampaignsPage() {
           </div>
         </div>
       </Modal>
-
     </div>
   );
 }

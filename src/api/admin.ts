@@ -15,7 +15,7 @@ export const adminApi = {
   updateUserStatus: (userId: string, status: 'active' | 'suspended') =>
     api.put<{ message: string }>(`/admin/users/${userId}/status`, { status }),
 
-  unapprovedCampaigns: () => api.get<AdminCampaign[]>('/admin/campaigns'),
+  campaigns: (status: string) => api.get<AdminCampaign[]>(`/admin/campaigns?status=${status}`),
 
   updateCampaignStatus: (campaignId: string, status: 'approved' | 'rejected') =>
     api.put<{ message: string }>(`/admin/campaigns/${campaignId}`, { status }),
