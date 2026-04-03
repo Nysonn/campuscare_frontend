@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Check, X, Trash2, Heart, AlertTriangle, Eye, Paperclip,
-  User, Target, Tag, Zap, TrendingUp,
+  User, Target, Tag, Zap, TrendingUp, ShieldCheck, ShieldX, Lock,
 } from 'lucide-react';
 import { adminApi } from '../../api/admin';
 import type { AdminCampaign } from '../../types';
@@ -69,6 +69,16 @@ export default function AdminCampaignsPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['adminCampaigns'] });
       setSelected(null); setAction(null);
+    },
+  });
+
+  const accountMutation = useMutation({
+    mutationFn: ({ id, account_status }: { id: string; account_status: 'verified' | 'rejected' }) =>
+      adminApi.verifyAccount(id, account_status),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ['adminCampaigns'] });
+      // Update the previewing state so the modal reflects the new account_status immediately.
+      setPreviewing(prev => prev ? { ...prev, account_status: vars.account_status } : prev);
     },
   });
 
@@ -236,13 +246,57 @@ export default function AdminCampaignsPage() {
 
             {(previewing.beneficiary_org_name || previewing.bank_name || previewing.account_number) && (
               <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Payment Destination</p>
-                <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-700 space-y-1">
+                <div className="flex items-center justify-between mb-1.5">
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Payment Destination</p>
+                  {previewing.account_status === 'verified' && (
+                    <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
+                      <ShieldCheck size={11} /> Account Verified
+                    </span>
+                  )}
+                  {previewing.account_status === 'rejected' && (
+                    <span className="flex items-center gap-1 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-full px-2 py-0.5">
+                      <ShieldX size={11} /> Account Rejected
+                    </span>
+                  )}
+                  {previewing.account_status === 'unverified' && (
+                    <span className="flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                      <Lock size={11} /> Awaiting Verification
+                    </span>
+                  )}
+                </div>
+                <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-700 space-y-1 mb-2">
                   {previewing.beneficiary_org_name && <p><span className="text-gray-400">Organisation:</span> {previewing.beneficiary_org_name}</p>}
                   {previewing.bank_name && <p><span className="text-gray-400">Bank:</span> {previewing.bank_name}</p>}
                   {previewing.account_number && <p><span className="text-gray-400">Account No:</span> {previewing.account_number}</p>}
                   {previewing.account_holder_name && <p><span className="text-gray-400">Account Holder:</span> {previewing.account_holder_name}</p>}
                 </div>
+                {previewing.account_status !== 'verified' && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => accountMutation.mutate({ id: previewing.id, account_status: 'verified' })}
+                      disabled={accountMutation.isPending}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors disabled:opacity-50"
+                    >
+                      <ShieldCheck size={13} /> Approve Account
+                    </button>
+                    <button
+                      onClick={() => accountMutation.mutate({ id: previewing.id, account_status: 'rejected' })}
+                      disabled={accountMutation.isPending}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold transition-colors disabled:opacity-50"
+                    >
+                      <ShieldX size={13} /> Reject Account
+                    </button>
+                  </div>
+                )}
+                {previewing.account_status === 'verified' && (
+                  <button
+                    onClick={() => accountMutation.mutate({ id: previewing.id, account_status: 'rejected' })}
+                    disabled={accountMutation.isPending}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 text-xs font-medium transition-colors disabled:opacity-50"
+                  >
+                    <ShieldX size={13} /> Revoke Verification
+                  </button>
+                )}
               </div>
             )}
 
@@ -275,16 +329,33 @@ export default function AdminCampaignsPage() {
               </div>
             )}
 
-            {previewing.status === 'pending' && (
-              <div className="flex gap-3 pt-1 border-t border-gray-100">
-                <Button className="flex-1" onClick={() => { setPreviewing(null); setSelected(previewing); setAction('approved'); }}>
-                  <Check size={14} /> Approve
-                </Button>
-                <Button variant="outline" className="flex-1" onClick={() => { setPreviewing(null); setSelected(previewing); setAction('rejected'); }}>
-                  <X size={14} /> Reject
-                </Button>
-              </div>
-            )}
+            {previewing.status === 'pending' && (() => {
+              const hasPaymentDetails = !!(previewing.bank_name || previewing.account_number || previewing.beneficiary_org_name);
+              const accountVerified = previewing.account_status === 'verified';
+              const canApprove = !hasPaymentDetails || accountVerified;
+              return (
+                <div className="pt-2 border-t border-gray-100 space-y-2">
+                  {!canApprove && (
+                    <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 text-xs text-amber-700">
+                      <Lock size={13} className="shrink-0" />
+                      Verify the payment account above before approving this campaign.
+                    </div>
+                  )}
+                  <div className="flex gap-3">
+                    <Button
+                      className="flex-1"
+                      disabled={!canApprove}
+                      onClick={() => { setPreviewing(null); setSelected(previewing); setAction('approved'); }}
+                    >
+                      <Check size={14} /> Approve Campaign
+                    </Button>
+                    <Button variant="outline" className="flex-1" onClick={() => { setPreviewing(null); setSelected(previewing); setAction('rejected'); }}>
+                      <X size={14} /> Reject
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
       </Modal>

@@ -20,6 +20,9 @@ export const adminApi = {
   updateCampaignStatus: (campaignId: string, status: 'approved' | 'rejected') =>
     api.put<{ message: string }>(`/admin/campaigns/${campaignId}`, { status }),
 
+  verifyAccount: (campaignId: string, account_status: 'verified' | 'rejected') =>
+    api.put<{ message: string }>(`/admin/campaigns/${campaignId}/account`, { account_status }),
+
   deleteCampaign: (campaignId: string) =>
     api.delete<{ message: string }>(`/admin/campaigns/${campaignId}`),
 
