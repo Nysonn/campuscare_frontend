@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Menu, X, LogOut, LayoutDashboard, ChevronDown,
-  Home, LayoutGrid, ArrowRight, Sparkles,
+  Home, LayoutGrid, ArrowRight, Users, Sparkles,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/authSlice';
@@ -10,46 +10,44 @@ import { authApi } from '../../api/auth';
 import Button from '../ui/Button';
 
 const NAV_LINKS = [
-  { label: 'Home',      to: '/',          icon: <Home size={15} />        },
-  { label: 'Campaigns', to: '/campaigns', icon: <LayoutGrid size={15} /> },
+  { label: 'Home',         to: '/',              sectionId: null,            icon: <Home size={15} />        },
+  { label: 'How It Works', to: '/#how-it-works', sectionId: 'how-it-works',  icon: <Sparkles size={15} />   },
+  { label: 'Campaigns',    to: '/campaigns',     sectionId: null,            icon: <LayoutGrid size={15} />  },
+  { label: 'Counsellors',  to: '/#counsellors',  sectionId: 'counsellors',   icon: <Users size={15} />       },
 ];
 
 export default function Header() {
-  const [menuOpen, setMenuOpen]               = useState(false);
-  const [scrolled, setScrolled]               = useState(false);
+  const [menuOpen, setMenuOpen]                = useState(false);
+  const [scrolled, setScrolled]                = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const dispatch  = useAppDispatch();
-  const navigate  = useNavigate();
-  const location  = useLocation();
-  const user      = useAppSelector(s => s.auth.user);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const user     = useAppSelector(s => s.auth.user);
 
   const dashboardPath =
     user?.role === 'admin'     ? '/admin/dashboard'     :
     user?.role === 'counselor' ? '/counselor/dashboard' :
                                  '/student/dashboard';
 
-  /* scroll shadow */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  /* close menu + dropdown on route change */
   useEffect(() => {
     setMenuOpen(false);
     setUserDropdownOpen(false);
   }, [location.pathname]);
 
-  /* lock body scroll when mobile menu is open */
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
 
-  /* close dropdown on outside click */
   useEffect(() => {
     if (!userDropdownOpen) return;
     const handler = (e: MouseEvent) => {
@@ -68,8 +66,14 @@ export default function Header() {
     }
   };
 
-  const isActive = (to: string) =>
-    to === '/' ? location.pathname === '/' : location.pathname.startsWith(to);
+  const scrollToSection = (sectionId: string) => {
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const isActive = (to: string) => {
+    if (to.startsWith('/#')) return false;
+    return to === '/' ? location.pathname === '/' : location.pathname.startsWith(to);
+  };
 
   const getInitials = (name?: string) => {
     if (!name) return '?';
@@ -90,47 +94,42 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          scrolled
-            ? 'bg-white/98 backdrop-blur-md shadow-[0_2px_20px_-4px_rgba(0,0,0,0.1)] border-b border-gray-100/80'
-            : 'bg-white/95 backdrop-blur-sm border-b border-transparent'
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 bg-white/98 backdrop-blur-md border-b border-gray-100/80 ${
+          scrolled ? 'shadow-[0_2px_20px_-4px_rgba(0,0,0,0.1)]' : ''
         }`}
       >
-        {/* ── Accent bar ── */}
-        <div className="absolute top-0 left-0 right-0 h-0.75 bg-linear-to-r from-primary-400 via-primary-600 to-primary-500" />
-
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-17 flex items-center justify-between gap-4">
 
-          {/* ── Logo ── */}
-          <Link
-            to="/"
-            className="flex items-center gap-2.5 shrink-0 group"
-            aria-label="CampusCare home"
-          >
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2.5 shrink-0 group" aria-label="CampusCare home">
             <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-primary-200/60 scale-0 group-hover:scale-110 transition-transform duration-300 blur-sm" />
+              <div className="absolute inset-0 rounded-full scale-0 group-hover:scale-110 transition-transform duration-300 blur-sm bg-primary-200/60" />
               <img
                 src="/logo.png"
                 alt=""
                 className="relative h-9 w-9 object-contain transition-transform duration-200 group-hover:scale-[1.07]"
               />
             </div>
-            <div className="flex flex-col leading-none">
-              <span className="font-display font-bold text-[1.2rem] tracking-tight text-gray-900">
-                Campus<span className="text-primary-600">Care</span>
-              </span>
-            </div>
+            <span className="font-display font-bold text-[1.2rem] tracking-tight text-gray-900">
+              Campus<span className="text-primary-600">Care</span>
+            </span>
           </Link>
 
-          {/* ── Desktop nav ── */}
-          <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-            {NAV_LINKS.map(({ label, to }) => (
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-0.5" aria-label="Main navigation">
+            {NAV_LINKS.map(({ label, to, sectionId }) => (
               <Link
                 key={to}
                 to={to}
-                className={`relative flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
+                onClick={(e) => {
+                  if (sectionId && location.pathname === '/') {
+                    e.preventDefault();
+                    scrollToSection(sectionId);
+                  }
+                }}
+                className={`relative flex items-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
                   isActive(to)
-                    ? 'bg-primary-50 text-primary-700 font-semibold shadow-sm shadow-primary-100'
+                    ? 'bg-primary-50 text-primary-700 font-semibold'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
@@ -139,7 +138,7 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* ── Desktop right actions ── */}
+          {/* Desktop right actions */}
           <div className="hidden md:flex items-center gap-2">
             {user ? (
               <>
@@ -150,7 +149,6 @@ export default function Header() {
                   </Button>
                 </Link>
 
-                {/* User avatar + dropdown */}
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setUserDropdownOpen(v => !v)}
@@ -174,17 +172,12 @@ export default function Header() {
                     />
                   </button>
 
-                  {/* Dropdown */}
                   {userDropdownOpen && (
                     <div
-                      className="absolute right-0 mt-2.5 w-56 bg-white rounded-2xl shadow-xl shadow-gray-200/80 border border-gray-100 py-1.5 origin-top-right
-                                 animate-in fade-in zoom-in-95 duration-150"
+                      className="absolute right-0 mt-2.5 w-56 bg-white rounded-2xl shadow-xl shadow-gray-200/80 border border-gray-100 py-1.5 origin-top-right animate-in fade-in zoom-in-95 duration-150"
                       onClick={e => e.stopPropagation()}
                     >
-                      {/* Pointer */}
                       <div className="absolute -top-1.5 right-4 h-3 w-3 bg-white border-l border-t border-gray-100 rotate-45" />
-
-                      {/* User info */}
                       <div className="px-4 pt-3 pb-3.5 border-b border-gray-100">
                         <div className="flex items-center gap-2.5">
                           <div className="h-9 w-9 rounded-full bg-linear-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
@@ -196,7 +189,6 @@ export default function Header() {
                           </div>
                         </div>
                       </div>
-
                       <Link
                         to={dashboardPath}
                         className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
@@ -205,7 +197,6 @@ export default function Header() {
                         <LayoutDashboard size={15} className="text-gray-400" />
                         Go to Dashboard
                       </Link>
-
                       <div className="border-t border-gray-100 mt-1 pt-1">
                         <button
                           onClick={handleLogout}
@@ -222,13 +213,12 @@ export default function Header() {
             ) : (
               <>
                 <Link to="/login">
-                  <button className="px-4 py-2 text-sm font-medium text-gray-700 rounded-full hover:bg-gray-50 hover:text-gray-900 transition-all duration-200">
+                  <button className="px-4 py-2 text-sm font-medium rounded-full text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200">
                     Sign In
                   </button>
                 </Link>
                 <Link to="/register/student">
-                  <button className="flex items-center gap-1.5 px-5 py-2 text-sm font-semibold text-white bg-linear-to-r from-primary-600 to-primary-500 rounded-full shadow-md shadow-primary-200/60 hover:shadow-lg hover:shadow-primary-200/70 hover:-translate-y-px active:translate-y-0 transition-all duration-200">
-                    <Sparkles size={13} />
+                  <button className="px-5 py-2 text-sm font-semibold rounded-full text-white bg-linear-to-r from-primary-600 to-primary-500 shadow-md shadow-primary-200/60 hover:shadow-lg hover:-translate-y-px active:translate-y-0 transition-all duration-200">
                     Get Started
                   </button>
                 </Link>
@@ -236,7 +226,7 @@ export default function Header() {
             )}
           </div>
 
-          {/* ── Mobile hamburger ── */}
+          {/* Mobile hamburger */}
           <button
             className="md:hidden relative h-9 w-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors cursor-pointer"
             onClick={() => setMenuOpen(v => !v)}
@@ -253,7 +243,7 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ── Mobile drawer backdrop ── */}
+      {/* Mobile backdrop */}
       <div
         className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${
           menuOpen ? 'bg-black/50 backdrop-blur-sm pointer-events-auto' : 'bg-transparent pointer-events-none'
@@ -262,19 +252,15 @@ export default function Header() {
         aria-hidden="true"
       />
 
-      {/* ── Mobile drawer panel ── */}
+      {/* Mobile drawer */}
       <div
         className={`fixed top-0 right-0 h-full w-75 z-50 md:hidden bg-white shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
           menuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        {/* Drawer accent */}
-        <div className="absolute top-0 left-0 right-0 h-0.75 bg-linear-to-r from-primary-400 via-primary-600 to-primary-500" />
-
-        {/* Drawer header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100">
           <Link to="/" className="flex items-center gap-2 group" onClick={() => setMenuOpen(false)}>
-            <img src="/logo.png" alt="CampusCare" className="h-7 w-7 object-contain transition-transform duration-200 group-hover:scale-105" />
+            <img src="/logo.png" alt="CampusCare" className="h-7 w-7 object-contain" />
             <span className="font-display font-bold text-lg text-gray-900">
               Campus<span className="text-primary-600">Care</span>
             </span>
@@ -288,7 +274,6 @@ export default function Header() {
           </button>
         </div>
 
-        {/* User card (logged in) */}
         {user && (
           <div className="mx-4 mt-4 p-4 bg-linear-to-br from-primary-50 to-primary-100/50 rounded-2xl flex items-center gap-3 border border-primary-100/80 shadow-sm shadow-primary-100">
             <div className="h-10 w-10 rounded-full bg-linear-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-sm font-bold shrink-0 ring-2 ring-white shadow-sm">
@@ -301,14 +286,19 @@ export default function Header() {
           </div>
         )}
 
-        {/* Nav links */}
         <nav className="flex-1 overflow-y-auto px-4 py-5 space-y-1">
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] px-3 mb-3">Explore</p>
-          {NAV_LINKS.map(({ label, to, icon }) => (
+          {NAV_LINKS.map(({ label, to, sectionId, icon }) => (
             <Link
               key={to}
               to={to}
-              onClick={() => setMenuOpen(false)}
+              onClick={(e) => {
+                if (sectionId && location.pathname === '/') {
+                  e.preventDefault();
+                  scrollToSection(sectionId);
+                }
+                setMenuOpen(false);
+              }}
               className={`flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all duration-150 ${
                 isActive(to)
                   ? 'bg-primary-600 text-white shadow-md shadow-primary-300/40'
@@ -337,7 +327,6 @@ export default function Header() {
           )}
         </nav>
 
-        {/* Bottom actions */}
         <div className="px-4 pb-8 pt-4 border-t border-gray-100 space-y-3">
           {user ? (
             <button
@@ -359,9 +348,8 @@ export default function Header() {
               <Link
                 to="/register/student"
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-linear-to-r from-primary-600 to-primary-500 text-white text-sm font-semibold shadow-md shadow-primary-200/50 hover:shadow-lg hover:shadow-primary-200/60 active:scale-[0.98] transition-all"
+                className="flex items-center justify-center w-full py-3.5 rounded-2xl bg-linear-to-r from-primary-600 to-primary-500 text-white text-sm font-semibold shadow-md shadow-primary-200/50 hover:shadow-lg active:scale-[0.98] transition-all"
               >
-                <Sparkles size={14} />
                 Get Started Free
               </Link>
             </>
@@ -369,8 +357,9 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Spacer to prevent content jump under fixed header */}
+      {/* Fixed header spacer */}
       <div className="h-17" aria-hidden="true" />
+
     </>
   );
 }

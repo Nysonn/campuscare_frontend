@@ -63,7 +63,7 @@ export default function StudentRegisterPage() {
       <div
         className="hidden lg:flex flex-col justify-between w-1/2 p-12 text-white relative overflow-hidden"
         style={{
-          backgroundImage: 'url(https://res.cloudinary.com/df3lhzzy7/image/upload/v1775223629/therapies_zpwseg.jpg)',
+          backgroundImage: 'url(https://res.cloudinary.com/df3lhzzy7/image/upload/v1775557090/pexels-silverkblack-36729613_pgglh8.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

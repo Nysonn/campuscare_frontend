@@ -24,6 +24,8 @@ import CampaignDetailPage from './pages/CampaignDetailPage';
 import LoginPage from './pages/LoginPage';
 import StudentRegisterPage from './pages/StudentRegisterPage';
 import CounselorRegisterPage from './pages/CounselorRegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Student pages
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -154,6 +156,8 @@ function AppRoutes() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register/student" element={<StudentRegisterPage />} />
           <Route path="/register/counselor" element={<CounselorRegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           {/* Student */}
           <Route path="/student" element={<StudentLayout />}>

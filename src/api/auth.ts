@@ -23,4 +23,10 @@ export const authApi = {
 
   updateProfile: (data: Record<string, unknown>) =>
     api.patch<{ message: string }>('/profile', data),
+
+  forgotPassword: (data: { email: string }) =>
+    api.post<{ message: string }>('/forgot-password', data),
+
+  resetPassword: (data: { token: string; password: string }) =>
+    api.post<{ message: string }>('/reset-password', data),
 };

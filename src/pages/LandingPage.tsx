@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  ArrowRight, Heart, Shield, Users, ChevronDown, CheckCircle2,
+  ArrowRight, Heart, Shield, Users, CheckCircle2,
   Calendar, Video, Award, BadgeCheck, Star, HandHeart, Lock,
   Sparkles, TrendingUp, BookOpen, MessageCircle,
 } from 'lucide-react';
@@ -52,88 +52,97 @@ export default function LandingPage() {
       />
 
       {/* ── Hero ──────────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-primary-50 min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center">
+      <section className="relative overflow-hidden bg-white">
 
-        {/* Decorative blobs */}
-        <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] bg-primary-100 rounded-full blur-3xl opacity-40" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-primary-200 rounded-full blur-3xl opacity-30" aria-hidden="true" />
+        {/* Background decorations */}
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-primary-50/40 pointer-events-none" aria-hidden="true" />
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary-100/30 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
 
-        {/* Dot-grid texture */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.035]"
-          style={{ backgroundImage: 'radial-gradient(circle, #15803d 1px, transparent 1px)', backgroundSize: '28px 28px' }}
-          aria-hidden="true"
-        />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-        {/* Content */}
-        <div className="relative w-full max-w-4xl mx-auto px-4 sm:px-6 py-24 sm:py-32 flex flex-col items-center text-center">
-
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white border border-primary-200 text-primary-700 text-xs font-semibold px-4 py-2 rounded-full mb-8 shadow-sm">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary-500" />
-            </span>
-            Campus Mental Health Support · Uganda
-          </div>
-
-          {/* Headline */}
-          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.08] tracking-tight mb-6">
-            You're Not{' '}
-            <span className="relative inline-block">
-              <span className="text-primary-600 italic">Alone</span>
-              <svg className="absolute -bottom-2 left-0 w-full overflow-visible" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M2 7 Q50 2 100 6 Q150 10 198 4" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.6" />
-              </svg>
-            </span>
-            {' '}in This Journey
-          </h1>
-
-          {/* Description */}
-          <p className="text-gray-500 text-lg sm:text-xl leading-relaxed max-w-2xl mb-10">
-            CampusCare connects university students with mental health resources,
-            confidential counselling, and a community that cares — all in one place.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-wrap gap-3 justify-center mb-16">
-            <Link to="/register/student">
-              <Button size="lg" className="rounded-full shadow-lg shadow-primary-200/60">
-                Get Started Free
-                <ArrowRight size={16} />
-              </Button>
-            </Link>
-            <Link to="/campaigns">
-              <Button variant="outline" size="lg" className="rounded-full bg-white/80 backdrop-blur-sm">
-                Browse Campaigns
-              </Button>
-            </Link>
-          </div>
-
-          {/* Stats row */}
-          <div className="inline-flex flex-wrap justify-center gap-0 bg-white/70 backdrop-blur-sm border border-gray-100 rounded-2xl shadow-sm px-2 py-3 divide-x divide-gray-200">
-            {[
-              { label: 'Students Supported', value: '500+' },
-              { label: 'Campaigns Funded', value: '120+' },
-              { label: 'Counsellors', value: '20+' },
-            ].map((stat, i) => (
-              <div key={stat.label} className={`px-6 sm:px-8 text-center ${i === 0 ? 'pl-4 sm:pl-6' : ''} ${i === 2 ? 'pr-4 sm:pr-6' : ''}`}>
-                <p className="font-display font-bold text-xl sm:text-2xl text-primary-700 leading-none">{stat.value}</p>
-                <p className="text-[10px] sm:text-xs text-gray-400 mt-1.5 whitespace-nowrap">{stat.label}</p>
+            {/* ── Left: Content ── */}
+            <div>
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-primary-50 border border-primary-200 text-primary-700 text-xs font-semibold px-4 py-2 rounded-full mb-8 shadow-sm">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary-400" />
+                </span>
+                Campus Mental Health Support · Uganda
               </div>
-            ))}
+
+              {/* Headline */}
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6">
+                How We{' '}
+                <span className="relative inline-block">
+                  <span className="text-primary-600 italic">Support</span>
+                  <svg className="absolute -bottom-2 left-0 w-full overflow-visible" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none" aria-hidden="true">
+                    <path d="M2 7 Q50 2 100 6 Q150 10 198 4" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.6" />
+                  </svg>
+                </span>
+                {' '}Students
+              </h1>
+
+              {/* Description */}
+              <p className="text-gray-500 text-lg sm:text-xl leading-relaxed max-w-lg mb-10">
+                We connect university students with mental health resources, confidential counselling,
+                and a community that cares — all in one place.
+              </p>
+
+              {/* CTAs */}
+              <div className="flex flex-wrap gap-3 mb-12">
+                <button
+                  onClick={() => setDonateOpen(true)}
+                  className="inline-flex items-center gap-2 px-7 py-3.5 text-base font-semibold rounded-full bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-200/60 hover:-translate-y-px active:translate-y-0 transition-all duration-200"
+                >
+                  Donate Now
+                </button>
+                <button
+                  onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="inline-flex items-center gap-2 px-7 py-3.5 text-base font-medium rounded-full border border-gray-200 text-gray-700 hover:border-primary-300 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
+                >
+                  Discover More
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* ── Right: Image ── */}
+            <div className="relative flex items-center justify-center lg:justify-end">
+              {/* Background organic blob */}
+              <div className="absolute inset-0 flex items-center justify-end pointer-events-none" aria-hidden="true">
+                <div className="w-[88%] h-[92%] bg-primary-100/50 rounded-[40%_60%_60%_40%/50%_50%_50%_50%]" />
+              </div>
+
+              {/* Leaf decorations */}
+              <div className="absolute top-6 left-8 w-14 h-20 bg-primary-200/70 rounded-[60%_40%_40%_60%/70%_30%_30%_70%] rotate-[-12deg] pointer-events-none" aria-hidden="true" />
+              <div className="absolute top-1/3 right-3 w-10 h-14 bg-primary-300/50 rounded-[60%_40%_40%_60%/70%_30%_30%_70%] rotate-[18deg] pointer-events-none" aria-hidden="true" />
+              <div className="absolute bottom-6 left-16 w-12 h-16 bg-primary-200/60 rounded-[60%_40%_40%_60%/70%_30%_30%_70%] rotate-[8deg] pointer-events-none" aria-hidden="true" />
+
+              {/* Image */}
+              <div className="relative z-10 w-full max-w-sm sm:max-w-md lg:max-w-none">
+                <img
+                  src="https://res.cloudinary.com/df3lhzzy7/image/upload/v1775557090/pexels-silverkblack-36729613_pgglh8.jpg"
+                  alt="Students supported by CampusCare"
+                  className="w-full object-cover rounded-3xl shadow-2xl shadow-primary-200/50"
+                  style={{ maxHeight: '580px' }}
+                />
+              </div>
+
+              {/* Floating counsellors badge */}
+              <div className="absolute bottom-8 -left-4 z-20 bg-white rounded-2xl shadow-xl px-5 py-3.5 border border-gray-100 hidden lg:block">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Active Counsellors</p>
+                <p className="font-display font-bold text-xl text-gray-900 leading-none">20+ Experts</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Scroll hint */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-gray-400 animate-bounce" aria-hidden="true">
-          <p className="text-[10px] tracking-widest uppercase font-medium">Scroll</p>
-          <ChevronDown size={14} />
-        </div>
       </section>
 
       {/* ── How It Works ──────────────────────────────────────────────────────── */}
-      <section className="py-20 bg-white">
+      <section id="how-it-works" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-semibold text-primary-600 uppercase tracking-widest mb-3 block">Simple & Seamless</span>
@@ -263,7 +272,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Featured Campaigns ────────────────────────────────────────────────── */}
-      <section className="py-24 bg-white overflow-hidden">
+      <section id="campaigns" className="py-24 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
@@ -411,7 +420,7 @@ export default function LandingPage() {
       />
 
       {/* ── Counsellor CTA — Hero-style ───────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-primary-50 py-24 sm:py-32">
+      <section id="counsellors" className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-primary-50 py-24 sm:py-32">
 
         {/* Decorative blobs — mirrors Hero */}
         <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] bg-primary-100 rounded-full blur-3xl opacity-40" aria-hidden="true" />

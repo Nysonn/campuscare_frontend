@@ -49,7 +49,7 @@ export default function LoginPage() {
       <div
         className="hidden lg:flex flex-col justify-between w-1/2 p-12 text-white relative overflow-hidden"
         style={{
-          backgroundImage: 'url(https://res.cloudinary.com/df3lhzzy7/image/upload/v1775223629/therapies_zpwseg.jpg)',
+          backgroundImage: 'url(https://res.cloudinary.com/df3lhzzy7/image/upload/v1775557090/pexels-silverkblack-36729613_pgglh8.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -114,7 +114,12 @@ export default function LoginPage() {
               />
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-gray-700">Password</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-700">Password</label>
+                  <Link to="/forgot-password" className="text-xs text-primary-600 hover:underline">
+                    Forgot password?
+                  </Link>
+                </div>
                 <div className="relative">
                   <input
                     type={showPw ? 'text' : 'password'}
