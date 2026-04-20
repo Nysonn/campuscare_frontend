@@ -55,6 +55,7 @@ import AdminCounselorsPage from './pages/admin/AdminCounselorsPage';
 
 import NotFoundPage from './pages/NotFoundPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import PWAUpdatePrompt from './components/PWAUpdatePrompt';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -208,6 +209,7 @@ export default function App() {
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
           <AppRoutes />
+          <PWAUpdatePrompt />
         </QueryClientProvider>
       </Provider>
     </ErrorBoundary>
