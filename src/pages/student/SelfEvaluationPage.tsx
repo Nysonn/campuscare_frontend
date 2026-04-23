@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ClipboardList, ChevronRight, ChevronLeft, CheckCircle, RotateCcw, Clock, BarChart2, Sparkles } from 'lucide-react';
+import { ClipboardList, ChevronRight, ChevronLeft, CheckCircle, RotateCcw, Clock, BarChart2, Sparkles, Lightbulb } from 'lucide-react';
 import { evaluationApi } from '../../api/evaluation';
 import type { EvaluationQuestion, EvaluationResult, EvaluationHistoryItem } from '../../types';
 import Spinner from '../../components/ui/Spinner';
@@ -105,6 +105,27 @@ function ResultCard({ result, onRetake }: { result: EvaluationResult; onRetake: 
           <span>Thriving<br/>26–32</span>
         </div>
       </div>
+
+      {result.recommendations && result.recommendations.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="h-7 w-7 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+              <Lightbulb size={14} className="text-primary-600" />
+            </div>
+            <h3 className="font-display text-sm font-bold text-gray-900">Recommended next steps</h3>
+          </div>
+          <ul className="space-y-2.5">
+            {result.recommendations.map((rec, i) => (
+              <li key={i} className="flex items-start gap-2.5 text-sm text-gray-600">
+                <span className="h-5 w-5 rounded-full bg-primary-100 text-primary-700 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                  {i + 1}
+                </span>
+                {rec}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <p className="text-sm text-gray-600 mb-4">

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   X, Heart, Calendar, Tag, CheckCircle, AlertTriangle,
-  CreditCard, Building2,
+  CreditCard, Building2, Users, AlertCircle, Paperclip, ExternalLink,
 } from 'lucide-react';
 import { campaignsApi } from '../../api/campaigns';
 import { contributionsApi } from '../../api/contributions';
@@ -202,7 +202,7 @@ export default function CampaignDetailModal({ campaignId, open, initialTab = 'de
                   <Avatar src={avatarSrc} name={authorName} size="md" />
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">{authorName}</p>
-                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 mt-0.5">
                       <span className="flex items-center gap-1">
                         <Calendar size={11} />
                         {new Date(campaign.created_at).toLocaleDateString('en-UG', { dateStyle: 'long' })}
@@ -210,6 +210,15 @@ export default function CampaignDetailModal({ campaignId, open, initialTab = 'de
                       {campaign.category && (
                         <span className="flex items-center gap-1 text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full capitalize">
                           <Tag size={10} /> {campaign.category}
+                        </span>
+                      )}
+                      {campaign.urgency_level && campaign.urgency_level !== 'normal' && (
+                        <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full capitalize font-medium ${
+                          campaign.urgency_level === 'high'
+                            ? 'text-red-700 bg-red-50'
+                            : 'text-amber-700 bg-amber-50'
+                        }`}>
+                          <AlertCircle size={10} /> {campaign.urgency_level} urgency
                         </span>
                       )}
                       {isCompleted && (
@@ -243,6 +252,35 @@ export default function CampaignDetailModal({ campaignId, open, initialTab = 'de
                   <ProgressBar current={campaign.current_amount} target={campaign.target_amount} />
                 </div>
 
+                {/* Beneficiary info */}
+                {(campaign.beneficiary_type || campaign.beneficiary_name || campaign.beneficiary_org_name) && (
+                  <div className="flex flex-col gap-2 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-blue-800">
+                      <Users size={14} /> Beneficiary Details
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                      {campaign.beneficiary_type && (
+                        <div>
+                          <p className="text-xs text-blue-500 font-medium">Beneficiary Type</p>
+                          <p className="text-gray-800 font-semibold capitalize">{campaign.beneficiary_type}</p>
+                        </div>
+                      )}
+                      {campaign.beneficiary_name && (
+                        <div>
+                          <p className="text-xs text-blue-500 font-medium">Beneficiary Name</p>
+                          <p className="text-gray-800 font-semibold">{campaign.beneficiary_name}</p>
+                        </div>
+                      )}
+                      {campaign.beneficiary_org_name && (
+                        <div>
+                          <p className="text-xs text-blue-500 font-medium">Organisation</p>
+                          <p className="text-gray-800 font-semibold">{campaign.beneficiary_org_name}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Account info */}
                 {hasAccount && (
                   <div className="flex flex-col gap-2 bg-primary-50 border border-primary-100 rounded-xl px-4 py-3">
@@ -268,6 +306,30 @@ export default function CampaignDetailModal({ campaignId, open, initialTab = 'de
                           <p className="text-gray-800 font-semibold tracking-wide">{campaign.account_number}</p>
                         </div>
                       )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Attachments */}
+                {campaign.attachments && campaign.attachments.length > 0 && (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                      <Paperclip size={14} /> Supporting Documents
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {campaign.attachments.map((att, i) => (
+                        <a
+                          key={i}
+                          href={att.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-primary-700 hover:bg-primary-50 hover:border-primary-200 transition-colors"
+                        >
+                          <Paperclip size={13} className="shrink-0 text-gray-400" />
+                          <span className="flex-1 truncate">{att.label || 'Document'}</span>
+                          <ExternalLink size={13} className="shrink-0 text-gray-400" />
+                        </a>
+                      ))}
                     </div>
                   </div>
                 )}

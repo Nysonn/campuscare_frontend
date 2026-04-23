@@ -131,7 +131,7 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
           <span className="font-semibold text-gray-900 text-sm capitalize">{user?.role} Dashboard</span>
         </div>
 
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {children}
         </div>
       </main>

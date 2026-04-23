@@ -122,9 +122,14 @@ export interface Campaign {
   category?: string;
   status?: string;
   account_status?: string;
+  urgency_level?: string;
+  beneficiary_type?: string;
+  beneficiary_name?: string;
+  beneficiary_org_name?: string;
   bank_name?: string;
   account_number?: string;
   account_holder_name?: string;
+  attachments?: CampaignAttachment[];
 }
 
 export interface CampaignAttachment {
@@ -337,6 +342,7 @@ export interface EvaluationResult {
   score: number;
   category: string;
   message: string;
+  recommendations?: string[];
 }
 
 export interface EvaluationHistoryItem {

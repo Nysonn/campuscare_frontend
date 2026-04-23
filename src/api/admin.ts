@@ -37,4 +37,36 @@ export const adminApi = {
   contributions: () => api.get<AdminContribution[]>('/admin/contributions'),
 
   exportContributions: () => api.get<Blob>('/admin/contributions/export'),
+
+  // ── Wallet / General Pool ──────────────────────────────────────────────────
+  walletBalance: () => api.get<{
+    total_donated: number; total_disbursed: number;
+    total_withdrawn: number; balance: number;
+  }>('/admin/wallet/balance'),
+
+  walletCampaigns: () => api.get<{
+    campaigns: { id: string; title: string; current_amount: number; target_amount: number }[];
+  }>('/admin/wallet/campaigns'),
+
+  disburse: (campaign_id: string, amount: number, note: string) =>
+    api.post<{ message: string; disbursement_id: string }>('/admin/wallet/disburse', { campaign_id, amount, note }),
+
+  withdraw: (amount: number, destination_type: string, destination_name: string, account_number: string, note: string) =>
+    api.post<{ message: string; withdrawal_id: string }>('/admin/wallet/withdraw', {
+      amount, destination_type, destination_name, account_number, note,
+    }),
+
+  disbursements: () => api.get<{
+    disbursements: {
+      id: string; campaign_id: string; campaign_title: string;
+      amount: number; note: string; created_at: string;
+    }[];
+  }>('/admin/wallet/disbursements'),
+
+  withdrawals: () => api.get<{
+    withdrawals: {
+      id: string; amount: number; destination_type: string;
+      destination_name: string; account_number: string; note: string; created_at: string;
+    }[];
+  }>('/admin/wallet/withdrawals'),
 };
