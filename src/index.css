@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode: toggling .dark on <html> activates dark: variants */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-display: "Merriweather", serif;
   --font-body: "Merriweather", serif;
@@ -60,6 +63,96 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Global dark mode overrides ─────────────────────────────────────────────
+   These rules cover the many pages/components that use hardcoded Tailwind
+   utility classes without dark: variants. They target the most common
+   structural patterns (cards, tables, auth pages, form shells) so that
+   every page looks correct in dark mode without touching every file.       */
+
+.dark body {
+  color: #f9fafb;
+  background-color: #030712;
+}
+
+/* Generic white panels / cards */
+.dark .bg-white {
+  background-color: #1f2937 !important;
+}
+
+/* Light gray section backgrounds */
+.dark .bg-gray-50 {
+  background-color: #111827 !important;
+}
+.dark .bg-gray-100 {
+  background-color: #1f2937 !important;
+}
+
+/* Light borders */
+.dark .border-gray-100 {
+  border-color: #374151 !important;
+}
+.dark .border-gray-200 {
+  border-color: #4b5563 !important;
+}
+
+/* Primary text */
+.dark .text-gray-900 {
+  color: #f9fafb !important;
+}
+.dark .text-gray-800 {
+  color: #f3f4f6 !important;
+}
+.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+.dark .text-gray-600 {
+  color: #9ca3af !important;
+}
+.dark .text-gray-500 {
+  color: #9ca3af !important;
+}
+
+/* Table header backgrounds */
+.dark thead tr {
+  background-color: #111827;
+}
+.dark tbody tr:hover {
+  background-color: #1f2937;
+}
+.dark th {
+  color: #9ca3af !important;
+}
+.dark td {
+  color: #d1d5db;
+  border-color: #1f2937;
+}
+
+/* Hover utility overrides */
+.dark .hover\:bg-gray-50:hover {
+  background-color: #374151 !important;
+}
+.dark .hover\:bg-gray-100:hover {
+  background-color: #374151 !important;
+}
+
+/* Select / native dropdowns */
+.dark select {
+  background-color: #1f2937;
+  color: #f9fafb;
+  border-color: #374151;
+}
+.dark select option {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
+/* Inline textareas not using the Textarea component */
+.dark textarea {
+  background-color: #1f2937;
+  color: #f9fafb;
+  border-color: #374151;
+}
+
 h1, h2, h3, h4 {
   font-family: var(--font-display);
 }
@@ -89,4 +182,12 @@ html {
 ::-webkit-scrollbar-thumb {
   background: #27ae60;
   border-radius: 3px;
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #15803d;
 }

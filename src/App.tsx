@@ -9,6 +9,7 @@ import {
 
 import { store } from './store';
 import { useAppDispatch } from './store/hooks';
+import { DarkModeProvider } from './context/DarkModeContext';
 import { setUser, setInitialized } from './store/authSlice';
 import { authApi } from './api/auth';
 
@@ -211,8 +212,10 @@ export default function App() {
     <ErrorBoundary>
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
-          <AppRoutes />
-          <PWAUpdatePrompt />
+          <DarkModeProvider>
+            <AppRoutes />
+            <PWAUpdatePrompt />
+          </DarkModeProvider>
         </QueryClientProvider>
       </Provider>
     </ErrorBoundary>

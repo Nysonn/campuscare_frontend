@@ -49,6 +49,10 @@ export const sponsorsApi = {
   getStreamToken: () =>
     api.get<StreamTokenResponse>('/stream/token'),
 
+  // ── Notifications ──────────────────────────────────────────────────────────
+  notifyPartnerMessage: () =>
+    api.post<{ sent: boolean; reason?: string }>('/sponsorships/notify-message', {}),
+
   // ── Admin ──────────────────────────────────────────────────────────────────
   adminListSponsors: () =>
     api.get<AdminSponsor[]>('/admin/sponsors'),

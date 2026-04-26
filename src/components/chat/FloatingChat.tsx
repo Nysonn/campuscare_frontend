@@ -248,6 +248,8 @@ function ChatWidget({
     setInputText('');
     try {
       await channelRef.current.sendMessage({ text });
+      // Fire-and-forget: notify partner by email if they are not currently online.
+      sponsorsApi.notifyPartnerMessage().catch(() => {});
     } catch {
       setInputText(text);
     } finally {

@@ -52,11 +52,11 @@ export default function LandingPage() {
       />
 
       {/* ── Hero ──────────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-white">
+      <section className="relative overflow-hidden bg-white dark:bg-gray-950">
 
         {/* Background decorations */}
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-primary-50/40 pointer-events-none" aria-hidden="true" />
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary-100/30 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-primary-50/40 dark:bg-primary-900/10 pointer-events-none" aria-hidden="true" />
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary-100/30 dark:bg-primary-900/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -73,7 +73,7 @@ export default function LandingPage() {
               </div>
 
               {/* Headline */}
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6">
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-[1.1] tracking-tight mb-6">
                 How We{' '}
                 <span className="relative inline-block">
                   <span className="text-primary-600 italic">Support</span>
@@ -96,14 +96,7 @@ export default function LandingPage() {
                   onClick={() => setDonateOpen(true)}
                   className="inline-flex items-center gap-2 px-7 py-3.5 text-base font-semibold rounded-full bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-200/60 hover:-translate-y-px active:translate-y-0 transition-all duration-200"
                 >
-                  Donate Now
-                </button>
-                <button
-                  onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="inline-flex items-center gap-2 px-7 py-3.5 text-base font-medium rounded-full border border-gray-200 text-gray-700 hover:border-primary-300 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
-                >
-                  Discover More
-                  <ArrowRight size={16} />
+                  Donate to General Pool
                 </button>
               </div>
             </div>
@@ -112,13 +105,13 @@ export default function LandingPage() {
             <div className="relative flex items-center justify-center lg:justify-end">
               {/* Background organic blob */}
               <div className="absolute inset-0 flex items-center justify-end pointer-events-none" aria-hidden="true">
-                <div className="w-[88%] h-[92%] bg-primary-100/50 rounded-[40%_60%_60%_40%/50%_50%_50%_50%]" />
+                <div className="w-[88%] h-[92%] bg-primary-100/50 dark:bg-primary-900/20 rounded-[40%_60%_60%_40%/50%_50%_50%_50%]" />
               </div>
 
               {/* Leaf decorations */}
-              <div className="absolute top-6 left-8 w-14 h-20 bg-primary-200/70 rounded-[60%_40%_40%_60%/70%_30%_30%_70%] rotate-[-12deg] pointer-events-none" aria-hidden="true" />
-              <div className="absolute top-1/3 right-3 w-10 h-14 bg-primary-300/50 rounded-[60%_40%_40%_60%/70%_30%_30%_70%] rotate-[18deg] pointer-events-none" aria-hidden="true" />
-              <div className="absolute bottom-6 left-16 w-12 h-16 bg-primary-200/60 rounded-[60%_40%_40%_60%/70%_30%_30%_70%] rotate-[8deg] pointer-events-none" aria-hidden="true" />
+              <div className="absolute top-6 left-8 w-14 h-20 bg-primary-200/70 dark:bg-primary-700/20 rounded-[60%_40%_40%_60%/70%_30%_30%_70%] rotate-[-12deg] pointer-events-none" aria-hidden="true" />
+              <div className="absolute top-1/3 right-3 w-10 h-14 bg-primary-300/50 dark:bg-primary-700/15 rounded-[60%_40%_40%_60%/70%_30%_30%_70%] rotate-[18deg] pointer-events-none" aria-hidden="true" />
+              <div className="absolute bottom-6 left-16 w-12 h-16 bg-primary-200/60 dark:bg-primary-700/15 rounded-[60%_40%_40%_60%/70%_30%_30%_70%] rotate-[8deg] pointer-events-none" aria-hidden="true" />
 
               {/* Image */}
               <div className="relative z-10 w-full max-w-sm sm:max-w-md lg:max-w-none">
@@ -142,11 +135,11 @@ export default function LandingPage() {
       </section>
 
       {/* ── How It Works ──────────────────────────────────────────────────────── */}
-      <section id="how-it-works" className="py-20 bg-white">
+      <section id="how-it-works" className="py-20 bg-white dark:bg-gray-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-semibold text-primary-600 uppercase tracking-widest mb-3 block">Simple & Seamless</span>
-            <h2 className="font-display text-4xl sm:text-5xl font-bold text-gray-900 leading-tight">
+            <h2 className="font-display text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
               Get started in minutes
             </h2>
           </div>
@@ -194,7 +187,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Why CampusCare ────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-gray-50/60 overflow-hidden">
+      <section className="py-24 bg-gray-50/60 dark:bg-gray-900 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="text-center max-w-2xl mx-auto mb-16">
@@ -239,7 +232,7 @@ export default function LandingPage() {
             ].map((f) => (
               <div
                 key={f.title}
-                className="group relative bg-white border border-gray-100 rounded-3xl p-8 hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col overflow-hidden"
+                className="group relative bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-3xl p-8 hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col overflow-hidden"
               >
                 {/* Top gradient bar on hover */}
                 <div className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${f.accentColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
@@ -254,7 +247,7 @@ export default function LandingPage() {
                   </span>
                 </div>
 
-                <h3 className="font-display font-bold text-xl text-gray-900 mb-3">{f.title}</h3>
+                <h3 className="font-display font-bold text-xl text-gray-900 dark:text-white mb-3">{f.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed mb-6">{f.desc}</p>
 
                 <ul className="mt-auto space-y-2.5">
@@ -272,7 +265,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Featured Campaigns ────────────────────────────────────────────────── */}
-      <section id="campaigns" className="py-24 bg-white overflow-hidden">
+      <section id="campaigns" className="py-24 bg-white dark:bg-gray-950 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
@@ -337,7 +330,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── General Pool Donation ─────────────────────────────────────────────── */}
-      <section className="py-16 bg-gray-50/60">
+      <section className="py-16 bg-gray-50/60 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 rounded-3xl overflow-hidden">
 
@@ -420,11 +413,11 @@ export default function LandingPage() {
       />
 
       {/* ── Counsellor CTA — Hero-style ───────────────────────────────────────── */}
-      <section id="counsellors" className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-primary-50 py-24 sm:py-32">
+      <section id="counsellors" className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-primary-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 py-24 sm:py-32">
 
         {/* Decorative blobs — mirrors Hero */}
-        <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] bg-primary-100 rounded-full blur-3xl opacity-40" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-primary-200 rounded-full blur-3xl opacity-30" aria-hidden="true" />
+        <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] bg-primary-100 dark:bg-primary-900/20 rounded-full blur-3xl opacity-40" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-primary-200 dark:bg-primary-900/15 rounded-full blur-3xl opacity-30" aria-hidden="true" />
 
         {/* Dot-grid texture — mirrors Hero */}
         <div

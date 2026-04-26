@@ -71,7 +71,11 @@ function BalanceCards() {
       {cards.map(c => (
         <div
           key={c.label}
-          className={`rounded-2xl border p-5 ${c.highlight ? 'border-primary-200 bg-primary-50' : 'border-gray-100 bg-white'} shadow-sm`}
+          className={`rounded-2xl border p-5 shadow-sm ${
+            c.highlight
+              ? 'border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/20'
+              : 'border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800'
+          }`}
         >
           <div className={`h-10 w-10 rounded-xl ${c.bg} flex items-center justify-center mb-3`}>
             {c.icon}
@@ -119,19 +123,19 @@ function DisburseForm() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 space-y-4">
       <div>
-        <h2 className="font-display text-base font-bold text-gray-900">Disburse to Campaign</h2>
-        <p className="text-xs text-gray-500 mt-0.5">Transfer funds from the general pool directly into a campaign.</p>
+        <h2 className="font-display text-base font-bold text-gray-900 dark:text-white">Disburse to Campaign</h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Transfer funds from the general pool into a campaign that has not yet reached its target.</p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-gray-700">Select Campaign *</label>
+        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Select Campaign *</label>
         <div className="relative">
           <select
             value={campaignId}
             onChange={e => setCampaignId(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white appearance-none pr-10"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 dark:text-white appearance-none pr-10"
           >
             <option value="">— Choose an approved campaign —</option>
             {campaigns.map(c => (
@@ -402,22 +406,22 @@ export default function AdminWalletPage() {
       <SEO title="Wallet — Admin" description="Manage the CampusCare general pool wallet." noindex />
 
       <div>
-        <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">General Pool Wallet</h1>
-        <p className="text-gray-500">View your balance and disburse or withdraw funds from the general donation pool.</p>
+        <h1 className="font-display text-3xl font-bold text-gray-900 dark:text-white mb-1">General Pool Wallet</h1>
+        <p className="text-gray-500 dark:text-gray-400">View your balance and disburse or withdraw funds from the general donation pool.</p>
       </div>
 
       <BalanceCards />
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit flex-wrap">
+      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 w-fit flex-wrap">
         {tabs.map(t => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
               tab === t.key
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
             }`}
           >
             {t.label}

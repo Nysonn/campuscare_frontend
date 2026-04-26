@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/authSlice';
 import { authApi } from '../../api/auth';
 import Button from '../ui/Button';
+import DarkModeToggle from '../ui/DarkModeToggle';
 
 const NAV_LINKS = [
   { label: 'Home',         to: '/',              sectionId: null,            icon: <Home size={15} />        },
@@ -94,8 +95,8 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 bg-white/98 backdrop-blur-md border-b border-gray-100/80 ${
-          scrolled ? 'shadow-[0_2px_20px_-4px_rgba(0,0,0,0.1)]' : ''
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 bg-white/98 dark:bg-gray-900/98 backdrop-blur-md border-b border-gray-100/80 dark:border-gray-800 ${
+          scrolled ? 'shadow-[0_2px_20px_-4px_rgba(0,0,0,0.1)] dark:shadow-[0_2px_20px_-4px_rgba(0,0,0,0.4)]' : ''
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-17 flex items-center justify-between gap-4">
@@ -110,7 +111,7 @@ export default function Header() {
                 className="relative h-9 w-9 object-contain transition-transform duration-200 group-hover:scale-[1.07]"
               />
             </div>
-            <span className="font-display font-bold text-[1.2rem] tracking-tight text-gray-900">
+            <span className="font-display font-bold text-[1.2rem] tracking-tight text-gray-900 dark:text-white">
               Campus<span className="text-primary-600">Care</span>
             </span>
           </Link>
@@ -129,8 +130,8 @@ export default function Header() {
                 }}
                 className={`relative flex items-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
                   isActive(to)
-                    ? 'bg-primary-50 text-primary-700 font-semibold'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 font-semibold'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
               >
                 {label}
@@ -140,6 +141,7 @@ export default function Header() {
 
           {/* Desktop right actions */}
           <div className="hidden md:flex items-center gap-2">
+            <DarkModeToggle />
             {user ? (
               <>
                 <Link to={dashboardPath}>
@@ -174,24 +176,24 @@ export default function Header() {
 
                   {userDropdownOpen && (
                     <div
-                      className="absolute right-0 mt-2.5 w-56 bg-white rounded-2xl shadow-xl shadow-gray-200/80 border border-gray-100 py-1.5 origin-top-right animate-in fade-in zoom-in-95 duration-150"
+                      className="absolute right-0 mt-2.5 w-56 bg-white dark:bg-gray-900 rounded-2xl shadow-xl shadow-gray-200/80 dark:shadow-gray-950/80 border border-gray-100 dark:border-gray-800 py-1.5 origin-top-right animate-in fade-in zoom-in-95 duration-150"
                       onClick={e => e.stopPropagation()}
                     >
                       <div className="absolute -top-1.5 right-4 h-3 w-3 bg-white border-l border-t border-gray-100 rotate-45" />
-                      <div className="px-4 pt-3 pb-3.5 border-b border-gray-100">
+                      <div className="px-4 pt-3 pb-3.5 border-b border-gray-100 dark:border-gray-800">
                         <div className="flex items-center gap-2.5">
                           <div className="h-9 w-9 rounded-full bg-linear-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
                             {getInitials(userName)}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
-                            <p className="text-xs text-primary-600 font-medium">{roleLabel}</p>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{userName}</p>
+                            <p className="text-xs text-primary-600 dark:text-primary-400 font-medium">{roleLabel}</p>
                           </div>
                         </div>
                       </div>
                       <Link
                         to={dashboardPath}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                         onClick={() => setUserDropdownOpen(false)}
                       >
                         <LayoutDashboard size={15} className="text-gray-400" />
@@ -254,24 +256,27 @@ export default function Header() {
 
       {/* Mobile drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-75 z-50 md:hidden bg-white shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-75 z-50 md:hidden bg-white dark:bg-gray-900 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
           menuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800">
           <Link to="/" className="flex items-center gap-2 group" onClick={() => setMenuOpen(false)}>
             <img src="/logo.png" alt="CampusCare" className="h-7 w-7 object-contain" />
-            <span className="font-display font-bold text-lg text-gray-900">
+            <span className="font-display font-bold text-lg text-gray-900 dark:text-white">
               Campus<span className="text-primary-600">Care</span>
             </span>
           </Link>
-          <button
-            onClick={() => setMenuOpen(false)}
-            className="h-8 w-8 flex items-center justify-center rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-            aria-label="Close menu"
-          >
-            <X size={18} />
-          </button>
+          <div className="flex items-center gap-2">
+            <DarkModeToggle />
+            <button
+              onClick={() => setMenuOpen(false)}
+              className="h-8 w-8 flex items-center justify-center rounded-xl text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              aria-label="Close menu"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         {user && (
@@ -302,7 +307,7 @@ export default function Header() {
               className={`flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all duration-150 ${
                 isActive(to)
                   ? 'bg-primary-600 text-white shadow-md shadow-primary-300/40'
-                  : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               <span className={isActive(to) ? 'text-primary-200' : 'text-gray-400'}>{icon}</span>
@@ -327,7 +332,7 @@ export default function Header() {
           )}
         </nav>
 
-        <div className="px-4 pb-8 pt-4 border-t border-gray-100 space-y-3">
+        <div className="px-4 pb-8 pt-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
           {user ? (
             <button
               onClick={() => { setMenuOpen(false); handleLogout(); }}

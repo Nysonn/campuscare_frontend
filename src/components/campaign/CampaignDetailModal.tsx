@@ -318,17 +318,30 @@ export default function CampaignDetailModal({ campaignId, open, initialTab = 'de
                     </div>
                     <div className="flex flex-col gap-2">
                       {campaign.attachments.map((att, i) => (
-                        <a
+                        <button
                           key={i}
-                          href={att.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-primary-700 hover:bg-primary-50 hover:border-primary-200 transition-colors"
+                          type="button"
+                          onClick={() => {
+                            // data: URLs are blocked in new tabs by browsers — convert to blob first
+                            if (att.url.startsWith('data:')) {
+                              const [meta, b64] = att.url.split(',');
+                              const mime = meta.split(':')[1].split(';')[0];
+                              const bytes = atob(b64);
+                              const buf = new Uint8Array(bytes.length);
+                              for (let j = 0; j < bytes.length; j++) buf[j] = bytes.charCodeAt(j);
+                              const blobUrl = URL.createObjectURL(new Blob([buf], { type: mime }));
+                              const win = window.open(blobUrl, '_blank');
+                              if (win) win.addEventListener('unload', () => URL.revokeObjectURL(blobUrl));
+                            } else {
+                              window.open(att.url, '_blank', 'noopener,noreferrer');
+                            }
+                          }}
+                          className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-primary-700 hover:bg-primary-50 hover:border-primary-200 transition-colors w-full text-left"
                         >
                           <Paperclip size={13} className="shrink-0 text-gray-400" />
                           <span className="flex-1 truncate">{att.label || 'Document'}</span>
                           <ExternalLink size={13} className="shrink-0 text-gray-400" />
-                        </a>
+                        </button>
                       ))}
                     </div>
                   </div>

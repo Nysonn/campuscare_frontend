@@ -149,10 +149,10 @@ export default function StudentDashboard() {
         noindex
       />
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">
+        <h1 className="font-display text-3xl font-bold text-gray-900 dark:text-white mb-1">
           Good day, {displayName}
         </h1>
-        <p className="text-gray-500">Here's what's happening with your CampusCare account.</p>
+        <p className="text-gray-500 dark:text-gray-400">Here's what's happening with your CampusCare account.</p>
       </div>
 
       {/* Stats */}
@@ -162,26 +162,26 @@ export default function StudentDashboard() {
           { label: 'Pending Bookings', value: pendingBookings, icon: <Calendar size={20} className="text-yellow-600" />, color: 'bg-yellow-50' },
           { label: 'Confirmed Sessions', value: acceptedBookings, icon: <Calendar size={20} className="text-blue-600" />, color: 'bg-blue-50' },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
+          <div key={s.label} className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-4">
             <div className={`h-12 w-12 rounded-xl ${s.color} flex items-center justify-center`}>
               {s.icon}
             </div>
             <div>
-              <p className="font-display text-2xl font-bold text-gray-900">{s.value}</p>
-              <p className="text-xs text-gray-500">{s.label}</p>
+              <p className="font-display text-2xl font-bold text-gray-900 dark:text-white">{s.value}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{s.label}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* ── Sponsor Hub ── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-xl bg-purple-50 flex items-center justify-center">
               <Users size={16} className="text-purple-600" />
             </div>
-            <h3 className="font-display font-semibold text-gray-900">Sponsor Hub</h3>
+            <h3 className="font-display font-semibold text-gray-900 dark:text-white">Sponsor Hub</h3>
           </div>
           {hasActiveSponsorship && (
             <span className="flex items-center gap-1.5 text-xs text-primary-600 bg-primary-50 px-2.5 py-1 rounded-full font-medium">
@@ -290,8 +290,8 @@ export default function StudentDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chatbot */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col" style={{ height: '500px' }}>
-          <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col" style={{ height: '500px' }}>
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-gray-700">
             <div className="h-9 w-9 bg-primary-100 rounded-xl flex items-center justify-center">
               <Bot size={18} className="text-primary-600" />
             </div>
@@ -357,7 +357,7 @@ export default function StudentDashboard() {
           </div>
 
           {/* Input */}
-          <div className="px-4 py-3 border-t border-gray-100">
+          <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
             <div className="flex gap-2">
               <input
                 type="text"
@@ -365,7 +365,7 @@ export default function StudentDashboard() {
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
                 placeholder="Type a message..."
-                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 disabled={sending}
               />
               <button
@@ -382,8 +382,8 @@ export default function StudentDashboard() {
         {/* Quick actions + recent bookings */}
         <div className="space-y-5">
           {/* Quick actions */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <h3 className="font-display font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5">
+            <h3 className="font-display font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-3">
               <Link to="/student/campaigns/new">
                 <div className="border-2 border-dashed border-primary-200 rounded-xl p-4 text-center hover:border-primary-400 hover:bg-primary-50 transition-all cursor-pointer group">
@@ -400,39 +400,77 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Upcoming bookings */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display font-semibold text-gray-900">Upcoming Sessions</h3>
-              <Link to="/student/bookings" className="text-xs text-primary-600 hover:underline">View all</Link>
-            </div>
-            {(bookings ?? []).length === 0 ? (
-              <div className="text-center py-6 text-gray-400">
-                <Calendar size={30} className="mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">No sessions booked yet.</p>
-                <Link to="/student/bookings/new" className="text-xs text-primary-600 mt-1 inline-block hover:underline">Book a counsellor</Link>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {(bookings ?? []).slice(0, 3).map(b => (
-                  <div key={b.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <div className="h-8 w-8 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
-                      <Calendar size={14} className="text-primary-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{b.counselor_name}</p>
-                      <p className="text-xs text-gray-400">
-                        {new Date(b.start_time).toLocaleDateString('en-UG', { dateStyle: 'medium' })} · {b.type}
-                      </p>
-                    </div>
-                    <Badge variant={b.status === 'accepted' ? 'green' : b.status === 'declined' ? 'red' : 'yellow'}>
-                      {b.status}
-                    </Badge>
+          {/* Sessions — Upcoming + Previous */}
+          {(() => {
+            const now = new Date();
+            const upcoming = (bookings ?? []).filter(b => new Date(b.end_time) >= now);
+            const previous = (bookings ?? []).filter(b => new Date(b.end_time) < now);
+
+            return (
+              <div className="space-y-5">
+                {/* Upcoming */}
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-display font-semibold text-gray-900 dark:text-white">Upcoming Sessions</h3>
+                    <Link to="/student/bookings" className="text-xs text-primary-600 hover:underline">View all</Link>
                   </div>
-                ))}
+                  {upcoming.length === 0 ? (
+                    <div className="text-center py-6 text-gray-400">
+                      <Calendar size={30} className="mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+                      <p className="text-sm">No upcoming sessions.</p>
+                      <Link to="/student/bookings/new" className="text-xs text-primary-600 mt-1 inline-block hover:underline">Book a counsellor</Link>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {upcoming.slice(0, 3).map(b => (
+                        <div key={b.id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                          <div className="h-8 w-8 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center shrink-0">
+                            <Calendar size={14} className="text-primary-600 dark:text-primary-400" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{b.counselor_name}</p>
+                            <p className="text-xs text-gray-400">
+                              {new Date(b.start_time).toLocaleDateString('en-UG', { dateStyle: 'medium' })} · {b.type}
+                            </p>
+                          </div>
+                          <Badge variant={b.status === 'accepted' ? 'green' : b.status === 'declined' ? 'red' : 'yellow'}>
+                            {b.status}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Previous */}
+                {previous.length > 0 && (
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-display font-semibold text-gray-900 dark:text-white">Previous Sessions</h3>
+                    </div>
+                    <div className="space-y-3">
+                      {previous.slice(0, 3).map(b => (
+                        <div key={b.id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl opacity-75">
+                          <div className="h-8 w-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0">
+                            <Calendar size={14} className="text-gray-400 dark:text-gray-500" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{b.counselor_name}</p>
+                            <p className="text-xs text-gray-400">
+                              {new Date(b.start_time).toLocaleDateString('en-UG', { dateStyle: 'medium' })} · {b.type}
+                            </p>
+                          </div>
+                          <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+                            Past
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            );
+          })()}
         </div>
       </div>
 

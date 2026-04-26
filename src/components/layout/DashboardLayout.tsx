@@ -6,6 +6,7 @@ import { logout } from '../../store/authSlice';
 import { authApi } from '../../api/auth';
 import { setAuthToken } from '../../api/client';
 import Avatar from '../ui/Avatar';
+import DarkModeToggle from '../ui/DarkModeToggle';
 
 interface NavItem {
   to: string;
@@ -35,7 +36,7 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
   const avatarUrl =
     user?.role === 'student' ? user.avatar_url
     : user?.role === 'counselor' ? user.avatar_url
-    : undefined;
+    : '/logo.png';
 
   const handleLogout = async () => {
     try { await authApi.logout(); } finally {
@@ -56,7 +57,7 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
   }, [sidebarOpen]);
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
@@ -67,19 +68,20 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
 
       {/* Sidebar */}
       <aside className={`
-        w-64 bg-white border-r border-gray-100 flex flex-col fixed h-full z-40 shadow-sm
+        w-64 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col fixed h-full z-40 shadow-sm
         transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0
       `}>
         {/* User info */}
-        <div className="px-5 py-4 border-b border-gray-100">
+        <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
             <Avatar src={avatarUrl} name={displayName} size="md" />
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
-              <p className="text-xs text-gray-400 capitalize">{user?.role}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{displayName}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 capitalize">{user?.role}</p>
             </div>
+            <DarkModeToggle />
           </div>
         </div>
 
@@ -92,10 +94,11 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
               end
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                 transition-all duration-150 hover:scale-[1.02]
                 ${isActive
-                  ? 'bg-primary-50 text-primary-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                 }`
               }
             >
@@ -106,10 +109,13 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
         </nav>
 
         {/* Logout */}
-        <div className="px-3 py-4 border-t border-gray-100">
+        <div className="px-3 py-4 border-t border-gray-100 dark:border-gray-800">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all w-full cursor-pointer"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+              text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400
+              hover:bg-red-50 dark:hover:bg-red-900/20 transition-all w-full cursor-pointer
+              hover:scale-[1.02]"
           >
             <LogOut size={16} />
             Sign out
@@ -120,15 +126,18 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
       {/* Main */}
       <main className="flex-1 md:ml-64 min-h-screen">
         {/* Mobile top bar */}
-        <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-100 sticky top-0 z-20">
+        <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-20">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors min-h-11 min-w-11 flex items-center justify-center"
+            className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-11 min-w-11 flex items-center justify-center"
             aria-label="Open menu"
           >
             <Menu size={20} />
           </button>
-          <span className="font-semibold text-gray-900 text-sm capitalize">{user?.role} Dashboard</span>
+          <span className="font-semibold text-gray-900 dark:text-white text-sm capitalize flex-1">
+            {user?.role} Dashboard
+          </span>
+          <DarkModeToggle />
         </div>
 
         <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
