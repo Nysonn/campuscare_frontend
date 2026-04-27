@@ -44,8 +44,8 @@ export default function AllCampaignsPage() {
   };
 
   const { data: campaigns, isLoading, isError, refetch } = useQuery({
-    queryKey: ['campaigns'],
-    queryFn: campaignsApi.list,
+    queryKey: ['campaigns', 'full'],
+    queryFn: campaignsApi.listFull,
   });
 
   const filtered = (campaigns ?? []).filter(c => {

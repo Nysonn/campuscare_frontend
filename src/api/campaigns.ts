@@ -22,6 +22,13 @@ interface CampaignPayload {
 export const campaignsApi = {
   list: () => api.get<Campaign[]>('/campaigns'),
 
+  // The list endpoint omits `category`; this fetches all detail pages in parallel to enrich it.
+  listFull: async (): Promise<Campaign[]> => {
+    const campaigns = await api.get<Campaign[]>('/campaigns');
+    const detailed = await Promise.all(campaigns.map(c => api.get<Campaign>(`/campaigns/${c.id}`)));
+    return detailed;
+  },
+
   get: (id: string) => api.get<Campaign>(`/campaigns/${id}`),
 
   mine: () => api.get<MyCampaign[]>('/campaigns/mine'),
