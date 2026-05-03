@@ -9,6 +9,7 @@ import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
 import SEO from '../../components/seo/SEO';
 import { exportToPdf } from '../../utils/exportToPdf';
+import { exportToCsv } from '../../utils/exportToCsv';
 
 type RoleFilter = '' | 'student' | 'counselor' | 'admin';
 
@@ -23,6 +24,22 @@ export default function AdminUsersPage() {
     setExporting(true);
     await exportToPdf('users-pdf-content', `campuscare-users-${new Date().toISOString().slice(0, 10)}.pdf`);
     setExporting(false);
+  };
+
+  const handleExportCsv = () => {
+    exportToCsv(
+      users ?? [],
+      [
+        { key: 'id',         label: 'ID' },
+        { key: 'full_name',  label: 'Full Name' },
+        { key: 'email',      label: 'Email' },
+        { key: 'role',       label: 'Role' },
+        { key: 'status',     label: 'Status' },
+        { key: 'phone',      label: 'Phone' },
+        { key: 'created_at', label: 'Joined' },
+      ],
+      `campuscare-users-${new Date().toISOString().slice(0, 10)}.csv`,
+    );
   };
 
   const { data: users, isLoading } = useQuery({
@@ -53,9 +70,14 @@ export default function AdminUsersPage() {
             <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Users</h1>
             <p className="text-gray-500">Manage platform users.</p>
           </div>
-          <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
-            <FileDown size={16} /> Export PDF
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExportCsv}>
+              <FileDown size={16} /> Export CSV
+            </Button>
+            <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
+              <FileDown size={16} /> Export PDF
+            </Button>
+          </div>
         </div>
       </div>
 

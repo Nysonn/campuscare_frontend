@@ -8,6 +8,7 @@ import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import SEO from '../../components/seo/SEO';
 import { exportToPdf } from '../../utils/exportToPdf';
+import { exportToCsv } from '../../utils/exportToCsv';
 
 export default function AdminSponsorsPage() {
   const { data: sponsors = [], isLoading } = useQuery({
@@ -20,6 +21,33 @@ export default function AdminSponsorsPage() {
     setExporting(true);
     await exportToPdf('sponsors-pdf-content', `campuscare-sponsors-${new Date().toISOString().slice(0, 10)}.pdf`);
     setExporting(false);
+  };
+
+  const handleExportCsv = () => {
+    const rows = sponsors.map(s => ({
+      id: s.id,
+      display_name: s.display_name,
+      university: s.university,
+      what_i_offer: s.what_i_offer,
+      is_active: s.is_active ? 'Yes' : 'No',
+      sponsee_name: s.sponsee?.display_name ?? '',
+      sponsee_since: s.sponsee?.since ?? '',
+      created_at: s.created_at,
+    }));
+    exportToCsv(
+      rows,
+      [
+        { key: 'id',            label: 'ID' },
+        { key: 'display_name',  label: 'Name' },
+        { key: 'university',    label: 'University' },
+        { key: 'what_i_offer',  label: 'What They Offer' },
+        { key: 'is_active',     label: 'Active' },
+        { key: 'sponsee_name',  label: 'Sponsee' },
+        { key: 'sponsee_since', label: 'Sponsoring Since' },
+        { key: 'created_at',    label: 'Joined' },
+      ],
+      `campuscare-sponsors-${new Date().toISOString().slice(0, 10)}.csv`,
+    );
   };
 
   const activeSponsors = sponsors.filter(s => s.is_active);
@@ -41,9 +69,14 @@ export default function AdminSponsorsPage() {
               Students who have volunteered to support a peer through the sponsorship programme.
             </p>
           </div>
-          <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
-            <FileDown size={16} /> Export PDF
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExportCsv}>
+              <FileDown size={16} /> Export CSV
+            </Button>
+            <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
+              <FileDown size={16} /> Export PDF
+            </Button>
+          </div>
         </div>
       </div>
 

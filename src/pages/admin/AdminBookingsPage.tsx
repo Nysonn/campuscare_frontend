@@ -7,6 +7,7 @@ import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import SEO from '../../components/seo/SEO';
 import { exportToPdf } from '../../utils/exportToPdf';
+import { exportToCsv } from '../../utils/exportToCsv';
 
 export default function AdminBookingsPage() {
   const { data: bookings, isLoading } = useQuery({
@@ -19,6 +20,21 @@ export default function AdminBookingsPage() {
     setExporting(true);
     await exportToPdf('bookings-pdf-content', `campuscare-bookings-${new Date().toISOString().slice(0, 10)}.pdf`);
     setExporting(false);
+  };
+
+  const handleExportCsv = () => {
+    exportToCsv(
+      bookings ?? [],
+      [
+        { key: 'id',            label: 'ID' },
+        { key: 'student_name',  label: 'Student' },
+        { key: 'counselor_name', label: 'Counsellor' },
+        { key: 'start_time',    label: 'Start Time' },
+        { key: 'end_time',      label: 'End Time' },
+        { key: 'status',        label: 'Status' },
+      ],
+      `campuscare-bookings-${new Date().toISOString().slice(0, 10)}.csv`,
+    );
   };
 
   return (
@@ -34,9 +50,14 @@ export default function AdminBookingsPage() {
             <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">All Bookings</h1>
             <p className="text-gray-500">All counselling session bookings across the platform.</p>
           </div>
-          <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
-            <FileDown size={16} /> Export PDF
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExportCsv}>
+              <FileDown size={16} /> Export CSV
+            </Button>
+            <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
+              <FileDown size={16} /> Export PDF
+            </Button>
+          </div>
         </div>
       </div>
 

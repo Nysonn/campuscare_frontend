@@ -12,6 +12,7 @@ import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import SEO from '../../components/seo/SEO';
 import { exportToPdf } from '../../utils/exportToPdf';
+import { exportToCsv } from '../../utils/exportToCsv';
 
 type StatusFilter = 'pending' | 'approved' | 'rejected' | 'all';
 
@@ -26,6 +27,24 @@ export default function AdminCounselorsPage() {
     setExporting(true);
     await exportToPdf('counselors-pdf-content', `campuscare-counselors-${new Date().toISOString().slice(0, 10)}.pdf`);
     setExporting(false);
+  };
+
+  const handleExportCsv = () => {
+    exportToCsv(
+      counselors ?? [],
+      [
+        { key: 'id',                   label: 'ID' },
+        { key: 'full_name',            label: 'Full Name' },
+        { key: 'email',                label: 'Email' },
+        { key: 'phone',                label: 'Phone' },
+        { key: 'specialization',       label: 'Specialization' },
+        { key: 'location',             label: 'Location' },
+        { key: 'years_of_experience',  label: 'Experience' },
+        { key: 'verification_status',  label: 'Status' },
+        { key: 'created_at',           label: 'Registered' },
+      ],
+      `campuscare-counselors-${new Date().toISOString().slice(0, 10)}.csv`,
+    );
   };
 
   const { data: counselors, isLoading } = useQuery({
@@ -66,9 +85,14 @@ export default function AdminCounselorsPage() {
             <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Counsellor Verification</h1>
             <p className="text-gray-500">Review applications and approve or reject counsellors.</p>
           </div>
-          <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
-            <FileDown size={16} /> Export PDF
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExportCsv}>
+              <FileDown size={16} /> Export CSV
+            </Button>
+            <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
+              <FileDown size={16} /> Export PDF
+            </Button>
+          </div>
         </div>
       </div>
 

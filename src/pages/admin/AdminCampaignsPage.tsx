@@ -12,6 +12,7 @@ import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
 import SEO from '../../components/seo/SEO';
 import { exportToPdf } from '../../utils/exportToPdf';
+import { exportToCsv } from '../../utils/exportToCsv';
 
 type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
 
@@ -56,6 +57,28 @@ export default function AdminCampaignsPage() {
     setExporting(true);
     await exportToPdf('campaigns-pdf-content', `campuscare-campaigns-${new Date().toISOString().slice(0, 10)}.pdf`);
     setExporting(false);
+  };
+
+  const handleExportCsv = () => {
+    exportToCsv(
+      campaigns ?? [],
+      [
+        { key: 'id',             label: 'ID' },
+        { key: 'title',          label: 'Title' },
+        { key: 'student_name',   label: 'Student' },
+        { key: 'category',       label: 'Category' },
+        { key: 'status',         label: 'Status' },
+        { key: 'target_amount',  label: 'Goal (UGX)' },
+        { key: 'current_amount', label: 'Raised (UGX)' },
+        { key: 'urgency_level',  label: 'Urgency' },
+        { key: 'beneficiary_type', label: 'Beneficiary Type' },
+        { key: 'bank_name',      label: 'Bank' },
+        { key: 'account_number', label: 'Account Number' },
+        { key: 'account_status', label: 'Account Status' },
+        { key: 'created_at',     label: 'Created' },
+      ],
+      `campuscare-campaigns-${new Date().toISOString().slice(0, 10)}.csv`,
+    );
   };
 
   const { data: campaigns, isLoading } = useQuery({
@@ -105,9 +128,14 @@ export default function AdminCampaignsPage() {
             <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Campaign Management</h1>
             <p className="text-gray-500">Review and manage all student fundraising campaigns.</p>
           </div>
-          <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
-            <FileDown size={16} /> Export PDF
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExportCsv}>
+              <FileDown size={16} /> Export CSV
+            </Button>
+            <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
+              <FileDown size={16} /> Export PDF
+            </Button>
+          </div>
         </div>
       </div>
 
