@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Menu, X, LogOut, LayoutDashboard, ChevronDown,
-  Home, LayoutGrid, ArrowRight, Users, Sparkles,
+  Home, LayoutGrid, ArrowRight, Users, Sparkles, BookOpen,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/authSlice';
@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { label: 'Home',         to: '/',              sectionId: null,            icon: <Home size={15} />        },
   { label: 'How It Works', to: '/#how-it-works', sectionId: 'how-it-works',  icon: <Sparkles size={15} />   },
   { label: 'Campaigns',    to: '/campaigns',     sectionId: null,            icon: <LayoutGrid size={15} />  },
+  { label: 'Blogs',        to: '/blogs',         sectionId: null,            icon: <BookOpen size={15} />    },
   { label: 'Counsellors',  to: '/#counsellors',  sectionId: 'counsellors',   icon: <Users size={15} />       },
 ];
 

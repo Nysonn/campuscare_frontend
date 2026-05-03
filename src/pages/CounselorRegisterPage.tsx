@@ -121,7 +121,7 @@ export default function CounselorRegisterPage() {
       <div
         className="hidden lg:flex flex-col justify-between w-1/2 p-12 text-white relative overflow-hidden"
         style={{
-          backgroundImage: 'url(https://res.cloudinary.com/df3lhzzy7/image/upload/v1775557090/pexels-silverkblack-36729613_pgglh8.jpg)',
+          backgroundImage: 'url(https://res.cloudinary.com/dca928wwo/image/upload/v1777819923/pexels-shkrabaanthony-7579107_kbsmqd.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

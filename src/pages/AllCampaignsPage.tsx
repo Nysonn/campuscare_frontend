@@ -68,25 +68,25 @@ export default function AllCampaignsPage() {
       />
 
       {/* ── Hero / Page Header ─────────────────────────────────────── */}
-      <div className="relative pt-16 bg-linear-to-br from-primary-50 via-white to-primary-50 border-b border-primary-100 overflow-hidden">
+      <div className="relative pt-16 bg-linear-to-br from-primary-50 via-white to-primary-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 border-b border-primary-100 dark:border-gray-700 overflow-hidden">
 
         {/* Decorative blobs */}
-        <div className="pointer-events-none absolute -top-20 -right-20 w-72 h-72 bg-primary-100 rounded-full blur-3xl opacity-50" />
-        <div className="pointer-events-none absolute -bottom-16 -left-16 w-56 h-56 bg-primary-200 rounded-full blur-3xl opacity-30" />
+        <div className="pointer-events-none absolute -top-20 -right-20 w-72 h-72 bg-primary-100 dark:bg-primary-900 rounded-full blur-3xl opacity-50" />
+        <div className="pointer-events-none absolute -bottom-16 -left-16 w-56 h-56 bg-primary-200 dark:bg-primary-800 rounded-full blur-3xl opacity-30" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
 
           {/* Label pill */}
-          <div className="inline-flex items-center gap-2 bg-white border border-primary-200 text-primary-700 text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm mb-5">
+          <div className="inline-flex items-center gap-2 bg-white dark:bg-gray-800 border border-primary-200 dark:border-gray-600 text-primary-700 dark:text-primary-400 text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm mb-5">
             <LayoutGrid size={12} />
             Browse Campaigns
           </div>
 
           {/* Headline + sub */}
-          <h1 className="font-display text-4xl sm:text-5xl font-bold text-gray-900 leading-tight mb-3">
+          <h1 className="font-display text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-50 leading-tight mb-3">
             All Campaigns
           </h1>
-          <p className="text-gray-500 text-base sm:text-lg max-w-xl mb-8">
+          <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg max-w-xl mb-8">
             Browse all active campaigns and support a student today.
           </p>
 
@@ -97,16 +97,16 @@ export default function AllCampaignsPage() {
             <div className="relative w-full max-w-lg">
               <Search
                 size={16}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
               />
               <input
                 type="text"
                 placeholder="Search campaigns..."
                 value={inputValue}
                 onChange={e => handleSearchChange(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-white text-sm shadow-sm
+                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 shadow-sm
                            focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent
-                           placeholder:text-gray-400 transition"
+                           placeholder:text-gray-400 dark:placeholder:text-gray-500 transition"
               />
             </div>
 
@@ -118,8 +118,8 @@ export default function AllCampaignsPage() {
                   onClick={() => setCategory(cat)}
                   className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400
                     ${category === cat
-                      ? 'bg-primary-600 text-white border-primary-600 shadow-md shadow-primary-200'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50'
+                      ? 'bg-primary-600 text-white border-primary-600 shadow-md shadow-primary-200 dark:shadow-primary-900'
+                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-primary-300 dark:hover:border-primary-600 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700'
                     }`}
                 >
                   {cat}

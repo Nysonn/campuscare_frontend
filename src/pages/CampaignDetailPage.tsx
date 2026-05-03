@@ -7,6 +7,7 @@ import { contributionsApi } from '../api/contributions';
 import type { PaymentMethod } from '../types';
 import Avatar from '../components/ui/Avatar';
 import ProgressBar from '../components/ui/ProgressBar';
+import FundingBreakdown from '../components/campaign/FundingBreakdown';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
@@ -241,6 +242,13 @@ export default function CampaignDetailPage() {
               </div>
               <ProgressBar current={campaign.current_amount} target={campaign.target_amount} />
             </div>
+
+            {/* Funding breakdown */}
+            <FundingBreakdown
+              currentAmount={campaign.current_amount}
+              directAmount={campaign.direct_amount ?? 0}
+              poolAmount={campaign.pool_amount ?? 0}
+            />
 
             {/* CTA */}
             <div id="donate">

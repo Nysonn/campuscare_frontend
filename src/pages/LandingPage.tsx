@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -7,12 +7,18 @@ import {
   Sparkles, TrendingUp, BookOpen, MessageCircle,
 } from 'lucide-react';
 import { campaignsApi } from '../api/campaigns';
+import { blogsApi } from '../api/blogs';
+import { testimonialsApi } from '../api/testimonials';
 import CampaignCard from '../components/campaign/CampaignCard';
 import CampaignCardSkeleton from '../components/campaign/CampaignCardSkeleton';
 import CampaignDetailModal from '../components/campaign/CampaignDetailModal';
 import GeneralPoolDonateModal from '../components/donate/GeneralPoolDonateModal';
 import Button from '../components/ui/Button';
 import Footer from '../components/layout/Footer';
+import ScrollToTopBottom from '../components/ui/ScrollToTopBottom';
+import QuickTestModal from '../components/ui/QuickTestModal';
+import Marquee from '../components/ui/Marquee';
+import PublicChatBubble from '../components/chat/PublicChatBubble';
 import SEO from '../components/seo/SEO';
 
 const WEBSITE_SCHEMA = {
@@ -30,7 +36,68 @@ const WEBSITE_SCHEMA = {
 
 export default function LandingPage() {
   const [donateOpen, setDonateOpen] = useState(false);
+  const [quickTestOpen, setQuickTestOpen] = useState(false);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
+
+  // ── Hero rotating characteristics ──────────────────────────────────────────
+  const CHARACTERISTICS = [
+    {
+      title: 'Anxiety',
+      description:
+        'Anxiety is a persistent feeling of worry, fear, or unease that can overwhelm daily life. Many students experience it around exams, relationships, or the future — but you don\'t have to face it alone.',
+      symptoms:
+        'Restlessness, racing thoughts, rapid heartbeat, excessive sweating, difficulty concentrating, and avoiding everyday situations.',
+    },
+    {
+      title: 'Depression',
+      description:
+        'Depression is more than just feeling sad. It drains energy, motivation, and hope — making even small tasks feel impossible. Recognising it early is the first step toward healing.',
+      symptoms:
+        'Persistent low mood, loss of interest in activities, fatigue, changes in appetite or sleep, feelings of worthlessness, and difficulty making decisions.',
+    },
+    {
+      title: 'Stress',
+      description:
+        'Academic pressure, financial strain, and social expectations create chronic stress for many university students. Left unaddressed, stress can affect your health, sleep, and relationships.',
+      symptoms:
+        'Headaches, irritability, muscle tension, poor concentration, disrupted sleep, and feeling constantly overwhelmed or on edge.',
+    },
+    {
+      title: 'PTSD',
+      description:
+        'Post-Traumatic Stress Disorder can follow any deeply distressing event. Flashbacks, nightmares, and emotional numbness are signs that professional support can make a real difference.',
+      symptoms:
+        'Intrusive memories or flashbacks, nightmares, emotional numbness, hypervigilance, avoiding trauma-related triggers, and sudden mood swings.',
+    },
+    {
+      title: 'Insomnia',
+      description:
+        'Poor sleep affects concentration, mood, and physical health. Insomnia is often a signal that something deeper — anxiety, stress, or depression — needs attention and care.',
+      symptoms:
+        'Difficulty falling or staying asleep, waking too early, daytime fatigue, poor focus, irritability, and relying on sleep aids or stimulants.',
+    },
+    {
+      title: 'Low Self-Esteem',
+      description:
+        'Constantly doubting your worth and abilities holds you back from reaching your potential. Building self-esteem is a journey, and the right support can help you rediscover your confidence.',
+      symptoms:
+        'Negative self-talk, fear of failure, difficulty accepting compliments, social withdrawal, people-pleasing, and reluctance to try new things.',
+    },
+  ] as const;
+  const [heroIndex, setHeroIndex] = useState(0);
+  const [heroVisible, setHeroVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroVisible(false);
+      setTimeout(() => {
+        setHeroIndex((i) => (i + 1) % CHARACTERISTICS.length);
+        setHeroVisible(true);
+      }, 500);
+    }, 10000);
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [campaignModalTab, setCampaignModalTab] = useState<'details' | 'donate'>('details');
 
   const { data: campaigns, isLoading, isError, refetch } = useQuery({
@@ -39,6 +106,18 @@ export default function LandingPage() {
   });
 
   const featured = campaigns?.slice(0, 6) ?? [];
+
+  const { data: blogsData } = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogsApi.list,
+  });
+  const recentBlogs = (blogsData ?? []).slice(0, 3);
+
+  const { data: testimonialsData } = useQuery({
+    queryKey: ['testimonials'],
+    queryFn: testimonialsApi.list,
+  });
+  const testimonials = testimonialsData ?? [];
 
   return (
     <div>
@@ -50,6 +129,9 @@ export default function LandingPage() {
         includeOrgSchema
         additionalSchemas={[WEBSITE_SCHEMA]}
       />
+
+      {/* ── Marquee banner ────────────────────────────────────────────────────── */}
+      <Marquee />
 
       {/* ── Hero ──────────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-white dark:bg-gray-950">
@@ -69,34 +151,44 @@ export default function LandingPage() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75" />
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary-400" />
                 </span>
-                Campus Mental Health Support · Uganda
+                Common Mental Health Challenges
               </div>
 
-              {/* Headline */}
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-[1.1] tracking-tight mb-6">
-                How We{' '}
-                <span className="relative inline-block">
-                  <span className="text-primary-600 italic">Support</span>
-                  <svg className="absolute -bottom-2 left-0 w-full overflow-visible" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none" aria-hidden="true">
-                    <path d="M2 7 Q50 2 100 6 Q150 10 198 4" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.6" />
-                  </svg>
-                </span>
-                {' '}Students
-              </h1>
+              {/* Headline + Description — animated */}
+              <div
+                style={{
+                  opacity: heroVisible ? 1 : 0,
+                  transition: 'opacity 0.5s ease-in-out',
+                }}
+              >
+                <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-[1.1] tracking-tight mb-6">
+                  <span className="relative inline-block">
+                    <span className="text-primary-600 italic">{CHARACTERISTICS[heroIndex].title}</span>
+                    <svg className="absolute -bottom-2 left-0 w-full overflow-visible" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none" aria-hidden="true">
+                      <path d="M2 7 Q50 2 100 6 Q150 10 198 4" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.6" />
+                    </svg>
+                  </span>
+                </h1>
 
-              {/* Description */}
-              <p className="text-gray-500 text-lg sm:text-xl leading-relaxed max-w-lg mb-10">
-                We connect university students with mental health resources, confidential counselling,
-                and a community that cares — all in one place.
-              </p>
+                <ul className="text-gray-500 text-base sm:text-lg leading-relaxed max-w-lg mb-10 space-y-2 list-none">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-2 w-2 rounded-full bg-primary-500 shrink-0" />
+                    <span>{CHARACTERISTICS[heroIndex].description}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-2 w-2 rounded-full bg-primary-300 shrink-0" />
+                    <span><span className="font-semibold text-gray-600 dark:text-gray-400">Symptoms: </span>{CHARACTERISTICS[heroIndex].symptoms}</span>
+                  </li>
+                </ul>
+              </div>
 
               {/* CTAs */}
               <div className="flex flex-wrap gap-3 mb-12">
                 <button
-                  onClick={() => setDonateOpen(true)}
+                  onClick={() => setQuickTestOpen(true)}
                   className="inline-flex items-center gap-2 px-7 py-3.5 text-base font-semibold rounded-full bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-200/60 hover:-translate-y-px active:translate-y-0 transition-all duration-200"
                 >
-                  Donate to General Pool
+                  Take a Quick Test
                 </button>
               </div>
             </div>
@@ -116,17 +208,11 @@ export default function LandingPage() {
               {/* Image */}
               <div className="relative z-10 w-full max-w-sm sm:max-w-md lg:max-w-none">
                 <img
-                  src="https://res.cloudinary.com/df3lhzzy7/image/upload/v1775557090/pexels-silverkblack-36729613_pgglh8.jpg"
+                  src="https://res.cloudinary.com/dca928wwo/image/upload/v1777819923/pexels-shkrabaanthony-7579107_kbsmqd.jpg"
                   alt="Students supported by CampusCare"
                   className="w-full object-cover rounded-3xl shadow-2xl shadow-primary-200/50"
                   style={{ maxHeight: '580px' }}
                 />
-              </div>
-
-              {/* Floating counsellors badge */}
-              <div className="absolute bottom-8 -left-4 z-20 bg-white rounded-2xl shadow-xl px-5 py-3.5 border border-gray-100 hidden lg:block">
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Active Counsellors</p>
-                <p className="font-display font-bold text-xl text-gray-900 leading-none">20+ Experts</p>
               </div>
             </div>
           </div>
@@ -186,9 +272,83 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Testimonials ──────────────────────────────────────────────────────── */}
+      {testimonials.length > 0 && (
+        <section className="py-24 bg-gray-50/60 dark:bg-gray-900 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <span className="text-xs font-semibold text-primary-600 uppercase tracking-widest mb-3 block">Student Stories</span>
+              <h2 className="font-display text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight mb-4">
+                What Our Students Say
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 text-lg leading-relaxed">
+                Real stories from students who found support through CampusCare.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {testimonials.slice(0, 6).map(t => {
+                const initials = t.display_name
+                  .split(' ')
+                  .map(n => n[0])
+                  .slice(0, 2)
+                  .join('')
+                  .toUpperCase();
+                const colors = [
+                  'from-primary-400 to-primary-600',
+                  'from-violet-400 to-violet-600',
+                  'from-blue-400 to-blue-600',
+                  'from-rose-400 to-rose-600',
+                  'from-amber-400 to-amber-600',
+                  'from-teal-400 to-teal-600',
+                ];
+                const colorClass = colors[t.display_name.charCodeAt(0) % colors.length];
+
+                return (
+                  <div
+                    key={t.id}
+                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 flex flex-col hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    {/* Large opening quote */}
+                    <div className="text-5xl leading-none font-serif text-primary-200 dark:text-primary-800 mb-3 select-none" aria-hidden="true">
+                      &ldquo;
+                    </div>
+
+                    {/* Content */}
+                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-5 flex-1">
+                      {t.content}
+                    </p>
+
+                    {/* Author row */}
+                    <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center gap-3">
+                      {t.avatar_url ? (
+                        <img
+                          src={t.avatar_url}
+                          alt={t.display_name}
+                          className="h-9 w-9 rounded-full object-cover shrink-0"
+                        />
+                      ) : (
+                        <div className={`h-9 w-9 rounded-full bg-linear-to-br ${colorClass} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
+                          {initials}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{t.display_name}</p>
+                        {t.university && (
+                          <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{t.university}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── Why CampusCare ────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-gray-50/60 dark:bg-gray-900 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-gray-50/60 dark:bg-gray-900 overflow-hidden">        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-xs font-semibold text-primary-600 uppercase tracking-widest mb-3 block">Why CampusCare</span>
@@ -412,6 +572,69 @@ export default function LandingPage() {
         onClose={() => setSelectedCampaignId(null)}
       />
 
+      {/* ── Blog Section ───────────────────────────────────────────────────────── */}
+      {recentBlogs.length > 0 && (
+        <section className="py-24 bg-white dark:bg-gray-950">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+              <div>
+                <span className="text-xs font-semibold text-primary-600 uppercase tracking-widest mb-3 block">CampusCare Blog</span>
+                <h2 className="font-display text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight mb-2">
+                  Insights &amp; Resources
+                </h2>
+                <p className="text-gray-500 text-base">Mental health articles and tips from our team.</p>
+              </div>
+              <Link to="/blogs" className="shrink-0">
+                <Button variant="outline" className="rounded-full">
+                  View All Articles <ArrowRight size={15} />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recentBlogs.map(blog => (
+                <Link
+                  key={blog.id}
+                  to={`/blogs/${blog.id}`}
+                  className="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
+                >
+                  {blog.image_url ? (
+                    <div className="aspect-video w-full overflow-hidden bg-gray-100 dark:bg-gray-700">
+                      <img
+                        src={blog.image_url}
+                        alt={blog.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  ) : (
+                    <div className="aspect-video w-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+                      <BookOpen size={36} className="text-primary-300 dark:text-primary-600" />
+                    </div>
+                  )}
+                  <div className="p-5 flex flex-col flex-1">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">
+                      {new Date(blog.created_at).toLocaleDateString('en-GB', {
+                        day: 'numeric', month: 'short', year: 'numeric',
+                      })}
+                      {' · '}{blog.author}
+                    </p>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                      {blog.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-3 flex-1">
+                      {blog.description}
+                    </p>
+                    <div className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-primary-600 dark:text-primary-400">
+                      Read article <ArrowRight size={13} />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── Counsellor CTA — Hero-style ───────────────────────────────────────── */}
       <section id="counsellors" className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-primary-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 py-24 sm:py-32">
 
@@ -574,6 +797,9 @@ export default function LandingPage() {
       </section>
 
       <Footer />
+      <ScrollToTopBottom />
+      <QuickTestModal open={quickTestOpen} onClose={() => setQuickTestOpen(false)} />
+      <PublicChatBubble />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   X, CheckCircle, XCircle, AlertTriangle, MapPin,
-  Calendar, Phone, Briefcase, FileText, ExternalLink, User,
+  Calendar, Phone, Briefcase, FileText, ExternalLink, User, FileDown,
 } from 'lucide-react';
 import { adminApi } from '../../api/admin';
 import type { AdminCounselor } from '../../types';
@@ -11,6 +11,7 @@ import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import SEO from '../../components/seo/SEO';
+import { exportToPdf } from '../../utils/exportToPdf';
 
 type StatusFilter = 'pending' | 'approved' | 'rejected' | 'all';
 
@@ -19,6 +20,13 @@ export default function AdminCounselorsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('pending');
   const [selected, setSelected] = useState<AdminCounselor | null>(null);
   const [confirmAction, setConfirmAction] = useState<'approved' | 'rejected' | null>(null);
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportPdf = async () => {
+    setExporting(true);
+    await exportToPdf('counselors-pdf-content', `campuscare-counselors-${new Date().toISOString().slice(0, 10)}.pdf`);
+    setExporting(false);
+  };
 
   const { data: counselors, isLoading } = useQuery({
     queryKey: ['adminCounselors', statusFilter],
@@ -53,8 +61,15 @@ export default function AdminCounselorsPage() {
       <SEO title="Counsellor Verification" description="Review and approve counsellor applications." noindex />
 
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Counsellor Verification</h1>
-        <p className="text-gray-500">Review applications and approve or reject counsellors.</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Counsellor Verification</h1>
+            <p className="text-gray-500">Review applications and approve or reject counsellors.</p>
+          </div>
+          <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
+            <FileDown size={16} /> Export PDF
+          </Button>
+        </div>
       </div>
 
       {/* Status filter */}
@@ -77,7 +92,7 @@ export default function AdminCounselorsPage() {
       {isLoading ? (
         <div className="py-16 flex justify-center"><Spinner size="lg" /></div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div id="counselors-pdf-content" className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px]">
               <thead>

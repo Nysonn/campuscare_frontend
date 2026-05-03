@@ -1,15 +1,25 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Calendar } from 'lucide-react';
+import { Calendar, FileDown } from 'lucide-react';
 import { adminApi } from '../../api/admin';
 import Badge from '../../components/ui/Badge';
+import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import SEO from '../../components/seo/SEO';
+import { exportToPdf } from '../../utils/exportToPdf';
 
 export default function AdminBookingsPage() {
   const { data: bookings, isLoading } = useQuery({
     queryKey: ['adminBookings'],
     queryFn: adminApi.bookings,
   });
+
+  const [exporting, setExporting] = useState(false);
+  const handleExportPdf = async () => {
+    setExporting(true);
+    await exportToPdf('bookings-pdf-content', `campuscare-bookings-${new Date().toISOString().slice(0, 10)}.pdf`);
+    setExporting(false);
+  };
 
   return (
     <div>
@@ -19,8 +29,15 @@ export default function AdminBookingsPage() {
         noindex
       />
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">All Bookings</h1>
-        <p className="text-gray-500">All counselling session bookings across the platform.</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">All Bookings</h1>
+            <p className="text-gray-500">All counselling session bookings across the platform.</p>
+          </div>
+          <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
+            <FileDown size={16} /> Export PDF
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -31,7 +48,7 @@ export default function AdminBookingsPage() {
           <p className="text-sm text-gray-400">No bookings found.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div id="bookings-pdf-content" className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-150">
               <thead>

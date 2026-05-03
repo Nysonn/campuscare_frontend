@@ -1,5 +1,28 @@
 export type UserRole = 'student' | 'counselor' | 'admin';
 
+export interface Blog {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  image_url: string;
+  author: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Testimonial {
+  id: string;
+  student_id: string;
+  display_name: string;
+  avatar_url: string;
+  university: string;
+  content: string;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+  updated_at: string;
+}
+
 export type PaymentMethod = 'mtn_momo' | 'airtel_money' | 'visa';
 
 export interface StudentProfile {
@@ -130,6 +153,8 @@ export interface Campaign {
   account_number?: string;
   account_holder_name?: string;
   attachments?: CampaignAttachment[];
+  direct_amount?: number;
+  pool_amount?: number;
 }
 
 export interface CampaignAttachment {
@@ -220,6 +245,7 @@ export interface AdminUser {
   email: string;
   role: UserRole;
   status: 'active' | 'suspended';
+  phone?: string;
   created_at: string;
 }
 
@@ -264,6 +290,7 @@ export interface AdminContribution {
   campaign_id: string;
   donor_name: string;
   donor_email: string;
+  donor_phone?: string;
   amount: number;
   status: 'pending' | 'success' | 'failed';
   created_at: string;

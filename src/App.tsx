@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
 import {
   LayoutDashboard, Heart, Calendar, User, Users,
-  FileCheck, BookOpen, TrendingUp, HandHeart, Target, ClipboardList, Wallet,
+  FileCheck, BookOpen, TrendingUp, HandHeart, Target, ClipboardList, Wallet, MessageSquare,
 } from 'lucide-react';
 
 import { store } from './store';
@@ -18,10 +18,12 @@ import ProtectedRoute from './components/layout/ProtectedRoute';
 import DashboardLayout from './components/layout/DashboardLayout';
 import FloatingChat from './components/chat/FloatingChat';
 
-// Public pages
+// Public pages1
 import LandingPage from './pages/LandingPage';
 import AllCampaignsPage from './pages/AllCampaignsPage';
 import CampaignDetailPage from './pages/CampaignDetailPage';
+import AllBlogsPage from './pages/AllBlogsPage';
+import BlogDetailPage from './pages/BlogDetailPage';
 import LoginPage from './pages/LoginPage';
 import StudentRegisterPage from './pages/StudentRegisterPage';
 import CounselorRegisterPage from './pages/CounselorRegisterPage';
@@ -40,6 +42,7 @@ import SponsorsPage from './pages/student/SponsorsPage';
 import BecomeASponsorPage from './pages/student/BecomeASponsorPage';
 import BehaviourTrackingPage from './pages/student/BehaviourTrackingPage';
 import SelfEvaluationPage from './pages/student/SelfEvaluationPage';
+import StudentTestimonialsPage from './pages/student/StudentTestimonialsPage';
 
 // Counselor pages
 import CounselorDashboard from './pages/counselor/CounselorDashboard';
@@ -54,6 +57,8 @@ import AdminContributionsPage from './pages/admin/AdminContributionsPage';
 import AdminSponsorsPage from './pages/admin/AdminSponsorsPage';
 import AdminCounselorsPage from './pages/admin/AdminCounselorsPage';
 import AdminWalletPage from './pages/admin/AdminWalletPage';
+import AdminBlogsPage from './pages/admin/AdminBlogsPage';
+import AdminTestimonialsPage from './pages/admin/AdminTestimonialsPage';
 
 import NotFoundPage from './pages/NotFoundPage';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -72,6 +77,7 @@ const studentNav = [
   { to: '/student/sponsors',     label: 'Sponsors',     icon: <HandHeart size={16} />       },
   { to: '/student/behaviour',    label: 'Behaviour',    icon: <Target size={16} />          },
   { to: '/student/evaluation',   label: 'Self Check',   icon: <ClipboardList size={16} />   },
+  { to: '/student/testimonials', label: 'Testimonials', icon: <MessageSquare size={16} />    },
   { to: '/student/profile',      label: 'My Profile',   icon: <User size={16} />            },
 ];
 
@@ -89,6 +95,8 @@ const adminNav = [
   { to: '/admin/contributions', label: 'Contributions',icon: <TrendingUp size={16} />      },
   { to: '/admin/sponsors',      label: 'Sponsors',     icon: <HandHeart size={16} />       },
   { to: '/admin/wallet',        label: 'Wallet',       icon: <Wallet size={16} />          },
+  { to: '/admin/blogs',         label: 'Blog',         icon: <BookOpen size={16} />        },
+  { to: '/admin/testimonials',   label: 'Testimonials', icon: <MessageSquare size={16} />    },
 ];
 
 function SessionHydrator({ children }: { children: React.ReactNode }) {
@@ -154,6 +162,8 @@ function AppRoutes() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/campaigns" element={<AllCampaignsPage />} />
             <Route path="/campaigns/:id" element={<CampaignDetailPage />} />
+            <Route path="/blogs" element={<AllBlogsPage />} />
+            <Route path="/blogs/:id" element={<BlogDetailPage />} />
           </Route>
 
           {/* Auth */}
@@ -176,6 +186,7 @@ function AppRoutes() {
             <Route path="sponsors/become" element={<BecomeASponsorPage />} />
             <Route path="behaviour" element={<BehaviourTrackingPage />} />
             <Route path="evaluation" element={<SelfEvaluationPage />} />
+            <Route path="testimonials" element={<StudentTestimonialsPage />} />
             <Route path="profile" element={<StudentProfilePage />} />
           </Route>
 
@@ -197,6 +208,8 @@ function AppRoutes() {
             <Route path="contributions" element={<AdminContributionsPage />} />
             <Route path="sponsors" element={<AdminSponsorsPage />} />
             <Route path="wallet" element={<AdminWalletPage />} />
+            <Route path="blogs" element={<AdminBlogsPage />} />
+            <Route path="testimonials" element={<AdminTestimonialsPage />} />
           </Route>
 
           {/* Fallback */}

@@ -115,7 +115,7 @@ export default function AdminContributionsPage() {
                 <table className="w-full min-w-175">
                   <thead>
                     <tr className="border-b border-gray-100 bg-gray-50">
-                      {['Donor', 'Email', 'Amount', 'Status', 'Date'].map(h => (
+                      {['Donor', 'Email', 'Phone', 'Amount', 'Status', 'Date'].map(h => (
                         <th key={h} className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3">{h}</th>
                       ))}
                     </tr>
@@ -125,6 +125,7 @@ export default function AdminContributionsPage() {
                       <tr key={c.id} className="hover:bg-gray-50">
                         <td className="px-5 py-3.5 text-sm font-medium text-gray-900">{c.donor_name}</td>
                         <td className="px-5 py-3.5 text-sm text-gray-500">{c.donor_email}</td>
+                        <td className="px-5 py-3.5 text-sm text-gray-500">{c.donor_phone || <span className="text-gray-300">—</span>}</td>
                         <td className="px-5 py-3.5 text-sm font-semibold text-primary-700">UGX {c.amount.toLocaleString()}</td>
                         <td className="px-5 py-3.5"><Badge variant={getStatusVariant(c.status)}>{c.status}</Badge></td>
                         <td className="px-5 py-3.5 text-sm text-gray-500">
@@ -133,7 +134,7 @@ export default function AdminContributionsPage() {
                       </tr>
                     ))}
                     {(contributions ?? []).length === 0 && (
-                      <tr><td colSpan={5} className="text-center py-12 text-sm text-gray-400">No contributions yet.</td></tr>
+                      <tr><td colSpan={6} className="text-center py-12 text-sm text-gray-400">No contributions yet.</td></tr>
                     )}
                   </tbody>
                 </table>

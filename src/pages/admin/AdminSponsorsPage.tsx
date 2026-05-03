@@ -1,16 +1,26 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Users, UserCheck } from 'lucide-react';
+import { Users, UserCheck, FileDown } from 'lucide-react';
 import { sponsorsApi } from '../../api/sponsors';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
+import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import SEO from '../../components/seo/SEO';
+import { exportToPdf } from '../../utils/exportToPdf';
 
 export default function AdminSponsorsPage() {
   const { data: sponsors = [], isLoading } = useQuery({
     queryKey: ['adminSponsors'],
     queryFn: sponsorsApi.adminListSponsors,
   });
+
+  const [exporting, setExporting] = useState(false);
+  const handleExportPdf = async () => {
+    setExporting(true);
+    await exportToPdf('sponsors-pdf-content', `campuscare-sponsors-${new Date().toISOString().slice(0, 10)}.pdf`);
+    setExporting(false);
+  };
 
   const activeSponsors = sponsors.filter(s => s.is_active);
   const inactiveSponsors = sponsors.filter(s => !s.is_active);
@@ -24,10 +34,17 @@ export default function AdminSponsorsPage() {
         noindex
       />
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Sponsors</h1>
-        <p className="text-gray-500">
-          Students who have volunteered to support a peer through the sponsorship programme.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Sponsors</h1>
+            <p className="text-gray-500">
+              Students who have volunteered to support a peer through the sponsorship programme.
+            </p>
+          </div>
+          <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
+            <FileDown size={16} /> Export PDF
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -58,7 +75,7 @@ export default function AdminSponsorsPage() {
           <p className="text-sm mt-1">Students who sign up as sponsors will appear here.</p>
         </div>
       ) : (
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <div id="sponsors-pdf-content" className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">

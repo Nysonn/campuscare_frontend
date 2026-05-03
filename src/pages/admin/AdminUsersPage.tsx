@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, FileDown } from 'lucide-react';
 import { adminApi } from '../../api/admin';
 import type { AdminUser } from '../../types';
 import Badge from '../../components/ui/Badge';
@@ -8,6 +8,7 @@ import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
 import SEO from '../../components/seo/SEO';
+import { exportToPdf } from '../../utils/exportToPdf';
 
 type RoleFilter = '' | 'student' | 'counselor' | 'admin';
 
@@ -16,6 +17,13 @@ export default function AdminUsersPage() {
   const [role, setRole] = useState<RoleFilter>('');
   const [targetUser, setTargetUser] = useState<AdminUser | null>(null);
   const [newStatus, setNewStatus] = useState<'active' | 'suspended' | null>(null);
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportPdf = async () => {
+    setExporting(true);
+    await exportToPdf('users-pdf-content', `campuscare-users-${new Date().toISOString().slice(0, 10)}.pdf`);
+    setExporting(false);
+  };
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['adminUsers', role],
@@ -40,8 +48,15 @@ export default function AdminUsersPage() {
         noindex
       />
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Users</h1>
-        <p className="text-gray-500">Manage platform users.</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Users</h1>
+            <p className="text-gray-500">Manage platform users.</p>
+          </div>
+          <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
+            <FileDown size={16} /> Export PDF
+          </Button>
+        </div>
       </div>
 
       {/* Role filter */}
@@ -69,13 +84,14 @@ export default function AdminUsersPage() {
       {isLoading ? (
         <div className="py-16 flex justify-center"><Spinner size="lg" /></div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div id="users-pdf-content" className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-175">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3">Name</th>
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3">Email</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3">Phone</th>
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3">Role</th>
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3">Status</th>
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3">Joined</th>
@@ -87,6 +103,7 @@ export default function AdminUsersPage() {
                   <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-3.5 text-sm font-medium text-gray-900">{u.full_name}</td>
                     <td className="px-5 py-3.5 text-sm text-gray-500">{u.email}</td>
+                    <td className="px-5 py-3.5 text-sm text-gray-500">{u.phone || <span className="text-gray-300">—</span>}</td>
                     <td className="px-5 py-3.5">
                       <Badge variant={u.role === 'admin' ? 'blue' : u.role === 'counselor' ? 'yellow' : 'green'}>
                         {u.role}
@@ -112,7 +129,7 @@ export default function AdminUsersPage() {
                   </tr>
                 ))}
                 {(users ?? []).length === 0 && (
-                  <tr><td colSpan={6} className="text-center py-12 text-sm text-gray-400">No users found.</td></tr>
+                  <tr><td colSpan={7} className="text-center py-12 text-sm text-gray-400">No users found.</td></tr>
                 )}
               </tbody>
             </table>

@@ -9,6 +9,7 @@ import { contributionsApi } from '../../api/contributions';
 import type { PaymentMethod } from '../../types';
 import Avatar from '../ui/Avatar';
 import ProgressBar from '../ui/ProgressBar';
+import FundingBreakdown from './FundingBreakdown';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import Spinner from '../ui/Spinner';
@@ -251,6 +252,13 @@ export default function CampaignDetailModal({ campaignId, open, initialTab = 'de
                   </div>
                   <ProgressBar current={campaign.current_amount} target={campaign.target_amount} />
                 </div>
+
+                {/* Funding breakdown */}
+                <FundingBreakdown
+                  currentAmount={campaign.current_amount}
+                  directAmount={campaign.direct_amount ?? 0}
+                  poolAmount={campaign.pool_amount ?? 0}
+                />
 
                 {/* Beneficiary info */}
                 {(campaign.beneficiary_type || campaign.beneficiary_name || campaign.beneficiary_org_name) && (

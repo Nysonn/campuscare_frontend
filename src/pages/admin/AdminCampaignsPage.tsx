@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Check, X, Trash2, Heart, AlertTriangle, Eye, Paperclip,
-  User, Target, Tag, Zap, TrendingUp, ShieldCheck, ShieldX, Lock,
+  User, Target, Tag, Zap, TrendingUp, ShieldCheck, ShieldX, Lock, FileDown,
 } from 'lucide-react';
 import { adminApi } from '../../api/admin';
 import type { AdminCampaign } from '../../types';
@@ -11,6 +11,7 @@ import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
 import SEO from '../../components/seo/SEO';
+import { exportToPdf } from '../../utils/exportToPdf';
 
 type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
 
@@ -49,6 +50,13 @@ export default function AdminCampaignsPage() {
   const [selected, setSelected] = useState<AdminCampaign | null>(null);
   const [action, setAction] = useState<'approved' | 'rejected' | 'delete' | null>(null);
   const [previewing, setPreviewing] = useState<AdminCampaign | null>(null);
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportPdf = async () => {
+    setExporting(true);
+    await exportToPdf('campaigns-pdf-content', `campuscare-campaigns-${new Date().toISOString().slice(0, 10)}.pdf`);
+    setExporting(false);
+  };
 
   const { data: campaigns, isLoading } = useQuery({
     queryKey: ['adminCampaigns', filter],
@@ -92,8 +100,15 @@ export default function AdminCampaignsPage() {
         noindex
       />
       <div className="mb-6">
-        <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Campaign Management</h1>
-        <p className="text-gray-500">Review and manage all student fundraising campaigns.</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Campaign Management</h1>
+            <p className="text-gray-500">Review and manage all student fundraising campaigns.</p>
+          </div>
+          <Button variant="outline" onClick={handleExportPdf} loading={exporting}>
+            <FileDown size={16} /> Export PDF
+          </Button>
+        </div>
       </div>
 
       {/* Filter tabs */}
@@ -124,7 +139,7 @@ export default function AdminCampaignsPage() {
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div id="campaigns-pdf-content" className="space-y-4">
           {list.map(c => (
             <div key={c.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
               <div className="flex flex-col sm:flex-row gap-4">

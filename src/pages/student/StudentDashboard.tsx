@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Send, Bot, User, AlertTriangle, Calendar, Heart, Plus, Users, UserCheck, ChevronRight, Bell, LogOut, Loader2 } from 'lucide-react';
+import { Send, Bot, User, AlertTriangle, Calendar, Heart, Plus, Users, UserCheck, ChevronRight, Bell, LogOut, Loader2, Quote } from 'lucide-react';
 import { useAppSelector } from '../../store/hooks';
 import { chatbotApi } from '../../api/chatbot';
 import { bookingsApi } from '../../api/bookings';
 import { campaignsApi } from '../../api/campaigns';
 import { sponsorsApi } from '../../api/sponsors';
+import { testimonialsApi } from '../../api/testimonials';
 import type { ChatMessage, StudentProfile } from '../../types';
 import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
@@ -15,6 +16,148 @@ import SEO from '../../components/seo/SEO';
 
 function cleanBotText(text: string) {
   return text.replace(/\s*\*\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
+}
+
+const STATUS_STYLES: Record<string, string> = {
+  pending:  'bg-yellow-50 text-yellow-700 border-yellow-200',
+  approved: 'bg-green-50 text-green-700 border-green-200',
+  rejected: 'bg-red-50 text-red-600 border-red-200',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  pending:  'Under Review',
+  approved: 'Published',
+  rejected: 'Not Approved',
+};
+
+function TestimonialWidget() {
+  const qc = useQueryClient();
+  const [draft, setDraft] = useState('');
+  const [editing, setEditing] = useState(false);
+
+  const { data: testimonial, isLoading } = useQuery({
+    queryKey: ['myTestimonial'],
+    queryFn: testimonialsApi.mine,
+  });
+
+  // Initialise draft when the user opens the editor
+  function openEditor() {
+    setDraft(testimonial?.content ?? '');
+    setEditing(true);
+  }
+
+  const submitMutation = useMutation({
+    mutationFn: () => testimonialsApi.submit(draft.trim()),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['myTestimonial'] });
+      setEditing(false);
+    },
+  });
+
+  return (
+    <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5">
+      <div className="flex items-center gap-2.5 mb-4">
+        <div className="h-8 w-8 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
+          <Quote size={16} className="text-primary-600 dark:text-primary-400" />
+        </div>
+        <div>
+          <h3 className="font-display font-semibold text-gray-900 dark:text-white text-sm">Share Your Experience</h3>
+          <p className="text-[11px] text-gray-400 dark:text-gray-500">Your story may inspire another student</p>
+        </div>
+      </div>
+
+      {isLoading && (
+        <div className="h-20 flex items-center justify-center">
+          <Loader2 size={18} className="animate-spin text-gray-300" />
+        </div>
+      )}
+
+      {!isLoading && !editing && (
+        <>
+          {testimonial ? (
+            /* Has an existing testimonial */
+            <div className="space-y-3">
+              <div className="bg-gray-50 dark:bg-gray-700/40 rounded-xl p-4 relative">
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-4">
+                  &ldquo;{testimonial.content}&rdquo;
+                </p>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${STATUS_STYLES[testimonial.status] ?? ''}`}>
+                  {STATUS_LABELS[testimonial.status] ?? testimonial.status}
+                </span>
+                <button
+                  onClick={openEditor}
+                  className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                >
+                  Edit testimonial
+                </button>
+              </div>
+              {testimonial.status === 'rejected' && (
+                <p className="text-xs text-red-500 dark:text-red-400">
+                  Your testimonial wasn&apos;t approved. You can edit and resubmit.
+                </p>
+              )}
+              {testimonial.status === 'approved' && (
+                <p className="text-xs text-green-600 dark:text-green-400">
+                  Your testimonial is live on the homepage. Thank you! 🎉
+                </p>
+              )}
+            </div>
+          ) : (
+            /* No testimonial yet */
+            <div
+              className="border-2 border-dashed border-primary-200 dark:border-primary-700 rounded-xl p-5 text-center hover:border-primary-400 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all cursor-pointer group"
+              onClick={openEditor}
+            >
+              <Quote size={22} className="mx-auto mb-2 text-primary-300 dark:text-primary-600 group-hover:text-primary-500 transition-colors" />
+              <p className="text-sm font-medium text-primary-600 dark:text-primary-400 group-hover:text-primary-800 dark:group-hover:text-primary-300">
+                Tell us about your experience
+              </p>
+              <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                Approved testimonials appear on our public homepage
+              </p>
+            </div>
+          )}
+        </>
+      )}
+
+      {!isLoading && editing && (
+        <div className="space-y-3">
+          <textarea
+            value={draft}
+            onChange={e => setDraft(e.target.value)}
+            placeholder="Tell us how CampusCare has helped you. Be honest and specific — your words can encourage other students to seek support."
+            rows={4}
+            className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+          />
+          <p className="text-[11px] text-gray-400 dark:text-gray-500">
+            Your testimonial will be reviewed before appearing on the homepage.
+          </p>
+          {submitMutation.isError && (
+            <p className="text-xs text-red-500">Failed to submit. Please try again.</p>
+          )}
+          <div className="flex justify-end gap-2.5">
+            <button
+              onClick={() => setEditing(false)}
+              disabled={submitMutation.isPending}
+              className="px-4 py-2 rounded-xl text-xs font-medium text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => submitMutation.mutate()}
+              disabled={submitMutation.isPending || draft.trim().length < 10}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {submitMutation.isPending && <Loader2 size={12} className="animate-spin" />}
+              {submitMutation.isPending ? 'Submitting…' : 'Submit for Review'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function StudentDashboard() {
@@ -296,7 +439,7 @@ export default function StudentDashboard() {
               <Bot size={18} className="text-primary-600" />
             </div>
             <div>
-              <p className="font-semibold text-sm text-gray-900">CampusCare Assistant</p>
+              <p className="font-semibold text-sm text-gray-900">Kae Assistant</p>
               <p className="text-xs text-primary-500 flex items-center gap-1">
                 <span className="h-1.5 w-1.5 bg-primary-500 rounded-full inline-block" />
                 Online
@@ -473,6 +616,9 @@ export default function StudentDashboard() {
           })()}
         </div>
       </div>
+
+      {/* ── Share Your Experience ─────────────────────────────────────────────── */}
+      <TestimonialWidget />
 
       <BecomeSponsorModal open={sponsorModalOpen} onClose={() => setSponsorModalOpen(false)} />
     </div>
