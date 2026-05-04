@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, AlertTriangle, Send, Loader2, CheckCircle, ShieldAlert, ChevronDown } from 'lucide-react';
 import { reportsApi } from '../../api/reports';
 
@@ -15,12 +16,15 @@ const URGENCY_OPTIONS = [
 ];
 
 export default function ReportModal({ open, onClose }: Props) {
+  const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const [reporterName, setReporterName] = useState('');
+  const [followupEmail, setFollowupEmail] = useState('');
+  const [wantsFollowup, setWantsFollowup] = useState(false);
   const [subjectName, setSubjectName] = useState('');
   const [subjectContact, setSubjectContact] = useState('');
   const [university, setUniversity] = useState('');
@@ -53,6 +57,8 @@ export default function ReportModal({ open, onClose }: Props) {
       setSubmitted(false);
       setError('');
       setReporterName('');
+      setFollowupEmail('');
+      setWantsFollowup(false);
       setSubjectName('');
       setSubjectContact('');
       setUniversity('');
@@ -67,16 +73,19 @@ export default function ReportModal({ open, onClose }: Props) {
 
     if (!subjectName.trim()) { setError('Please enter the name of the person you are concerned about.'); return; }
     if (!description.trim() || description.trim().length < 20) { setError('Please provide more detail (at least 20 characters).'); return; }
+    if (wantsFollowup && !followupEmail.trim()) { setError('Please enter the email you will use to register or log in for weekly follow-up reports.'); return; }
 
     setLoading(true);
     try {
       await reportsApi.submit({
         reporter_name: reporterName.trim() || undefined,
+        followup_email: wantsFollowup ? followupEmail.trim() : undefined,
         subject_name: subjectName.trim(),
         subject_contact: subjectContact.trim() || undefined,
         university: university.trim() || undefined,
         description: description.trim(),
         urgency,
+        wants_followup: wantsFollowup,
       });
       setSubmitted(true);
     } catch {
@@ -143,14 +152,33 @@ export default function ReportModal({ open, onClose }: Props) {
               </div>
               <h3 className="font-display font-bold text-gray-900 dark:text-white text-lg">Report Submitted</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                Thank you for reaching out. Our team will review the report and take appropriate action to support the student.
+                {wantsFollowup
+                  ? 'Thank you for reaching out. Use the same email you entered to register or log in, then submit weekly offline wellbeing updates for this student.'
+                  : 'Thank you for reaching out. Our team will review the report, and the case can also be picked up in the Help A Student sponsor pool.'}
               </p>
-              <button
-                onClick={handleClose}
-                className="mt-2 px-6 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition-colors"
-              >
-                Close
-              </button>
+              {wantsFollowup ? (
+                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                  <button
+                    onClick={() => { handleClose(); navigate('/register/student'); }}
+                    className="px-6 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition-colors"
+                  >
+                    Register as Student
+                  </button>
+                  <button
+                    onClick={() => { handleClose(); navigate('/login'); }}
+                    className="px-6 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    Already Registered? Log In
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleClose}
+                  className="mt-2 px-6 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition-colors"
+                >
+                  Close
+                </button>
+              )}
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -174,6 +202,41 @@ export default function ReportModal({ open, onClose }: Props) {
                   placeholder="You may stay anonymous"
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
+              </div>
+
+              <div className="rounded-xl border border-primary-100 dark:border-primary-900/40 bg-primary-50/70 dark:bg-primary-900/20 p-4 space-y-3">
+                <div className="flex items-start gap-3">
+                  <input
+                    id="follow-up-toggle"
+                    type="checkbox"
+                    checked={wantsFollowup}
+                    onChange={e => setWantsFollowup(e.target.checked)}
+                    className="mt-1 h-4 w-4 accent-primary-600"
+                  />
+                  <div>
+                    <label htmlFor="follow-up-toggle" className="text-sm font-semibold text-gray-800 dark:text-gray-100 cursor-pointer">
+                      I want to follow up on this student offline
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      If you choose this, CampusCare will ask you to register or log in so you can submit weekly wellbeing reports about the student you are helping offline.
+                    </p>
+                  </div>
+                </div>
+
+                {wantsFollowup && (
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Email for Follow-up <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={followupEmail}
+                      onChange={e => setFollowupEmail(e.target.value)}
+                      placeholder="Use the same email when you register or log in"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Student name */}

@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LogOut, Menu } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/authSlice';
 import { authApi } from '../../api/auth';
 import { setAuthToken } from '../../api/client';
+import { notificationsApi } from '../../api/notifications';
+import { sponsorsApi } from '../../api/sponsors';
 import Avatar from '../ui/Avatar';
 import DarkModeToggle from '../ui/DarkModeToggle';
 
@@ -12,6 +15,7 @@ interface NavItem {
   to: string;
   label: string;
   icon: React.ReactNode;
+  requiresSponsor?: boolean;
 }
 
 interface DashboardLayoutProps {
@@ -25,6 +29,43 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
   const navigate = useNavigate();
   const user = useAppSelector(s => s.auth.user);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Notification unread count — only for student / counsellor
+  const isNotifUser = user?.role === 'student' || user?.role === 'counselor';
+  const { data: countData } = useQuery({
+    queryKey: ['notifUnreadCount'],
+    queryFn: () => notificationsApi.unreadCount(),
+    refetchInterval: 30_000,
+    enabled: isNotifUser,
+  });
+  const { data: sponsorStatus } = useQuery({
+    queryKey: ['mySponsorStatus', 'nav'],
+    queryFn: sponsorsApi.myStatus,
+    enabled: user?.role === 'student',
+  });
+  const unreadCount = countData?.count ?? 0;
+  const visibleNavItems = navItems.filter(item => !item.requiresSponsor || sponsorStatus?.is_sponsor);
+  const prevCountRef = useRef(unreadCount);
+
+  useEffect(() => {
+    if (unreadCount > prevCountRef.current) {
+      try {
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.5);
+        osc.onended = () => ctx.close();
+      } catch { /* AudioContext not available */ }
+    }
+    prevCountRef.current = unreadCount;
+  }, [unreadCount]);
 
   const displayName =
     user?.role === 'student'
@@ -87,25 +128,40 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {navItems.map(item => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-                 transition-all duration-150 hover:scale-[1.02]
-                ${isActive
-                  ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
-                }`
-              }
-            >
-              <span className="shrink-0">{item.icon}</span>
-              {item.label}
-            </NavLink>
-          ))}
+          {visibleNavItems.map(item => {
+            const showBadge = isNotifUser && item.to.endsWith('/notifications') && unreadCount > 0;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end
+                onClick={() => setSidebarOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                   transition-all duration-150 hover:scale-[1.02]
+                  ${isActive
+                    ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  }`
+                }
+              >
+                <span className="shrink-0 relative">
+                  {item.icon}
+                  {showBadge && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-0.5 leading-none">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </span>
+                <span className="flex-1">{item.label}</span>
+                {showBadge && (
+                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </NavLink>
+            );
+          })}
         </nav>
 
         {/* Logout */}

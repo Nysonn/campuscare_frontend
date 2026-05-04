@@ -39,7 +39,7 @@ export default function CounselorNotificationsPage() {
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-12">
+    <div className="space-y-6 pb-12">
       <SEO title="Notifications — Counsellor Dashboard" description="Your CampusCare notifications" noindex />
 
       <div className="flex items-center justify-between">

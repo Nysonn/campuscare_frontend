@@ -44,6 +44,8 @@ import BehaviourTrackingPage from './pages/student/BehaviourTrackingPage';
 import SelfEvaluationPage from './pages/student/SelfEvaluationPage';
 import MindCheckPage from './pages/student/MindCheckPage';
 import StudentNotificationsPage from './pages/student/NotificationsPage';
+import HelpAStudentPage from './pages/student/HelpAStudentPage';
+import WeeklyReportsPage from './pages/student/WeeklyReportsPage';
 import StudentTestimonialsPage from './pages/student/StudentTestimonialsPage';
 
 // Counselor pages
@@ -82,6 +84,8 @@ const studentNav = [
   { to: '/student/mind-check',   label: 'Mind Check',   icon: <Brain size={16} />           },
   { to: '/student/behaviour',    label: 'Behaviour',    icon: <Target size={16} />          },
   { to: '/student/evaluation',   label: 'Self Check',   icon: <ClipboardList size={16} />   },
+  { to: '/student/help-a-student', label: 'Help A Student', icon: <Users size={16} />, requiresSponsor: true },
+  { to: '/student/reports',      label: 'Weekly Reports', icon: <FileCheck size={16} />     },
   { to: '/student/notifications',label: 'Notifications',icon: <Bell size={16} />            },
   { to: '/student/testimonials', label: 'Testimonials', icon: <MessageSquare size={16} />    },
   { to: '/student/profile',      label: 'My Profile',   icon: <User size={16} />            },
@@ -195,6 +199,8 @@ function AppRoutes() {
             <Route path="behaviour" element={<BehaviourTrackingPage />} />
             <Route path="evaluation" element={<SelfEvaluationPage />} />
             <Route path="mind-check" element={<MindCheckPage />} />
+            <Route path="help-a-student" element={<HelpAStudentPage />} />
+            <Route path="reports" element={<WeeklyReportsPage />} />
             <Route path="notifications" element={<StudentNotificationsPage />} />
             <Route path="testimonials" element={<StudentTestimonialsPage />} />
             <Route path="profile" element={<StudentProfilePage />} />

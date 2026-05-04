@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ShieldAlert, CheckCircle2, Eye, Trash2,
-  ChevronDown, Loader2, X, Clock,
+  ChevronDown, Loader2, X, Clock, HeartPulse,
 } from 'lucide-react';
 import { reportsApi } from '../../api/reports';
-import type { Report } from '../../api/reports';
+import type { Report, WelfareReport } from '../../api/reports';
 import SEO from '../../components/seo/SEO';
 import Spinner from '../../components/ui/Spinner';
 
@@ -106,6 +106,24 @@ function ReportDrawer({ report, onClose }: { report: Report; onClose: () => void
             <p className="text-sm text-gray-700 dark:text-gray-300">{report.reporter_name ?? 'Anonymous'}</p>
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Reporter Follow-up</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                {report.wants_followup ? `Yes${report.followup_email ? ` — ${report.followup_email}` : ''}` : 'No'}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Pool Helper</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300">{report.pool_helper_name ?? 'Unassigned'}</p>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Weekly Follow-up Reports</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300">{report.weekly_reports_count}</p>
+          </div>
+
           {/* Description */}
           <div>
             <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Description</p>
@@ -180,6 +198,10 @@ export default function AdminReportsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['adminReports', statusFilter],
     queryFn: () => reportsApi.adminList(statusFilter || undefined),
+  });
+  const { data: welfareReports = [], isLoading: loadingWelfare } = useQuery({
+    queryKey: ['adminWelfareReports'],
+    queryFn: reportsApi.adminListWelfare,
   });
 
   const reports = data ?? [];
@@ -287,6 +309,55 @@ export default function AdminReportsPage() {
           onClose={() => setSelected(null)}
         />
       )}
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-2xl font-bold text-gray-900 dark:text-white mb-1">Weekly Follow-up Reports</h2>
+          <p className="text-gray-500 dark:text-gray-400">These are the weekly offline wellbeing updates submitted by reporters or sponsors.</p>
+        </div>
+
+        {loadingWelfare ? (
+          <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        ) : welfareReports.length === 0 ? (
+          <div className="text-center py-12 text-gray-400 dark:text-gray-500 rounded-2xl border border-gray-100 dark:border-gray-700">
+            <HeartPulse size={32} className="mx-auto mb-3 text-gray-300 dark:text-gray-700" />
+            <p className="text-sm">No weekly follow-up reports yet.</p>
+          </div>
+        ) : (
+          <WelfareReportsTable reports={welfareReports} />
+        )}
+      </section>
+    </div>
+  );
+}
+
+function WelfareReportsTable({ reports }: { reports: WelfareReport[] }) {
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-gray-100 dark:border-gray-700">
+      <table className="w-full min-w-[760px]">
+        <thead>
+          <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60">
+            {['Week', 'Student', 'Helper Type', 'Submitted By', 'Score', 'Notes'].map(h => (
+              <th key={h} className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-5 py-3">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+          {reports.map(report => (
+            <tr key={report.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors align-top">
+              <td className="px-5 py-3.5 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{formatDate(report.week_of)}</td>
+              <td className="px-5 py-3.5 text-sm font-semibold text-gray-900 dark:text-white">{report.subject_name}</td>
+              <td className="px-5 py-3.5 text-sm text-gray-500 dark:text-gray-400">{report.helper_type === 'sponsor_pool' ? 'Sponsor Pool' : 'Reporter Follow-up'}</td>
+              <td className="px-5 py-3.5 text-sm text-gray-500 dark:text-gray-400">
+                <p>{report.helper_name}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{report.helper_email}</p>
+              </td>
+              <td className="px-5 py-3.5 text-sm font-semibold text-primary-700 dark:text-primary-300 whitespace-nowrap">{report.wellbeing_score}/5</td>
+              <td className="px-5 py-3.5 text-sm text-gray-500 dark:text-gray-400 whitespace-pre-wrap">{report.observations}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
