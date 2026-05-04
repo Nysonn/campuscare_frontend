@@ -57,6 +57,15 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString('en-UG', { dateStyle: 'medium' });
 }
 
+function formatTimeRemaining(isoDate: string): string {
+  const msLeft = new Date(isoDate).getTime() - Date.now();
+  if (msLeft <= 0) return 'soon';
+  const days = Math.floor(msLeft / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((msLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  if (days > 0) return `${days} day${days !== 1 ? 's' : ''}`;
+  return `${hours} hour${hours !== 1 ? 's' : ''}`;
+}
+
 // ── My Testimonials section ───────────────────────────────────────────────────
 
 function MyTestimonialsSection() {
@@ -111,7 +120,9 @@ function MyTestimonialsSection() {
           ) : (
             <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-xl shrink-0">
               <CalendarClock size={13} />
-              Available {nextAllowedAt ? formatDate(nextAllowedAt) : ''}
+              {nextAllowedAt
+                ? `Available in ${formatTimeRemaining(nextAllowedAt)} · ${formatDate(nextAllowedAt)}`
+                : 'Cooldown active'}
             </div>
           )
         )}
@@ -145,7 +156,7 @@ function MyTestimonialsSection() {
 
           {submitMutation.isError && (
             <p className="text-xs text-red-500 dark:text-red-400">
-              Something went wrong. Please try again.
+              {submitMutation.error?.message ?? 'Something went wrong. Please try again.'}
             </p>
           )}
 
@@ -224,6 +235,20 @@ function MyTestimonialsSection() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Cooldown notice */}
+      {!isLoading && !composing && !canSubmit && nextAllowedAt && (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 px-4 py-3">
+          <CalendarClock size={16} className="mt-0.5 shrink-0 text-amber-500 dark:text-amber-400" />
+          <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
+            You can submit your next testimonial in{' '}
+            <span className="font-semibold">{formatTimeRemaining(nextAllowedAt)}</span>
+            {' '}— on{' '}
+            <span className="font-semibold">{formatDate(nextAllowedAt)}</span>.
+            Testimonials are limited to one every 90 days.
+          </p>
         </div>
       )}
     </div>

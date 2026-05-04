@@ -104,12 +104,12 @@ export default function PublicChatBubble() {
       {phase === 'idle' && (
         <button
           onClick={openChat}
-          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-indigo-600 text-white shadow-xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center"
+          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary-600 text-white shadow-xl hover:bg-primary-700 active:scale-95 transition-all flex items-center justify-center"
           aria-label="Open Kae Assistant"
         >
           <Bot size={26} />
           {/* Pulse ring */}
-          <span className="absolute inset-0 rounded-full animate-ping bg-indigo-400 opacity-30 pointer-events-none" />
+          <span className="absolute inset-0 rounded-full animate-ping bg-primary-400 opacity-30 pointer-events-none" />
         </button>
       )}
 
@@ -119,7 +119,7 @@ export default function PublicChatBubble() {
              style={{ maxHeight: '520px' }}>
 
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 bg-indigo-600 dark:bg-indigo-700 shrink-0">
+          <div className="flex items-center gap-3 px-4 py-3 bg-primary-600 dark:bg-primary-700 shrink-0">
             <div className="h-9 w-9 rounded-full bg-white/20 flex items-center justify-center shrink-0">
               <Bot size={20} className="text-white" />
             </div>
@@ -146,7 +146,7 @@ export default function PublicChatBubble() {
                 {/* Avatar */}
                 <div className={`h-7 w-7 rounded-full flex items-center justify-center shrink-0 mb-0.5 ${
                   m.role === 'assistant'
-                    ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600'
+                    ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-600'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                 }`}>
                   {m.role === 'assistant' ? <Bot size={14} /> : <UserRound size={14} />}
@@ -171,7 +171,7 @@ export default function PublicChatBubble() {
             {/* Typing indicator */}
             {loading && (
               <div className="flex items-end gap-2">
-                <div className="h-7 w-7 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 flex items-center justify-center shrink-0">
+                <div className="h-7 w-7 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-600 flex items-center justify-center shrink-0">
                   <Bot size={14} />
                 </div>
                 <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2.5 rounded-2xl rounded-bl-sm flex gap-1 items-center">
