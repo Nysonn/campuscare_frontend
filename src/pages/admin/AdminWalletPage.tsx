@@ -314,7 +314,6 @@ function DisbursementsHistory() {
   }
 
   function handleExport() {
-    const today = new Date().toISOString().slice(0, 10);
     exportToCsv(
       rows,
       [
@@ -323,7 +322,7 @@ function DisbursementsHistory() {
         { key: 'amount', label: 'Amount (UGX)' },
         { key: 'note', label: 'Note' },
       ],
-      `campuscare-disbursements-${today}.csv`,
+      'Disbursements Report',
     );
   }
 
@@ -386,7 +385,6 @@ function WithdrawalsHistory() {
   };
 
   function handleExport() {
-    const today = new Date().toISOString().slice(0, 10);
     exportToCsv(
       rows,
       [
@@ -397,7 +395,7 @@ function WithdrawalsHistory() {
         { key: 'amount', label: 'Amount (UGX)' },
         { key: 'note', label: 'Note' },
       ],
-      `campuscare-withdrawals-${today}.csv`,
+      'Withdrawals Report',
     );
   }
 

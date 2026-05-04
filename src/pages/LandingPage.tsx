@@ -798,14 +798,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Concerned about a Classmate? — Report Section ────────────────────── */}
+      {/* ── Concerned about another Student? — Report Section ─────────────────── */}
       <section className="bg-amber-50 dark:bg-amber-950/20 border-y border-amber-100 dark:border-amber-900/40 py-14 sm:py-18">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <div className="h-14 w-14 rounded-2xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center mx-auto mb-5">
             <ShieldAlert size={28} className="text-amber-600 dark:text-amber-400" />
           </div>
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3">
-            Concerned about a Classmate?
+            Concerned about another Student?
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-base leading-relaxed mb-7 max-w-xl mx-auto">
             If you believe a fellow student may be struggling with their mental health, you can submit a confidential report. Our team will review it and reach out to offer appropriate support.

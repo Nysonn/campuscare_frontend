@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { X, ChevronRight, RotateCcw } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { X, ChevronRight, RotateCcw, Clock, HeartHandshake } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -109,6 +110,15 @@ const CATEGORIES: Category[] = [
 // ─── Score helpers ────────────────────────────────────────────────────────────
 
 type Answer = 'agree' | 'disagree';
+
+function overallRecommendation(totalScore: number): string {
+  const max = CATEGORIES.length * 6;
+  const pct = (totalScore / max) * 100;
+  if (pct >= 83) return 'Your overall mental wellness is excellent. Keep up your healthy habits and continue nurturing the areas where you are thriving.';
+  if (pct >= 60) return 'Your overall mental wellness is good. There are a few areas worth developing further. Consider small daily habits — like exercise, sleep routines, or talking to a trusted friend — to strengthen your wellbeing.';
+  if (pct >= 40) return 'Your overall mental wellness is moderate. Some areas may need attention. We encourage you to explore the support available on CampusCare — from counselling sessions to peer sponsorship.';
+  return 'Your results suggest your mental wellness may need meaningful support right now. Please consider speaking with one of our professional counsellors. You do not have to face this alone — CampusCare is here for you.';
+}
 
 function calcScore(category: Category, answers: (Answer | null)[]): number {
   return category.questions.reduce((total, q, i) => {
@@ -234,6 +244,14 @@ export default function QuickTestModal({ open, onClose }: Props) {
           {/* ── INTRO ── */}
           {screen === 'intro' && (
             <div className="space-y-5">
+              {/* Time + recency notice */}
+              <div className="flex items-start gap-2.5 bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/40 rounded-xl px-4 py-3">
+                <Clock size={15} className="text-primary-600 dark:text-primary-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-primary-800 dark:text-primary-300 leading-relaxed">
+                  <strong>This test takes only a few minutes.</strong> When answering, please base your responses on how you have been feeling <strong>over the past two months</strong> — not just today.
+                </p>
+              </div>
+
               <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
                 This quick test covers <strong>5 areas of mental wellness</strong>: Ability to Enjoy Life, Resilience, Balance,
                 Self-actualization, and Flexibility. Each section has 6 questions — simply choose <em>Agree</em> or <em>Disagree</em>.
@@ -377,52 +395,89 @@ export default function QuickTestModal({ open, onClose }: Props) {
           )}
 
           {/* ── SUMMARY ── */}
-          {screen === 'summary' && (
-            <div className="space-y-5">
-              <h3 className="text-base font-bold text-gray-900 dark:text-white text-center">Your Wellness Summary</h3>
+          {screen === 'summary' && (() => {
+            const totalScore = scores.reduce((a, b) => a + b, 0);
+            const totalMax = CATEGORIES.length * 6;
+            return (
+              <div className="space-y-5">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white text-center">Your Wellness Summary</h3>
 
-              <div className="space-y-3">
-                {CATEGORIES.map((c, i) => {
-                  const s = scores[i] ?? 0;
-                  return (
-                    <div key={c.id} className="space-y-1">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">{c.title}</span>
-                        <span className="font-bold text-gray-900 dark:text-white">{s}/6</span>
+                <div className="space-y-3">
+                  {CATEGORIES.map((c, i) => {
+                    const s = scores[i] ?? 0;
+                    return (
+                      <div key={c.id} className="space-y-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium text-gray-700 dark:text-gray-300">{c.title}</span>
+                          <span className="font-bold text-gray-900 dark:text-white">{s}/6</span>
+                        </div>
+                        <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className={`h-2 rounded-full transition-all duration-700 ${scoreColour(s)}`}
+                            style={{ width: `${(s / 6) * 100}%` }}
+                          />
+                        </div>
                       </div>
-                      <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2 overflow-hidden">
-                        <div
-                          className={`h-2 rounded-full transition-all duration-700 ${scoreColour(s)}`}
-                          style={{ width: `${(s / 6) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
 
-              {/* Disclaimer */}
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl px-4 py-3 text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
-                <strong>Disclaimer:</strong> This is not a scientific test. Information provided is not a substitute for professional advice.
-                If you feel that you may need advice, please consult a qualified health care professional.
-              </div>
+                {/* Overall score */}
+                <div className="bg-gray-50 dark:bg-gray-800/60 rounded-xl px-4 py-3 space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-semibold text-gray-700 dark:text-gray-200">Overall Score</span>
+                    <span className="font-bold text-gray-900 dark:text-white">{totalScore}/{totalMax}</span>
+                  </div>
+                  <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                    <div
+                      className={`h-2.5 rounded-full transition-all duration-700 ${scoreColour(totalScore >= 25 ? 5 : totalScore >= 18 ? 3 : 1)}`}
+                      style={{ width: `${(totalScore / totalMax) * 100}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{overallRecommendation(totalScore)}</p>
+                </div>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={handleRestart}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <RotateCcw size={15} /> Retake
-                </button>
-                <button
-                  onClick={handleClose}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-primary-600 text-white font-semibold text-sm hover:bg-primary-700 transition-colors"
-                >
-                  Done
-                </button>
+                {/* Join platform prompt */}
+                <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/40 rounded-xl px-4 py-4 text-center space-y-3">
+                  <div className="flex items-center justify-center gap-2">
+                    <HeartHandshake size={18} className="text-primary-600 dark:text-primary-400" />
+                    <p className="text-sm font-semibold text-primary-800 dark:text-primary-300">Want more personalised support?</p>
+                  </div>
+                  <p className="text-xs text-primary-700 dark:text-primary-400 leading-relaxed">
+                    Join CampusCare to access professional counsellors, peer sponsors, and ongoing mental wellness tools tailored to your results.
+                  </p>
+                  <Link
+                    to="/register/student"
+                    onClick={handleClose}
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-primary-600 text-white font-semibold text-xs hover:bg-primary-700 transition-colors"
+                  >
+                    Get Help — Join CampusCare
+                  </Link>
+                </div>
+
+                {/* Disclaimer */}
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl px-4 py-3 text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+                  <strong>Disclaimer:</strong> This is not a scientific test. Information provided is not a substitute for professional advice.
+                  If you feel that you may need advice, please consult a qualified health care professional.
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleRestart}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <RotateCcw size={15} /> Retake
+                  </button>
+                  <button
+                    onClick={handleClose}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    Done
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
         </div>
       </div>

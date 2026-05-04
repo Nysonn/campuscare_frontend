@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, X, Send, UserRound, AlertTriangle } from 'lucide-react';
+import { Bot, X, Send, UserRound, AlertTriangle, Lock } from 'lucide-react';
 import { chatbotApi } from '../../api/chatbot';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -10,12 +10,59 @@ interface Message {
   crisis?: boolean;
 }
 
-type Phase = 'idle' | 'open' | 'replied' | 'gate';
+type Phase = 'idle' | 'open' | 'replied' | 'gate' | 'exhausted';
 
 const GREETING: Message = {
   role: 'assistant',
   text: "Hi there! I'm Kae, your CampusCare wellness companion 👋",
 };
+
+const STORAGE_KEY_PREFIX = 'cc_chat_used_';
+
+// ─── Browser fingerprint ──────────────────────────────────────────────────────
+function djb2(str: string): number {
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) + h) ^ str.charCodeAt(i);
+    h = h >>> 0; // keep unsigned 32-bit
+  }
+  return h;
+}
+
+function canvasFingerprint(): string {
+  try {
+    const c = document.createElement('canvas');
+    c.width = 200;
+    c.height = 50;
+    const ctx = c.getContext('2d');
+    if (!ctx) return 'no-canvas';
+    ctx.textBaseline = 'top';
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#f60';
+    ctx.fillRect(125, 1, 62, 20);
+    ctx.fillStyle = '#069';
+    ctx.fillText('CampusCare🛡️', 2, 15);
+    ctx.fillStyle = 'rgba(102,204,0,0.7)';
+    ctx.fillText('CampusCare🛡️', 4, 17);
+    return c.toDataURL().slice(-80);
+  } catch {
+    return 'canvas-error';
+  }
+}
+
+function getBrowserFingerprint(): string {
+  const parts = [
+    navigator.userAgent,
+    screen.width,
+    screen.height,
+    screen.colorDepth,
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+    navigator.language,
+    navigator.hardwareConcurrency ?? 0,
+    canvasFingerprint(),
+  ].join('|');
+  return djb2(parts).toString(16);
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function PublicChatBubble() {
@@ -24,8 +71,18 @@ export default function PublicChatBubble() {
   const [messages, setMessages] = useState<Message[]>([GREETING]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fingerprint, setFingerprint] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Compute fingerprint and check if already exhausted
+  useEffect(() => {
+    const fp = getBrowserFingerprint();
+    setFingerprint(fp);
+    if (localStorage.getItem(STORAGE_KEY_PREFIX + fp) === 'true') {
+      setPhase('exhausted');
+    }
+  }, []);
 
   // Auto-scroll to latest message
   useEffect(() => {
@@ -39,12 +96,16 @@ export default function PublicChatBubble() {
     }
   }, [phase]);
 
+  const markExhausted = useCallback((fp: string) => {
+    if (fp) localStorage.setItem(STORAGE_KEY_PREFIX + fp, 'true');
+  }, []);
+
   function openChat() {
     setPhase('open');
   }
 
   function closeChat() {
-    setPhase('idle');
+    setPhase(fingerprint && localStorage.getItem(STORAGE_KEY_PREFIX + fingerprint) === 'true' ? 'exhausted' : 'idle');
   }
 
   async function handleSend() {
@@ -53,8 +114,8 @@ export default function PublicChatBubble() {
 
     // After the first reply, the next send attempt opens the gate modal.
     if (phase === 'replied') {
+      markExhausted(fingerprint);
       setPhase('gate');
-      // Trigger entrance animation on next tick
       requestAnimationFrame(() => requestAnimationFrame(() => setGateVisible(true)));
       return;
     }
@@ -94,22 +155,28 @@ export default function PublicChatBubble() {
 
   function closeGate() {
     setGateVisible(false);
-    setTimeout(() => setPhase('replied'), 300);
+    setTimeout(() => setPhase('exhausted'), 300);
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <>
       {/* ── Floating Bubble Button ── */}
-      {phase === 'idle' && (
+      {(phase === 'idle' || phase === 'exhausted') && (
         <button
-          onClick={openChat}
-          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary-600 text-white shadow-xl hover:bg-primary-700 active:scale-95 transition-all flex items-center justify-center"
-          aria-label="Open Kae Assistant"
+          onClick={phase === 'exhausted' ? undefined : openChat}
+          className={`fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-xl flex items-center justify-center transition-all ${
+            phase === 'exhausted'
+              ? 'bg-gray-400 text-white cursor-not-allowed'
+              : 'bg-primary-600 text-white hover:bg-primary-700 active:scale-95'
+          }`}
+          aria-label={phase === 'exhausted' ? 'Chatbot trial exhausted' : 'Open Kae Assistant'}
+          title={phase === 'exhausted' ? 'You have used your free trial — register to continue' : undefined}
         >
-          <Bot size={26} />
-          {/* Pulse ring */}
-          <span className="absolute inset-0 rounded-full animate-ping bg-primary-400 opacity-30 pointer-events-none" />
+          {phase === 'exhausted' ? <Lock size={22} /> : <Bot size={26} />}
+          {phase !== 'exhausted' && (
+            <span className="absolute inset-0 rounded-full animate-ping bg-primary-400 opacity-30 pointer-events-none" />
+          )}
         </button>
       )}
 
@@ -247,10 +314,10 @@ export default function PublicChatBubble() {
             </div>
 
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2 font-display">
-              Continue with Kae Assistant
+              Free Trial Used Up
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
-              You've used your free preview message. Join CampusCare to unlock unlimited
+              You have used up your free trial with Kae. Register on CampusCare to unlock unlimited
               mental wellness support, confidential counselling bookings, and so much more — all in one place.
             </p>
 

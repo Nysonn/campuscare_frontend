@@ -18,7 +18,7 @@ export default function AdminBookingsPage() {
   const [exporting, setExporting] = useState(false);
   const handleExportPdf = async () => {
     setExporting(true);
-    await exportToPdf('bookings-pdf-content', `campuscare-bookings-${new Date().toISOString().slice(0, 10)}.pdf`);
+    await exportToPdf('bookings-pdf-content', 'Bookings Report');
     setExporting(false);
   };
 
@@ -26,14 +26,13 @@ export default function AdminBookingsPage() {
     exportToCsv(
       bookings ?? [],
       [
-        { key: 'id',            label: 'ID' },
         { key: 'student_name',  label: 'Student' },
         { key: 'counselor_name', label: 'Counsellor' },
         { key: 'start_time',    label: 'Start Time' },
         { key: 'end_time',      label: 'End Time' },
         { key: 'status',        label: 'Status' },
       ],
-      `campuscare-bookings-${new Date().toISOString().slice(0, 10)}.csv`,
+      'Bookings Report',
     );
   };
 

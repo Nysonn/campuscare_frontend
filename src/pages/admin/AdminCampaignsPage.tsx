@@ -55,7 +55,7 @@ export default function AdminCampaignsPage() {
 
   const handleExportPdf = async () => {
     setExporting(true);
-    await exportToPdf('campaigns-pdf-content', `campuscare-campaigns-${new Date().toISOString().slice(0, 10)}.pdf`);
+    await exportToPdf('campaigns-pdf-content', 'Campaigns Report');
     setExporting(false);
   };
 
@@ -63,7 +63,6 @@ export default function AdminCampaignsPage() {
     exportToCsv(
       campaigns ?? [],
       [
-        { key: 'id',             label: 'ID' },
         { key: 'title',          label: 'Title' },
         { key: 'student_name',   label: 'Student' },
         { key: 'category',       label: 'Category' },
@@ -77,7 +76,7 @@ export default function AdminCampaignsPage() {
         { key: 'account_status', label: 'Account Status' },
         { key: 'created_at',     label: 'Created' },
       ],
-      `campuscare-campaigns-${new Date().toISOString().slice(0, 10)}.csv`,
+      'Campaigns Report',
     );
   };
 

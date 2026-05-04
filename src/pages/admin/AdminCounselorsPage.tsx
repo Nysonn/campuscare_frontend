@@ -25,7 +25,7 @@ export default function AdminCounselorsPage() {
 
   const handleExportPdf = async () => {
     setExporting(true);
-    await exportToPdf('counselors-pdf-content', `campuscare-counselors-${new Date().toISOString().slice(0, 10)}.pdf`);
+    await exportToPdf('counselors-pdf-content', 'Counsellors Report');
     setExporting(false);
   };
 
@@ -33,7 +33,6 @@ export default function AdminCounselorsPage() {
     exportToCsv(
       counselors ?? [],
       [
-        { key: 'id',                   label: 'ID' },
         { key: 'full_name',            label: 'Full Name' },
         { key: 'email',                label: 'Email' },
         { key: 'phone',                label: 'Phone' },
@@ -43,7 +42,7 @@ export default function AdminCounselorsPage() {
         { key: 'verification_status',  label: 'Status' },
         { key: 'created_at',           label: 'Registered' },
       ],
-      `campuscare-counselors-${new Date().toISOString().slice(0, 10)}.csv`,
+      'Counsellors Report',
     );
   };
 

@@ -19,7 +19,7 @@ export default function AdminSponsorsPage() {
   const [exporting, setExporting] = useState(false);
   const handleExportPdf = async () => {
     setExporting(true);
-    await exportToPdf('sponsors-pdf-content', `campuscare-sponsors-${new Date().toISOString().slice(0, 10)}.pdf`);
+    await exportToPdf('sponsors-pdf-content', 'Sponsors Report');
     setExporting(false);
   };
 
@@ -37,7 +37,6 @@ export default function AdminSponsorsPage() {
     exportToCsv(
       rows,
       [
-        { key: 'id',            label: 'ID' },
         { key: 'display_name',  label: 'Name' },
         { key: 'university',    label: 'University' },
         { key: 'what_i_offer',  label: 'What They Offer' },
@@ -46,7 +45,7 @@ export default function AdminSponsorsPage() {
         { key: 'sponsee_since', label: 'Sponsoring Since' },
         { key: 'created_at',    label: 'Joined' },
       ],
-      `campuscare-sponsors-${new Date().toISOString().slice(0, 10)}.csv`,
+      'Sponsors Report',
     );
   };
 

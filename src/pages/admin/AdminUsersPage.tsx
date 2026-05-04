@@ -22,7 +22,7 @@ export default function AdminUsersPage() {
 
   const handleExportPdf = async () => {
     setExporting(true);
-    await exportToPdf('users-pdf-content', `campuscare-users-${new Date().toISOString().slice(0, 10)}.pdf`);
+    await exportToPdf('users-pdf-content', 'Users Report');
     setExporting(false);
   };
 
@@ -30,7 +30,6 @@ export default function AdminUsersPage() {
     exportToCsv(
       users ?? [],
       [
-        { key: 'id',         label: 'ID' },
         { key: 'full_name',  label: 'Full Name' },
         { key: 'email',      label: 'Email' },
         { key: 'role',       label: 'Role' },
@@ -38,7 +37,7 @@ export default function AdminUsersPage() {
         { key: 'phone',      label: 'Phone' },
         { key: 'created_at', label: 'Joined' },
       ],
-      `campuscare-users-${new Date().toISOString().slice(0, 10)}.csv`,
+      'Users Report',
     );
   };
 

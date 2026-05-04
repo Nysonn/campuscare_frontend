@@ -212,7 +212,7 @@ export default function ReportModal({ open, onClose }: Props) {
                     type="text"
                     value={university}
                     onChange={e => setUniversity(e.target.value)}
-                    placeholder="e.g. Makerere University"
+                    placeholder="e.g. Mbarara University of Science and Technology"
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>

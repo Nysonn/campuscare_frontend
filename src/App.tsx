@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
 import {
   LayoutDashboard, Heart, Calendar, User, Users,
-  FileCheck, BookOpen, TrendingUp, HandHeart, Target, ClipboardList, Wallet, MessageSquare, ShieldAlert,
+  FileCheck, BookOpen, TrendingUp, HandHeart, Target, ClipboardList, Wallet, MessageSquare, ShieldAlert, Brain, Bell,
 } from 'lucide-react';
 
 import { store } from './store';
@@ -42,10 +42,13 @@ import SponsorsPage from './pages/student/SponsorsPage';
 import BecomeASponsorPage from './pages/student/BecomeASponsorPage';
 import BehaviourTrackingPage from './pages/student/BehaviourTrackingPage';
 import SelfEvaluationPage from './pages/student/SelfEvaluationPage';
+import MindCheckPage from './pages/student/MindCheckPage';
+import StudentNotificationsPage from './pages/student/NotificationsPage';
 import StudentTestimonialsPage from './pages/student/StudentTestimonialsPage';
 
 // Counselor pages
 import CounselorDashboard from './pages/counselor/CounselorDashboard';
+import CounselorNotificationsPage from './pages/counselor/NotificationsPage';
 import CounselorProfilePage from './pages/counselor/CounselorProfilePage';
 
 // Admin pages
@@ -76,15 +79,18 @@ const studentNav = [
   { to: '/student/campaigns',    label: 'My Campaigns', icon: <Heart size={16} />           },
   { to: '/student/bookings',     label: 'My Bookings',  icon: <Calendar size={16} />        },
   { to: '/student/sponsors',     label: 'Sponsors',     icon: <HandHeart size={16} />       },
+  { to: '/student/mind-check',   label: 'Mind Check',   icon: <Brain size={16} />           },
   { to: '/student/behaviour',    label: 'Behaviour',    icon: <Target size={16} />          },
   { to: '/student/evaluation',   label: 'Self Check',   icon: <ClipboardList size={16} />   },
+  { to: '/student/notifications',label: 'Notifications',icon: <Bell size={16} />            },
   { to: '/student/testimonials', label: 'Testimonials', icon: <MessageSquare size={16} />    },
   { to: '/student/profile',      label: 'My Profile',   icon: <User size={16} />            },
 ];
 
 const counselorNav = [
-  { to: '/counselor/dashboard', label: 'Appointments', icon: <Calendar size={16} /> },
-  { to: '/counselor/profile',   label: 'My Profile',   icon: <User size={16} />     },
+  { to: '/counselor/dashboard',     label: 'Appointments', icon: <Calendar size={16} /> },
+  { to: '/counselor/notifications', label: 'Notifications',icon: <Bell size={16} />     },
+  { to: '/counselor/profile',       label: 'My Profile',   icon: <User size={16} />     },
 ];
 
 const adminNav = [
@@ -188,6 +194,8 @@ function AppRoutes() {
             <Route path="sponsors/become" element={<BecomeASponsorPage />} />
             <Route path="behaviour" element={<BehaviourTrackingPage />} />
             <Route path="evaluation" element={<SelfEvaluationPage />} />
+            <Route path="mind-check" element={<MindCheckPage />} />
+            <Route path="notifications" element={<StudentNotificationsPage />} />
             <Route path="testimonials" element={<StudentTestimonialsPage />} />
             <Route path="profile" element={<StudentProfilePage />} />
           </Route>
@@ -196,6 +204,7 @@ function AppRoutes() {
           <Route path="/counselor" element={<CounselorLayout />}>
             <Route index element={<Navigate to="/counselor/dashboard" replace />} />
             <Route path="dashboard" element={<CounselorDashboard />} />
+            <Route path="notifications" element={<CounselorNotificationsPage />} />
             <Route path="profile" element={<CounselorProfilePage />} />
           </Route>
 
