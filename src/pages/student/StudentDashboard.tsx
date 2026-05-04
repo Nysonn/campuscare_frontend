@@ -35,21 +35,24 @@ function TestimonialWidget() {
   const [draft, setDraft] = useState('');
   const [editing, setEditing] = useState(false);
 
-  const { data: testimonial, isLoading } = useQuery({
-    queryKey: ['myTestimonial'],
+  const { data, isLoading } = useQuery({
+    queryKey: ['myTestimonials'],
     queryFn: testimonialsApi.mine,
   });
 
-  // Initialise draft when the user opens the editor
+  const testimonial = data?.testimonials?.[0] ?? null;
+  const canSubmit = data?.can_submit ?? true;
+  const nextAllowedAt = data?.next_allowed_at ?? null;
+
   function openEditor() {
-    setDraft(testimonial?.content ?? '');
+    setDraft('');
     setEditing(true);
   }
 
   const submitMutation = useMutation({
     mutationFn: () => testimonialsApi.submit(draft.trim()),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['myTestimonial'] });
+      qc.invalidateQueries({ queryKey: ['myTestimonials'] });
       setEditing(false);
     },
   });
@@ -75,7 +78,6 @@ function TestimonialWidget() {
       {!isLoading && !editing && (
         <>
           {testimonial ? (
-            /* Has an existing testimonial */
             <div className="space-y-3">
               <div className="bg-gray-50 dark:bg-gray-700/40 rounded-xl p-4 relative">
                 <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-4">
@@ -86,16 +88,22 @@ function TestimonialWidget() {
                 <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${STATUS_STYLES[testimonial.status] ?? ''}`}>
                   {STATUS_LABELS[testimonial.status] ?? testimonial.status}
                 </span>
-                <button
-                  onClick={openEditor}
-                  className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
-                >
-                  Edit testimonial
-                </button>
+                {canSubmit ? (
+                  <button
+                    onClick={openEditor}
+                    className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                  >
+                    Write new
+                  </button>
+                ) : (
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    Next: {nextAllowedAt ? new Date(nextAllowedAt).toLocaleDateString('en-UG', { dateStyle: 'medium' }) : ''}
+                  </span>
+                )}
               </div>
               {testimonial.status === 'rejected' && (
                 <p className="text-xs text-red-500 dark:text-red-400">
-                  Your testimonial wasn&apos;t approved. You can edit and resubmit.
+                  Your testimonial wasn&apos;t approved. Submit a new one when the cooldown ends.
                 </p>
               )}
               {testimonial.status === 'approved' && (
@@ -105,7 +113,6 @@ function TestimonialWidget() {
               )}
             </div>
           ) : (
-            /* No testimonial yet */
             <div
               className="border-2 border-dashed border-primary-200 dark:border-primary-700 rounded-xl p-5 text-center hover:border-primary-400 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all cursor-pointer group"
               onClick={openEditor}

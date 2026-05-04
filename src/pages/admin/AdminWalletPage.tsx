@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Wallet, ArrowUpRight, ArrowDownLeft, TrendingDown,
-  CheckCircle, AlertTriangle, ChevronDown,
+  CheckCircle, AlertTriangle, ChevronDown, FileDown,
 } from 'lucide-react';
 import { adminApi } from '../../api/admin';
 import Spinner from '../../components/ui/Spinner';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import SEO from '../../components/seo/SEO';
+import { exportToCsv } from '../../utils/exportToCsv';
 
 type ActiveTab = 'disburse' | 'withdraw' | 'disbursements' | 'withdrawals';
 
@@ -312,8 +313,31 @@ function DisbursementsHistory() {
     );
   }
 
+  function handleExport() {
+    const today = new Date().toISOString().slice(0, 10);
+    exportToCsv(
+      rows,
+      [
+        { key: 'created_at', label: 'Date' },
+        { key: 'campaign_title', label: 'Campaign' },
+        { key: 'amount', label: 'Amount (UGX)' },
+        { key: 'note', label: 'Note' },
+      ],
+      `campuscare-disbursements-${today}.csv`,
+    );
+  }
+
   return (
-    <div className="overflow-x-auto rounded-2xl border border-gray-100">
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <button
+          onClick={handleExport}
+          className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        >
+          <FileDown size={14} /> Export CSV
+        </button>
+      </div>
+      <div className="overflow-x-auto rounded-2xl border border-gray-100">
       <table className="w-full min-w-[600px]">
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50">
@@ -333,11 +357,10 @@ function DisbursementsHistory() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
-
-// ── Withdrawals History ───────────────────────────────────────────────────────
 
 function WithdrawalsHistory() {
   const { data, isLoading } = useQuery({
@@ -362,8 +385,33 @@ function WithdrawalsHistory() {
     airtel_money: 'Airtel Money',
   };
 
+  function handleExport() {
+    const today = new Date().toISOString().slice(0, 10);
+    exportToCsv(
+      rows,
+      [
+        { key: 'created_at', label: 'Date' },
+        { key: 'destination_name', label: 'Recipient' },
+        { key: 'destination_type', label: 'Destination' },
+        { key: 'account_number', label: 'Account' },
+        { key: 'amount', label: 'Amount (UGX)' },
+        { key: 'note', label: 'Note' },
+      ],
+      `campuscare-withdrawals-${today}.csv`,
+    );
+  }
+
   return (
-    <div className="overflow-x-auto rounded-2xl border border-gray-100">
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <button
+          onClick={handleExport}
+          className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        >
+          <FileDown size={14} /> Export CSV
+        </button>
+      </div>
+      <div className="overflow-x-auto rounded-2xl border border-gray-100">
       <table className="w-full min-w-[700px]">
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50">
@@ -385,6 +433,7 @@ function WithdrawalsHistory() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

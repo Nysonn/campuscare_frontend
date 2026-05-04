@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   ArrowRight, Heart, Shield, Users, CheckCircle2,
   Calendar, Video, Award, BadgeCheck, Star, HandHeart, Lock,
-  Sparkles, TrendingUp, BookOpen, MessageCircle,
+  Sparkles, TrendingUp, BookOpen, MessageCircle, ShieldAlert,
 } from 'lucide-react';
 import { campaignsApi } from '../api/campaigns';
 import { blogsApi } from '../api/blogs';
@@ -19,6 +19,7 @@ import ScrollToTopBottom from '../components/ui/ScrollToTopBottom';
 import QuickTestModal from '../components/ui/QuickTestModal';
 import Marquee from '../components/ui/Marquee';
 import PublicChatBubble from '../components/chat/PublicChatBubble';
+import ReportModal from '../components/landing/ReportModal';
 import SEO from '../components/seo/SEO';
 
 const WEBSITE_SCHEMA = {
@@ -37,6 +38,7 @@ const WEBSITE_SCHEMA = {
 export default function LandingPage() {
   const [donateOpen, setDonateOpen] = useState(false);
   const [quickTestOpen, setQuickTestOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
 
   // ── Hero rotating characteristics ──────────────────────────────────────────
@@ -796,9 +798,35 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Concerned about a Classmate? — Report Section ────────────────────── */}
+      <section className="bg-amber-50 dark:bg-amber-950/20 border-y border-amber-100 dark:border-amber-900/40 py-14 sm:py-18">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <div className="h-14 w-14 rounded-2xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center mx-auto mb-5">
+            <ShieldAlert size={28} className="text-amber-600 dark:text-amber-400" />
+          </div>
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+            Concerned about a Classmate?
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 text-base leading-relaxed mb-7 max-w-xl mx-auto">
+            If you believe a fellow student may be struggling with their mental health, you can submit a confidential report. Our team will review it and reach out to offer appropriate support.
+          </p>
+          <button
+            onClick={() => setReportOpen(true)}
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm transition-colors shadow-md hover:shadow-lg"
+          >
+            <ShieldAlert size={17} />
+            Submit a Welfare Report
+          </button>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">
+            All reports are confidential and reviewed only by CampusCare staff.
+          </p>
+        </div>
+      </section>
+
       <Footer />
       <ScrollToTopBottom />
       <QuickTestModal open={quickTestOpen} onClose={() => setQuickTestOpen(false)} />
+      <ReportModal open={reportOpen} onClose={() => setReportOpen(false)} />
       <PublicChatBubble />
     </div>
   );

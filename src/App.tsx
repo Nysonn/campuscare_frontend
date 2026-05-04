@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
 import {
   LayoutDashboard, Heart, Calendar, User, Users,
-  FileCheck, BookOpen, TrendingUp, HandHeart, Target, ClipboardList, Wallet, MessageSquare,
+  FileCheck, BookOpen, TrendingUp, HandHeart, Target, ClipboardList, Wallet, MessageSquare, ShieldAlert,
 } from 'lucide-react';
 
 import { store } from './store';
@@ -59,6 +59,7 @@ import AdminCounselorsPage from './pages/admin/AdminCounselorsPage';
 import AdminWalletPage from './pages/admin/AdminWalletPage';
 import AdminBlogsPage from './pages/admin/AdminBlogsPage';
 import AdminTestimonialsPage from './pages/admin/AdminTestimonialsPage';
+import AdminReportsPage from './pages/admin/AdminReportsPage';
 
 import NotFoundPage from './pages/NotFoundPage';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -97,6 +98,7 @@ const adminNav = [
   { to: '/admin/wallet',        label: 'Wallet',       icon: <Wallet size={16} />          },
   { to: '/admin/blogs',         label: 'Blog',         icon: <BookOpen size={16} />        },
   { to: '/admin/testimonials',   label: 'Testimonials', icon: <MessageSquare size={16} />    },
+  { to: '/admin/reports',        label: 'Reports',      icon: <ShieldAlert size={16} />      },
 ];
 
 function SessionHydrator({ children }: { children: React.ReactNode }) {
@@ -210,6 +212,7 @@ function AppRoutes() {
             <Route path="wallet" element={<AdminWalletPage />} />
             <Route path="blogs" element={<AdminBlogsPage />} />
             <Route path="testimonials" element={<AdminTestimonialsPage />} />
+            <Route path="reports" element={<AdminReportsPage />} />
           </Route>
 
           {/* Fallback */}

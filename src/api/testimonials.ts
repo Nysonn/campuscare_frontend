@@ -1,22 +1,14 @@
 import { api } from './client';
-import type { Testimonial } from '../types';
+import type { Testimonial, MyTestimonialsData } from '../types';
 
 export const testimonialsApi = {
   /** Public — approved testimonials for the landing page */
   list: () => api.get<Testimonial[]>('/testimonials'),
 
-  /** Student — get their own testimonial (any status). Returns null if none exists. */
-  mine: async (): Promise<Testimonial | null> => {
-    try {
-      const t = await api.get<Testimonial>('/testimonials/mine');
-      // server returns 204 (→ {}) when no testimonial exists yet
-      return t && (t as { id?: string }).id ? t : null;
-    } catch {
-      return null;
-    }
-  },
+  /** Student — get all their testimonials plus cooldown info */
+  mine: () => api.get<MyTestimonialsData>('/testimonials/mine'),
 
-  /** Student — submit / update their testimonial */
+  /** Student — submit a new testimonial */
   submit: (content: string) =>
     api.post<Testimonial>('/testimonials', { content }),
 

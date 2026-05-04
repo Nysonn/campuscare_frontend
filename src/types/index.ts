@@ -23,6 +23,12 @@ export interface Testimonial {
   updated_at: string;
 }
 
+export interface MyTestimonialsData {
+  testimonials: Testimonial[];
+  can_submit: boolean;
+  next_allowed_at: string | null;
+}
+
 export type PaymentMethod = 'mtn_momo' | 'airtel_money' | 'visa';
 
 export interface StudentProfile {
